@@ -68,9 +68,11 @@
 
 #include "floaterao.h"
 
+#include "llattachmentsmgr.h"
 
-#define phoenix_point (LLAssetType::EType)127
+#define phoenix_point (U8)127
 #define phoenix_bridge_name "#LSL<->Client Bridge v0.09"
+#define phoenix_current_version (F32)0.09f
 
 void cmdline_printchat(std::string message);
 
@@ -394,9 +396,11 @@ const LLUUID& JCLSLBridge::findInventoryByName(const std::string& object_name, s
 
 	gInventory.collectDescendentsIf(category,cats,items,FALSE,objectnamematches);
 
-	if (items.count())
+	for (S32 idxItem = 0, cntItem = items.count(); idxItem < cntItem; idxItem++)
 	{
-		return items[0]->getUUID();
+		const LLViewerInventoryItem* itemp = items.get(idxItem);
+		if (!itemp->getIsLinkType())
+			return itemp->getUUID();
 	}
 	return LLUUID::null;
 }
@@ -523,13 +527,13 @@ void bridge_trash_check()
 							F32 version_float;
 							if(vstream >> version_float)
 							{
-								if(version_float < 0.06f)
+								if(version_float < phoenix_current_version)
 								{
-									llinfos << "bridge older than 0.06f found (" << version_float << ")[" << version_str << "] in inv but not in trash" << llendl;
+									llinfos << "bridge older than " << phoenix_current_version << " found (" << version_float << ")[" << version_str << "] in inv but not in trash" << llendl;
 									delete_queue.push_back(item);
 								}else
 								{
-									llinfos << "bridge >= 0.06f found (" << version_float << ")[" << version_str << "] in inv but not in trash" << llendl;
+									llinfos << "bridge >= " << phoenix_current_version << " found (" << version_float << ")[" << version_str << "] in inv but not in trash" << llendl;
 								}
 							}else
 							{
@@ -615,19 +619,8 @@ BOOL JCLSLBridge::tick()
 							{
 								//cmdline_printchat("attaching");
 								//cmdline_printchat("bridge is complete, attaching");//<< llendl;
-								LLMessageSystem* msg = gMessageSystem;
-								msg->newMessageFast(_PREHASH_RezSingleAttachmentFromInv);
-								msg->nextBlockFast(_PREHASH_AgentData);
-								msg->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
-								msg->addUUIDFast(_PREHASH_SessionID, gAgent.getSessionID());
-								msg->nextBlockFast(_PREHASH_ObjectData);
-								msg->addUUIDFast(_PREHASH_ItemID, bridge->getUUID());
-								msg->addUUIDFast(_PREHASH_OwnerID, bridge->getPermissions().getOwner());
-								msg->addU8Fast(_PREHASH_AttachmentPt, phoenix_point);
-								pack_permissions_slam(msg, bridge->getFlags(), bridge->getPermissions());
-								msg->addStringFast(_PREHASH_Name, bridge->getName());
-								msg->addStringFast(_PREHASH_Description, bridge->getDescription());
-								msg->sendReliable(gAgent.getRegionHost());
+								// Queue bridge attachment
+								LLAttachmentsMgr::instance().addAttachment(bridge->getUUID(), phoenix_point, TRUE, TRUE);
 								sBridgeStatus = RECHANNEL;
 							}
 						}/*else
