@@ -69,6 +69,17 @@
 			<key>Value</key>
 			<integer>0</integer>
 		</map>
+		<key>PhoenixTPFromSearch</key>
+		<map>
+			<key>Comment</key>
+			<string>Should the TP button in search start a TP or should it show an info window of the place your going to</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>Boolean</string>
+			<key>Value</key>
+			<integer>1</integer>
+		</map>
 		<key>DiamondShowGroupNameInChatIM</key>
 		<map>
 			<key>Comment</key>
@@ -418,6 +429,17 @@
 		<map>
 			<key>Comment</key>
 			<string>Whether or not to automatically wear objects in your inventory you wear</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>Boolean</string>
+			<key>Value</key>
+			<integer>0</integer>
+		</map>
+		<key>PhoenixDoubleClickAddInventoryObjects</key>
+		<map>
+			<key>Comment</key>
+			<string>Whether or not to add items instead of wearing them</string>
 			<key>Persist</key>
 			<integer>1</integer>
 			<key>Type</key>
@@ -1959,13 +1981,46 @@
 		<key>RestrainedLoveForbidGiveToRLV</key>
 		<map>
 			<key>Comment</key>
-			<string>When FALSE, allows to give sub-folders to the #RLV RestrainedLove folder.</string>
+			<string>When TRUE, forbids to give sub-folders to the #RLV RestrainedLove folder.</string>
 			<key>Persist</key>
 			<integer>1</integer>
 			<key>Type</key>
 			<string>Boolean</string>
 			<key>Value</key>
 			<integer>1</integer>
+		</map>
+		<key>RestrainedLoveReplaceWhenFolderBeginsWith</key>
+		<map>
+			<key>Comment</key>
+			<string>If a folder name begins with this string, its attach behavior will always be "replace", never "stack". Default is blank (disabled).</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>String</string>
+			<key>Value</key>
+			<string></string>
+		</map>
+		<key>RestrainedLoveStackWhenFolderBeginsWith</key>
+		<map>
+			<key>Comment</key>
+			<string>If a folder name begins with this string, its attach behavior will always be "stack", never "replace". Default is "+".</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>String</string>
+			<key>Value</key>
+			<string>+</string>
+		</map>
+		<key>RLVaDebugHideUnsetDuplicate</key>
+		<map>
+			<key>Comment</key>
+			<string>Suppresses reporting "unset" or "duplicate" command restrictions when RestrainedLoveDebug is TRUE</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>Boolean</string>
+			<key>Value</key>
+			<integer>0</integer>
 		</map>
 		<key>RLVaEnableCompositeFolders</key>
 		<map>
@@ -1989,21 +2044,10 @@
 			<key>Value</key>
 			<integer>1</integer>
 		</map>
-		<key>RLVaEnableWear</key>
-		<map>
-			<key>Comment</key>
-			<string>Enables the "Wear" option on the inventory item context menu for attachments</string>
-			<key>Persist</key>
-			<integer>1</integer>
-			<key>Type</key>
-			<string>Boolean</string>
-			<key>Value</key>
-			<integer>1</integer>
-		</map>
 		<key>RLVaEnableSharedWear</key>
 		<map>
 			<key>Comment</key>
-			<string>Attachments in the shared #RLV folder can be force-attached without needing to specify an attachment point (as long as no attachment is non-detachable)</string>
+			<string>Attachments in the shared #RLV folder can be force-attached without needing to specify an attachment point</string>
 			<key>Persist</key>
 			<integer>1</integer>
 			<key>Type</key>
@@ -2054,39 +2098,6 @@
 			<string>Boolean</string>
 			<key>Value</key>
 			<integer>0</integer>
-		</map>
-		<key>WarnFirstRLVDetach</key>
-		<map>
-			<key>Comment</key>
-			<string>Enables FirstRLVDetach warning dialog</string>
-			<key>Persist</key>
-			<integer>1</integer>
-			<key>Type</key>
-			<string>Boolean</string>
-			<key>Value</key>
-			<integer>1</integer>
-		</map>
-		<key>WarnFirstRLVEnableWear</key>
-		<map>
-			<key>Comment</key>
-			<string>Enables RLVEnableWear warning dialog</string>
-			<key>Persist</key>
-			<integer>1</integer>
-			<key>Type</key>
-			<string>Boolean</string>
-			<key>Value</key>
-			<integer>1</integer>
-		</map>
-		<key>WarnFirstRLVFartouch</key>
-		<map>
-			<key>Comment</key>
-			<string>Enables FirstRLVFartouch warning dialog</string>
-			<key>Persist</key>
-			<integer>1</integer>
-			<key>Type</key>
-			<string>Boolean</string>
-			<key>Value</key>
-			<integer>1</integer>
 		</map>
 		<key>WarnFirstRLVGiveToRLV</key>
 		<map>
@@ -7978,6 +7989,17 @@
 			<key>Value</key>
 			<integer>0</integer>
 		</map>
+        <key>LegacyMultiAttachmentSupport</key>
+        <map>
+          <key>Comment</key>
+          <string>Converts legacy "secondary attachment points" to multi-attachments for other avatars</string>
+          <key>Persist</key>
+          <integer>1</integer>
+          <key>Type</key>
+          <string>Boolean</string>
+          <key>Value</key>
+          <integer>1</integer>
+        </map>
 		<key>LimitDragDistance</key>
 		<map>
 			<key>Comment</key>
@@ -9150,17 +9172,6 @@
 		<map>
 			<key>Comment</key>
 			<string>whether or not to create the lsl bridge</string>
-			<key>Persist</key>
-			<integer>1</integer>
-			<key>Type</key>
-			<string>Boolean</string>
-			<key>Value</key>
-			<integer>1</integer>
-		</map>
-		<key>WarnPhoenixOldBridgeCleanup</key>
-		<map>
-			<key>Comment</key>
-			<string>offer to deletre any obsolete bridge objects</string>
 			<key>Persist</key>
 			<integer>1</integer>
 			<key>Type</key>
@@ -14009,6 +14020,17 @@
 			<key>Value</key>
 			<integer>0</integer>
 		</map>
+		<key>UseInventoryLinks</key>
+			<map>
+			<key>Comment</key>
+			<string>When making a new outfit, use links for no-copy items</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>Boolean</string>
+			<key>Value</key>
+			<integer>0</integer>
+			</map>
 		<key>UseOcclusion</key>
 		<map>
 			<key>Comment</key>
@@ -14020,6 +14042,17 @@
 			<key>Value</key>
 			<integer>1</integer>
 		</map>
+        <key>UseOutfitFolders</key>
+        <map>
+          <key>Comment</key>
+          <string>When making a new outfit, use Viewer 2 outfit folders</string>
+          <key>Persist</key>
+          <integer>1</integer>
+          <key>Type</key>
+          <string>Boolean</string>
+          <key>Value</key>
+          <integer>1</integer>
+        </map>
 		<key>RenderDelayVBUpdate</key>
 		<map>
 			<key>Comment</key>
@@ -15486,6 +15519,17 @@
 			<string>Boolean</string>
 			<key>Value</key>
 			<integer>0</integer>
+		</map>
+		<key>PhoenixOldBridgeCleanup</key>
+		<map>
+			<key>Comment</key>
+			<string>Offer to deletre any obsolete bridge objects</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>Boolean</string>
+			<key>Value</key>
+			<integer>1</integer>
 		</map>
 	</map>
 </llsd>
