@@ -4409,8 +4409,8 @@ The following required components are missing from [FLOATER]:
    name="PhoenixUsingDeprecatedAttachPoint"
    type="alertmodal">
 You are attempting to use a secondary attachment point.
-The secondary attachment points in previous versions of the Phoenix Viewer are no longer supported. Items that were attached there have been detached.
-You should attach any items on those points to the regular attachment points instead. Once you have done so, you may need to adjust their position, but you should only have to do that once for each attachment.
+The secondary attachment points in previous versions of the Phoenix Viewer are no longer supported. 
+Phoenix will attempt to add your item to the regular attachment point instead. Once it has done so, you may need to adjust the item's position manually.
   </notification>
 
   <notification
@@ -7314,5 +7314,87 @@ For more details on outfits in Phoenix, please see the Phoenix Viewer Wiki.
      yestext="Go to Wiki"
 	 notext="Close" />
   </notification>
+
+  <notification
+   icon="alertmodal.tga"
+   name="SetDisplayNameSuccess"
+   type="alert">
+    Hi [DISPLAY_NAME]!
+
+    Just like in real life, it takes a while for everyone to learn about a new name.  Please allow several days for [http://wiki.secondlife.com/wiki/Setting_your_display_name your name to update] in objects, scripts, search, etc.
+  </notification>
+
+  <notification
+ icon="alertmodal.tga"
+ name="SetDisplayNameBlocked"
+ type="alert">
+    Sorry, you cannot change your display name. If you feel this is in error, please contact support.
+  </notification>
+
+  <notification
+   icon="alertmodal.tga"
+   name="SetDisplayNameFailedLength"
+   type="alertmodal">
+    Sorry, that name is too long.  Display names can have a maximum of [LENGTH] characters.
+
+    Please try a shorter name.
+  </notification>
+
+  <notification
+   icon="alertmodal.tga"
+   name="SetDisplayNameFailedGeneric"
+   type="alertmodal">
+    Sorry, we could not set your display name.  Please try again later.
+  </notification>
+
+  <notification
+   icon="alertmodal.tga"
+   name="SetDisplayNameMismatch"
+   type="alertmodal">
+    The display names you entered do not match. Please re-enter.
+  </notification>
+
+  <!-- *NOTE: This should never happen -->
+  <notification
+   icon="alertmodal.tga"
+   name="AgentDisplayNameUpdateThresholdExceeded"
+   type="alertmodal">
+    Sorry, you have to wait longer before you can change your display name.
+
+    See http://wiki.secondlife.com/wiki/Setting_your_display_name
+
+    Please try again later.
+  </notification>
+
+  <notification
+   icon="alertmodal.tga"
+   name="AgentDisplayNameSetBlocked"
+   type="alertmodal">
+    Sorry, we could not set your requested name because it contains a banned word.
+
+    Please try a different name.
+  </notification>
+
+  <notification
+   icon="alertmodal.tga"
+ name="AgentDisplayNameSetInvalidUnicode"
+ type="alertmodal">
+    The display name you wish to set contains invalid characters.
+  </notification>
+
+  <notification
+   icon="alertmodal.tga"
+ name="AgentDisplayNameSetOnlyPunctuation"
+ type="alertmodal">
+    Your display name must contain letters other than punctuation.
+  </notification>
+
+  <notification
+ icon="notifytip.tga"
+ name="DisplayNameUpdate"
+ type="notifytip">
+    [OLD_NAME] ([SLID]) is now known as [NEW_NAME].
+  </notification>
+
 
 </notifications>

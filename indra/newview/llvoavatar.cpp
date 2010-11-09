@@ -89,6 +89,7 @@
 #include "llkeyframefallmotion.h"
 #include "llkeyframestandmotion.h"
 #include "llkeyframewalkmotion.h"
+#include "llmanip.h" //KC: needed for adjusting the rotation on attachments relocated from 2nd points
 #include "llmutelist.h"
 #include "llnotify.h"
 #include "llquantize.h"
@@ -124,6 +125,9 @@
 #include "jc_lslviewerbridge.h"
 
 #include "llfloaterchat.h"
+
+#include "llavatarname.h"
+#include "llavatarnamecache.h"
 
 // [RLVa:KB] - Checked: 2010-04-01 (RLVa-1.2.0c)
 #include "rlvhandler.h"
@@ -720,7 +724,7 @@ S32	LLVOAvatar::sNumLODChangesThisFrame = 0;
 LLSD LLVOAvatar::sClientResolutionList;
 
 const LLUUID LLVOAvatar::sStepSoundOnLand = LLUUID("e8af4a28-aa83-4310-a7c4-c047e15ea0df");
-const LLUUID LLVOAvatar::sStepSounds[LL_MCODE_END] =
+const LLUUID LLVOAvatar::sStepSounds[LL_MCODE_END] =	
 {
 	LLUUID(SND_STONE_RUBBER),
 	LLUUID(SND_METAL_RUBBER),
@@ -784,6 +788,9 @@ LLVOAvatar::LLVOAvatar(const LLUUID& id,
 	mAppearanceAnimating(FALSE),
 	mNameString(),
 	mTitle(),
+	mRenderedName(),
+	mUsedNameSystem(),
+	mClientName(),
 	mNameAway(FALSE),
 	mNameBusy(FALSE),
 	mNameMute(FALSE),
@@ -3353,6 +3360,7 @@ void LLVOAvatar::resolveClient(LLColor4& avatar_name_color, std::string& client,
 	}
 }
 
+
 void LLVOAvatar::idleUpdateNameTag(const LLVector3& root_pos_last)
 {
 	// update chat bubble
@@ -3403,6 +3411,7 @@ void LLVOAvatar::idleUpdateNameTag(const LLVector3& root_pos_last)
 			new_name = TRUE;
 		}
 
+		static S32 *sPhoenixNameSystem = rebind_llcontrol<S32>("PhoenixNameSystem", &gSavedSettings, true);
 // [RLVa:KB] - Checked: 2009-07-08 (RLVa-1.0.0e) | Added: RLVa-0.2.0b
 		if (fRlvShowNames)
 		{
@@ -3535,8 +3544,31 @@ void LLVOAvatar::idleUpdateNameTag(const LLVector3& root_pos_last)
 		LLNameValue* firstname = getNVPair("FirstName");
 		LLNameValue* lastname = getNVPair("LastName");
 
+
 		if (mNameText.notNull() && firstname && lastname)
 		{
+		
+		/*
+			Phoenix: Wolfspirit:
+				The following part replaces the username with the Displayname, if Displaynames are enabled
+
+		*/
+
+			LLAvatarName av_name;
+			bool dnhasloaded = false;
+			bool useddn = true;
+			if(LLAvatarNameCache::useDisplayNames() && LLAvatarNameCache::get(getID(), &av_name)) dnhasloaded=true;
+			
+			std::string usedname;
+			if(dnhasloaded && !av_name.mIsDisplayNameDefault && !av_name.mIsDummy && av_name.mDisplayName != av_name.getLegacyName()) usedname = av_name.mDisplayName;
+			else {
+				usedname = firstname->getString();
+				usedname += " ";
+				usedname += lastname->getString();
+				dnhasloaded=false;
+				useddn=false;
+			}
+
 			BOOL is_away = mSignaledAnimations.find(ANIM_AGENT_AWAY)  != mSignaledAnimations.end();
 			BOOL is_busy = mSignaledAnimations.find(ANIM_AGENT_BUSY) != mSignaledAnimations.end();
 			BOOL is_appearance = mSignaledAnimations.find(ANIM_AGENT_CUSTOMIZE) != mSignaledAnimations.end();
@@ -3555,11 +3587,14 @@ void LLVOAvatar::idleUpdateNameTag(const LLVector3& root_pos_last)
 
 			if (mNameString.empty() ||
 				new_name ||
+				mRenderedName != usedname ||
+				mUsedNameSystem != *sPhoenixNameSystem ||
 				(!title && !mTitle.empty()) ||
 				(title && mTitle != title->getString()) ||
 				(is_away != mNameAway || is_busy != mNameBusy || is_muted != mNameMute)
-				|| is_appearance != mNameAppearance || client.length() != 0)
+				|| is_appearance != mNameAppearance || client != mClientName)
 			{
+
 				std::string line;
 // [RLVa:KB] - Version: 1.23.4 | Checked: 2009-07-08 (RLVa-1.0.0e) | Added: RLVa-0.2.0b
 				if (!fRlvShowNames)
@@ -3569,23 +3604,41 @@ void LLVOAvatar::idleUpdateNameTag(const LLVector3& root_pos_last)
 					{
 						// If all group titles are turned off, stack first name
 						// on a line above last name
-						line += firstname->getString();
-						line += "\n";
+						if(!dnhasloaded){
+							line += firstname->getString();
+							line += "\n";
+							line += lastname->getString();
+						}
+						else
+						{
+							line += usedname;
+						}
 					}
 					else if (title && title->getString() && title->getString()[0] != '\0')
 					{
 						line += title->getString();
 						LLStringFn::replace_ascii_controlchars(line,LL_UNKNOWN_CHAR);
 						line += "\n";
-						line += firstname->getString();
+						if(!dnhasloaded){
+							line += usedname;
+						}
+						else
+						{
+							useddn=true;
+							line += usedname;
+						}
 					}
 					else
 					{
-						line += firstname->getString();
+						if(!dnhasloaded){
+							line += usedname;
+						}
+						else
+						{
+							useddn=true;
+							line += usedname;
+						}
 					}
-
-					line += " ";
-					line += lastname->getString();
 // [RLVa:KB] - Version: 1.23.4 | Checked: 2009-07-08 (RLVa-1.0.0e) | Added: RLVa-0.2.0b
 				}
 				else
@@ -3632,6 +3685,21 @@ void LLVOAvatar::idleUpdateNameTag(const LLVector3& root_pos_last)
 					}
 					line += ")";
 				}
+
+				if(useddn){
+					if(*sPhoenixNameSystem!=2){
+						line += "\n";
+						line += "("+av_name.mUsername+")";
+					}
+					mRenderedName = av_name.mDisplayName;
+				}
+				else
+				{
+					mRenderedName = firstname->getString();
+					mRenderedName += " ";
+					mRenderedName += lastname->getString();
+				}
+
 				if (is_appearance)
 				{
 					line += "\n";
@@ -3645,6 +3713,8 @@ void LLVOAvatar::idleUpdateNameTag(const LLVector3& root_pos_last)
 				mNameAway = is_away;
 				mNameBusy = is_busy;
 				mNameMute = is_muted;
+				mClientName = client;
+				mUsedNameSystem = *sPhoenixNameSystem;
 				mNameAppearance = is_appearance;
 				mTitle = title ? title->getString() : "";
 				LLStringFn::replace_ascii_controlchars(mTitle,LL_UNKNOWN_CHAR);
@@ -3758,6 +3828,45 @@ void LLVOAvatar::idleUpdateNameTag(const LLVector3& root_pos_last)
 		sNumVisibleChatBubbles--;
 	}
 }
+
+/* Phoenix: Wolfspirit: This allows us to replace one specific nametag of a user */
+
+void LLVOAvatar::clearNameTag()
+{
+	mNameString.clear();
+	if (mNameText)
+				{
+					mNameText->setLabel("");
+		mNameText->setString(mNameString);
+	}
+}
+
+//static
+void LLVOAvatar::invalidateNameTag(const LLUUID& agent_id)
+{
+	LLViewerObject* obj = gObjectList.findObject(agent_id);
+	if (!obj) return;
+
+	LLVOAvatar* avatar = dynamic_cast<LLVOAvatar*>(obj);
+	if (!avatar) return;
+
+	avatar->clearNameTag();
+}
+
+//staticmNameString.empty()
+void LLVOAvatar::invalidateNameTags()
+{
+	for (std::vector<LLCharacter*>::iterator iter = LLCharacter::sInstances.begin();
+		iter != LLCharacter::sInstances.end(); ++iter)
+	{
+		LLVOAvatar* avatar = (LLVOAvatar*) *iter;
+		if (!avatar) continue;
+		if (avatar->isDead()) continue;
+		
+		avatar->clearNameTag();
+	}
+}
+
 
 void LLVOAvatar::idleUpdateTractorBeam()
 {
@@ -6595,9 +6704,12 @@ LLViewerJointAttachment* LLVOAvatar::getTargetAttachmentPoint(const LLViewerObje
 //-----------------------------------------------------------------------------
 BOOL LLVOAvatar::attachObject(LLViewerObject *viewer_object)
 {
+	if ( (isSelf()) && (viewer_object) )
+	{
+		const LLUUID& idItem = viewer_object->getAttachmentItemID();
+	
 	// Force-detach attachments using secondary attachment points
-	if ( (isSelf()) && (viewer_object) &&
-		 (ATTACHMENT_ID_FROM_STATE(viewer_object->getState()) > 38) && (ATTACHMENT_ID_FROM_STATE(viewer_object->getState()) <= 70) )
+	if ( (ATTACHMENT_ID_FROM_STATE(viewer_object->getState()) > 38) && (ATTACHMENT_ID_FROM_STATE(viewer_object->getState()) <= 70) )
 	{
 		static const std::string cstrAlert("PhoenixUsingDeprecatedAttachPoint");
 
@@ -6610,6 +6722,22 @@ BOOL LLVOAvatar::attachObject(LLViewerObject *viewer_object)
 		if (fShowAlert)
 			LLNotifications::instance().add(cstrAlert);
 
+		//KC: Save the rot of the object on the secondary attachment point before removing it and queue it for reattachment on the primary
+		if (idItem.notNull())
+		{
+			LLViewerInventoryItem* item;
+			item = (LLViewerInventoryItem*)gInventory.getItem(idItem);
+			if (item)
+			{
+				llinfos << "saving rotation from old attachment point" << llendl;
+				oldAttachmentRots[idItem] = viewer_object->getRotationEdit();
+				
+				S32 idxAttachPt = ATTACHMENT_ID_FROM_STATE(viewer_object->getState()) - 38;
+				LLViewerJointAttachment* attachmentp = get_if_there(mAttachmentPoints, idxAttachPt, (LLViewerJointAttachment*)NULL);
+				rez_attachment(item, attachmentp, FALSE);
+			}
+		}
+		
 		// Force-detach it on the server side
 		gMessageSystem->newMessage("ObjectDetach");
 		gMessageSystem->nextBlockFast(_PREHASH_AgentData);
@@ -6620,7 +6748,6 @@ BOOL LLVOAvatar::attachObject(LLViewerObject *viewer_object)
 		gMessageSystem->sendReliable(gAgent.getRegionHost());
 
 		// Make sure it doesn't stay stuck in COF since we'll never see it detach
-		const LLUUID& idItem = viewer_object->getAttachmentItemID();
 		if (idItem.notNull())
 			LLCOFMgr::instance().removeAttachment(idItem);
 
@@ -6628,6 +6755,17 @@ BOOL LLVOAvatar::attachObject(LLViewerObject *viewer_object)
 		gObjectList.killObject(viewer_object);
 
 		return FALSE;
+	}
+	
+		//KC: now reapply the rotation saved from the 2nd point
+		if ( idItem.notNull() && (oldAttachmentRots.find(idItem) != oldAttachmentRots.end()) )
+		{
+			llinfos << "rerotating item from old attachment point" << llendl;
+			viewer_object->setRotation(oldAttachmentRots[idItem]);
+			LLManip::rebuild(viewer_object);
+			viewer_object->sendRotationUpdate();
+			oldAttachmentRots.erase(idItem);
+		}
 	}
 
 	LLViewerJointAttachment* attachment = getTargetAttachmentPoint(viewer_object);

@@ -48,6 +48,7 @@
 #include "llrendertarget.h"
 #include "llwearable.h"
 #include "llvoavatardefines.h"
+#include "llavatarname.h"
 
 #include "phoenixboobutils.h"
 
@@ -110,6 +111,10 @@ public:
 	void idleUpdateWindEffect();
 	void idleUpdateBoobEffect();
 	void idleUpdateNameTag(const LLVector3& root_pos_last);
+	void			clearNameTag();
+	static void		invalidateNameTag(const LLUUID& agent_id);
+	// force all name tags to rebuild, useful when display names turned on/off
+	static void		invalidateNameTags();
 	void idleUpdateRenderCost();
 	void idleUpdateTractorBeam();
 	void idleUpdateBelowWater();
@@ -491,6 +496,7 @@ private:
 	std::deque<LLChat>			mChats;
 	BOOL						mTyping;
 	LLFrameTimer				mTypingTimer;
+	static void on_avatar_name_response(const LLUUID& agent_id, const LLAvatarName& av_name, void *userdata);
 
 	//--------------------------------------------------------------------
 	// wind rippling in clothes
@@ -647,6 +653,8 @@ private:
 
 	static void resolveClient(LLColor4& avatar_name_color, std::string& client, LLVOAvatar* avatar);
 	friend class LLFloaterAvatarList;
+	
+	std::map<LLUUID, LLQuaternion> oldAttachmentRots;
 
 protected:
 	LLPointer<LLHUDEffectSpiral> mBeam;
@@ -662,6 +670,9 @@ protected:
 	BOOL      mNameAppearance;
 	BOOL	  mVisibleChat;
 	BOOL      mRenderGroupTitles;
+	std::string      mRenderedName;
+	std::string      mClientName;
+	S32		  mUsedNameSystem;
 
 	std::string  mDebugText;
 	U64		  mLastRegionHandle;
