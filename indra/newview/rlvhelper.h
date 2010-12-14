@@ -318,7 +318,9 @@ protected:
 public:
 	void addNotify(const LLUUID& idObj, S32 nChannel, const std::string& strFilter)
 	{
-		m_Notifications.insert(std::pair<LLUUID, notifyData>(idObj, notifyData(nChannel, strFilter)));
+		//m_Notifications.insert(std::pair<LLUUID, notifyData>(idObj, notifyData(nChannel, strFilter)));
+		// RLVa-HACK: see RlvBehaviourNotifyHandler::changed()
+		m_NotificationsDelayed.insert(std::pair<LLUUID, notifyData>(idObj, notifyData(nChannel, strFilter)));
 	}
 	void removeNotify(const LLUUID& idObj, S32 nChannel, const std::string& strFilter)
 	{
@@ -331,8 +333,6 @@ public:
 				break;
 			}
 		}
-		if (m_Notifications.empty())
-			delete this;	// Delete ourself if we have nothing to do
 	}
 	void sendNotification(const std::string& strText, const std::string& strSuffix = LLStringUtil::null) const;
 protected:
@@ -346,6 +346,7 @@ protected:
 		notifyData(S32 channel, const std::string& filter) : nChannel(channel), strFilter(filter) {}
 	};
 	std::multimap<LLUUID, notifyData> m_Notifications;
+	std::multimap<LLUUID, notifyData> m_NotificationsDelayed;
 };
 
 // ============================================================================
