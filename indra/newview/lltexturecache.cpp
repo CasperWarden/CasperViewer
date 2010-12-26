@@ -506,9 +506,9 @@ bool LLTextureCacheRemoteWorker::doRead()
 											 file_offset, file_size);
 			if (bytes_read != file_size)
 			{
-				LL_DEBUGS("TextureCache") << "LLTextureCacheWorker: "  << mID
+				llwarns << "LLTextureCacheWorker: "  << mID
 						<< " incorrect number of bytes read from body: " << bytes_read
-						<< " / " << file_size << LL_ENDL;
+						<< " / " << file_size << llendl;
 				delete[] mReadData;
 				mReadData = NULL;
 				mDataSize = -1; // failed
@@ -764,9 +764,8 @@ LLTextureCache::LLTextureCache(bool threaded)
 
 LLTextureCache::~LLTextureCache()
 {
-	purgeTextures(false, true);
-	clearDeleteList();
-	writeUpdatedEntries();
+	clearDeleteList() ;
+	writeUpdatedEntries() ;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -952,7 +951,7 @@ void LLTextureCache::setReadOnly(BOOL read_only)
 }
 
 //called in the main thread.
-S64 LLTextureCache::initCache(ELLPath location, S64 max_size, BOOL texture_cache_mismatch)
+S64 LLTextureCache::initCache(ELLPath location, S64 max_size, BOOL disable_texture_cache)
 {
 	llassert_always(getPending() == 0) ; //should not start accessing the texture cache before initialized.
 	
@@ -972,18 +971,15 @@ S64 LLTextureCache::initCache(ELLPath location, S64 max_size, BOOL texture_cache
 
 	setDirNames(location);
 	
-	if(texture_cache_mismatch) 
+	if(disable_texture_cache) //the texture cache is disabled
 	{
-		//if readonly, disable the texture cache,
-		//otherwise wipe out the texture cache.
+		llinfos << "The texture cache is disabled!" << llendl ;
+		setReadOnly(TRUE) ;
 		purgeAllTextures(true); 
 
-		if(mReadOnly)
-		{
-			return max_size;
-		}
+		return max_size ;
 	}
-	
+
 	if (!mReadOnly)
 	{
 		LLFile::mkdir(mTexturesDirName);
@@ -1194,11 +1190,11 @@ void LLTextureCache::readEntryFromHeaderImmediately(S32& idx, Entry& entry)
 //update an existing entry time stamp, delay writing.
 void LLTextureCache::updateEntryTimeStamp(S32 idx, Entry& entry)
 {
-	static const U32 MAX_ENTRIES_WITHOUT_TIME_STAMP = (U32)(LLTextureCache::sCacheMaxEntries * 0.75f);
+	static const U32 MAX_ENTRIES_WITHOUT_TIME_STAMP = (U32)(LLTextureCache::sCacheMaxEntries * 0.75f) ;
 
 	if(mHeaderEntriesInfo.mEntries < MAX_ENTRIES_WITHOUT_TIME_STAMP)
 	{
-		return; //there are enough empty entry index space, no need to stamp time.
+		return ; //there are enough empty entry index space, no need to stamp time.
 	}
 
 	if (idx >= 0)
@@ -1222,39 +1218,39 @@ bool LLTextureCache::updateEntry(S32& idx, Entry& entry, S32 new_image_size, S32
 	}
 	else 
 	{
-		bool purge = false;
+		bool purge = false ;
 
-		lockHeaders();
+		lockHeaders() ;
 
-		bool update_header = false;
+		bool update_header = false ;
 		if(entry.mImageSize < 0) //is a brand-new entry
 		{
 			mHeaderIDMap[entry.mID] = idx;
-			mTexturesSizeMap[entry.mID] = new_body_size;
-			mTexturesSizeTotal += new_body_size;
+			mTexturesSizeMap[entry.mID] = new_body_size ;
+			mTexturesSizeTotal += new_body_size ;
 			
 			// Update Header
-			update_header = true;
+			update_header = true ;
 		}				
 		else if (entry.mBodySize != new_body_size)
 		{
 			//already in mHeaderIDMap.
-			mTexturesSizeMap[entry.mID] = new_body_size;
-			mTexturesSizeTotal -= entry.mBodySize;
-			mTexturesSizeTotal += new_body_size;
+			mTexturesSizeMap[entry.mID] = new_body_size ;
+			mTexturesSizeTotal -= entry.mBodySize ;
+			mTexturesSizeTotal += new_body_size ;
 		}
 		entry.mTime = time(NULL);
-		entry.mImageSize = new_image_size; 
-		entry.mBodySize = new_body_size;
+		entry.mImageSize = new_image_size ; 
+		entry.mBodySize = new_body_size ;
 		
-		writeEntryToHeaderImmediately(idx, entry, update_header);
+		writeEntryToHeaderImmediately(idx, entry, update_header) ;
 	
 		if (mTexturesSizeTotal > sCacheMaxTexturesSize)
 		{
 			purge = true;
 		}
 		
-		unlockHeaders();
+		unlockHeaders() ;
 
 		if (purge)
 		{
@@ -1357,21 +1353,21 @@ void LLTextureCache::updatedHeaderEntriesFile()
 	{
 		//entriesInfo
 		mHeaderAPRFile->seek(APR_SET, 0);
-		S32 bytes_written = mHeaderAPRFile->write((U8*)&mHeaderEntriesInfo, sizeof(EntriesInfo));
+		S32 bytes_written = mHeaderAPRFile->write((U8*)&mHeaderEntriesInfo, sizeof(EntriesInfo)) ;
 		if(bytes_written != sizeof(EntriesInfo))
 		{
-			clearCorruptedCache(); //clear the cache.
-			return;
+			clearCorruptedCache() ; //clear the cache.
+			return ;
 		}
 		
 		//write each updated entry
-		S32 entry_size = (S32)sizeof(Entry);
-		S32 prev_idx = -1;
-		S32 delta_idx;
+		S32 entry_size = (S32)sizeof(Entry) ;
+		S32 prev_idx = -1 ;
+		S32 delta_idx ;
 		for (idx_entry_map_t::iterator iter = mUpdatedEntryMap.begin(); iter != mUpdatedEntryMap.end(); ++iter)
 		{
 			delta_idx = iter->first - prev_idx - 1;
-			prev_idx = iter->first;
+			prev_idx = iter->first ;
 			if(delta_idx)
 			{
 				mHeaderAPRFile->seek(APR_CUR, delta_idx * entry_size);
@@ -1380,11 +1376,11 @@ void LLTextureCache::updatedHeaderEntriesFile()
 			bytes_written = mHeaderAPRFile->write((void*)(&iter->second), entry_size);
 			if(bytes_written != entry_size)
 			{
-				clearCorruptedCache(); //clear the cache.
-				return;
+				clearCorruptedCache() ; //clear the cache.
+				return ;
 			}
 		}
-		mUpdatedEntryMap.clear();
+		mUpdatedEntryMap.clear() ;
 	}
 }
 //----------------------------------------------------------------------------
@@ -1441,7 +1437,7 @@ void LLTextureCache::readHeaderCache()
 			{
 				// Special case: cache size was reduced, need to remove entries
 				// Note: After we prune entries, we will call this again and create the LRU
-				S32 entries_to_purge = (num_entries-empty_entries) - sCacheMaxEntries;
+				U32 entries_to_purge = (num_entries-empty_entries) - sCacheMaxEntries;
 				llinfos << "Texture Cache Entries: " << num_entries << " Max: " << sCacheMaxEntries << " Empty: " << empty_entries << " Purging: " << entries_to_purge << llendl;
 				if (entries_to_purge > 0)
 				{
@@ -1567,10 +1563,9 @@ void LLTextureCache::purgeAllTextures(bool purge_directories)
 void LLTextureCache::purgeTextures(bool validate, bool force)
 {
 	static LLTimer timeout;
-	const S32 min_purge_count = 10;
+	const S32 min_purge_count = 100;
 	const F32 delay_between_passes = 1.0f;
-	const F32 max_time_per_pass = 0.2f;
-	F32 time_per_pass = 0.05f;
+	static F32 max_time_per_pass = 0.05f;
 
 	if (!force && timeout.getElapsedTimeF32() <= delay_between_passes)
 	{
@@ -1578,6 +1573,7 @@ void LLTextureCache::purgeTextures(bool validate, bool force)
 	}
 	mDoPurge = FALSE;
 	timeout.reset();
+
 	if (mReadOnly)
 	{
 		return;
@@ -1639,9 +1635,9 @@ void LLTextureCache::purgeTextures(bool validate, bool force)
 	}
 
 	F32 overhead = timeout.getElapsedTimeF32();
-	if (overhead > time_per_pass)
+	if (overhead > max_time_per_pass)
 	{
-		time_per_pass = llmin(overhead, max_time_per_pass);
+		max_time_per_pass = llmin(overhead, delay_between_passes / 4.0f);
 	}
 	timeout.reset();
 	llinfos << "Overhead: " << overhead << " Maximum time per pass: " <<
@@ -1650,12 +1646,17 @@ void LLTextureCache::purgeTextures(bool validate, bool force)
 	S64 cache_size = mTexturesSizeTotal;
 	S64 purged_cache_size = (sCacheMaxTexturesSize * (S64)((1.f - TEXTURE_CACHE_PURGE_AMOUNT) * 100.f)) / 100;
 	S32 purge_count = 0;
+	F32 elapsed;
 	for (time_idx_set_t::iterator iter = time_idx_set.begin();
 		 iter != time_idx_set.end(); ++iter)
 	{
-		if (!force && !validate && purge_count >= min_purge_count && timeout.getElapsedTimeF32() > time_per_pass) 
+		if (!force && !validate && (purge_count >= min_purge_count)
+		        && ((elapsed = timeout.getElapsedTimeF32()) >
+        		        max_time_per_pass))
 		{
-			LL_INFOS("TextureCache") << "Texture cache purge splitted to avoid hickup." << LL_ENDL;
+			LL_INFOS("TextureCache") << 
+			        "Texture cache purge split to avoid hiccup after "
+                                << elapsed << " seconds."<< LL_ENDL;
 			mDoPurge = TRUE;
 			break;
 		}
@@ -1709,8 +1710,11 @@ void LLTextureCache::purgeTextures(bool validate, bool force)
 	LL_INFOS("TextureCache") << "TEXTURE CACHE:"
 			<< " Purged: " << purge_count
 			<< " - Entries: " << num_entries
-			<< " - Cache size: " << mTexturesSizeTotal / (1024 * 1024) << " MB"
-			<< " - Time used for this purge: " << timeout.getElapsedTimeF32() << "s + " << overhead << "s of overhead."
+			<< " - Cache size: " 
+			        << mTexturesSizeTotal / 1024*1024 << " MB"
+			<< " - Time used for this purge: " 
+			        << timeout.getElapsedTimeF32() << "s + " 
+			        << overhead << "s of overhead."
 			<< LL_ENDL;
 
 	timeout.reset();
@@ -1955,9 +1959,9 @@ bool LLTextureCache::removeFromCache(const LLUUID& id)
 			ret = true;
 		}
 
-		unlockHeaders();
+		unlockHeaders() ;
 	}
-	return ret;
+	return ret ;
 }
 
 //////////////////////////////////////////////////////////////////////////////
