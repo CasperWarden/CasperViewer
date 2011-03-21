@@ -727,7 +727,7 @@ The outfit folder contains no clothing, body parts, or attachments.
    icon="alertmodal.tga"
    name="CannotWearTrash"
    type="alertmodal">
-You can not wear clothes or body parts that are in the trash
+You cannot wear clothes or body parts that are in the trash.
   </notification>
 
   <notification
@@ -743,7 +743,7 @@ Please detach something else first.
    icon="alertmodal.tga"
    name="CannotWearInfoNotComplete"
    type="alertmodal">
-You can not wear that item because it has not yet loaded. Please try again in a minute.
+You cannot wear that item because it has not yet loaded. Please try again in a minute.
   </notification>
 
   <notification
