@@ -4940,7 +4940,7 @@ void LLPipeline::setUseVBO(BOOL use_vbo)
 		}
 		
 		resetVertexBuffers();
-		LLVertexBuffer::initClass(use_vbo);
+		LLVertexBuffer::initClass(use_vbo && gGLManager.mHasVertexBufferObject);
 #if !LL_DARWIN
 		if(LLFloaterHardwareSettings::isOpen())
 			LLFloaterHardwareSettings::instance()->refreshEnabledState();
