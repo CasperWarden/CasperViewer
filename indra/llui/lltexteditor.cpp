@@ -5064,7 +5064,7 @@ BOOL LLTextEditor::findHTML(const std::string &line, S32 *begin, S32 *end, std::
 		// will match PHOE-1 as well as phoe-1
 		// match 1, "JIRA-#"
 		// match 2, is phoenix jira
-		const boost::regex key("((?:(?:SVC|VWR|SNOW|STORM|DN|SH|WEB|PYO|LLSD|CTS|ARVC|MISC|SOCIAL|ECC|PLAT|ER|OPEN|SEC|LEAP)|(PHOE|FIRE|SPOT))-(?:[\\d]+))",
+		const boost::regex key("[\\s?/\\\\<>.,'\"@()[\\]\\-]((?:(?:ECC|SH|SOCIAL|LEAP|DN|MISC|SNOW|LLSD|CTS|PYO|STORM|PLAT|ER|VWR|SVC|WEB|SEC|ARVD|OPEN|SCR)|(PHOE|FIRE|SPOT))-(?:[\\d]+))",
 		boost::regex::perl|boost::regex::icase);
 		
 		boost::cmatch result;
@@ -5082,8 +5082,8 @@ BOOL LLTextEditor::findHTML(const std::string &line, S32 *begin, S32 *end, std::
 
 		if (found)
 		{
-			*begin = static_cast<U32>(result[0].first - line.c_str());
-			*end  = static_cast<U32>(result[0].second - line.c_str());
+			*begin = static_cast<U32>(result.position(1));
+			*end  = static_cast<U32>(*begin + result.length(1));
 			if (result[2].matched)
 			{
 				url = llformat("http://jira.phoenixviewer.com/browse/%s", std::string(result[1]).c_str());
