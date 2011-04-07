@@ -592,23 +592,23 @@
 					<key>darwin</key>
 					<map>
 						<key>md5sum</key>
-						<string>6cc5ce1fafd10299fdb890b3d4c3cf53</string>
+						<string>64a131bae070964de6431e1c7d5e7362</string>
 						<key>url</key>
-						<uri>http://s3.amazonaws.com/viewer-source-downloads/install_pkgs/glib-2.0-darwin-20080817.tar.bz2</uri>
+						<uri>http://imprudenceviewer.org/download/libs/glib-2.12.0-darwin-20091107.tar.bz2</uri>
 					</map>
 					<key>linux</key>
 					<map>
 						<key>md5sum</key>
-						<string>2f1a9e14f9213c2c9564c1c1cfdd6d47</string>
+						<string>566cc47a572303bc4aef12ca02670902</string>
 						<key>url</key>
-						<uri>http://s3.amazonaws.com/viewer-source-downloads/install_pkgs/glib-2.0-linux-20080817.tar.bz2</uri>
+						<uri>http://imprudenceviewer.org/download/libs/glib-2.20.5-linux32-20100529.tar.bz2</uri>
 					</map>
 					<key>windows</key>
 					<map>
 						<key>md5sum</key>
-						<string>3d5e29d444dde4815b36082eedfc775a</string>
+						<string>58c11add6b275c163950364df5b2964a</string>
 						<key>url</key>
-						<uri>http://s3.amazonaws.com/viewer-source-downloads/install_pkgs/glib-2.0-windows-20080817.tar.bz2</uri>
+						<uri>http://imprudenceviewer.org/download/libs/glib-2.20.5-linux64-20100515.tar.bz2</uri>
 					</map>
 				</map>
 			</map>
@@ -947,9 +947,9 @@
 					<key>darwin</key>
 					<map>
 						<key>md5sum</key>
-						<string>66c46841825ab4969ec875b5c8f9b24c</string>
+						<string>13f9be04ba029d19f822abdcb755c700</string>
 						<key>url</key>
-						<uri>http://viewer-source-downloads.s3.amazonaws.com/install_pkgs/llqtwebkit-darwin-qt4.7.1-20101221.tar.bz2</uri>
+						<uri>http://viewer-source-downloads.s3.amazonaws.com/install_pkgs/llqtwebkit-darwin-4.7.1-20110302.tar.bz2</uri>
 					</map>
 					<key>linux</key>
 					<map>
@@ -961,9 +961,9 @@
 					<key>windows</key>
 					<map>
 						<key>md5sum</key>
-						<string>b678c4d18ea8e4fab42b20f8d0b2629a</string>
+						<string>7cc9626ff4ac035f8605c996d18ea6a9</string>
 						<key>url</key>
-						<uri>http://viewer-source-downloads.s3.amazonaws.com/install_pkgs/llqtwebkit-windows-qt4.7.1-20101221.tar.bz2</uri>
+						<uri>http://viewer-source-downloads.s3.amazonaws.com/install_pkgs/llqtwebkit-windows-qt4.7.1-20110302.tar.bz2</uri>
 					</map>
 				</map>
 			</map>
