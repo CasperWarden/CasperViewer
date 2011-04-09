@@ -572,10 +572,12 @@ void LLIMMgr::addMessage(
 {
 	LLUUID other_participant_id = target_id;
 
+	BOOL is_linden = LLMuteList::getInstance()->isLinden(from);
+
 	// don't process muted IMs
 	if (LLMuteList::getInstance()->isMuted(
 			other_participant_id,
-			LLMute::flagTextChat) && !LLMuteList::getInstance()->isLinden(from))
+			LLMute::flagTextChat) && !is_linden)
 	{
 		return;
 	}
@@ -652,6 +654,7 @@ void LLIMMgr::addMessage(
 	LLColor4 color;
 	//Phoenix:KC - color chat from friends. taking care not to color when RLV hide names is in effect, lol
 	static BOOL* sPhoenixColorFriendsChat = rebind_llcontrol<BOOL>("PhoenixColorFriendsChat", &gSavedSettings, true);
+	static BOOL* sPhoenixColorLindensChat = rebind_llcontrol<BOOL>("PhoenixColorLindensChat", &gSavedSettings, true);
 	if (is_from_system)
 	{
 		color = gSavedSettings.getColor4("SystemChatColor");
@@ -670,7 +673,11 @@ void LLIMMgr::addMessage(
 	|| !gRlvHandler.hasBehaviour(RLV_BHVR_SHOWNAMES)))
 	{
 		color = gSavedSettings.getColor4("PhoenixFriendChatColor");
-	} 
+	}
+	else if (*sPhoenixColorLindensChat && is_linden)
+	{
+		color = gSavedSettings.getColor4("PhoenixLindensChatColor");
+	}
 	else
 	{
 		color = gSavedSettings.getColor4("IMChatColor");
