@@ -42,6 +42,7 @@
 #include "llversionviewer.h"
 #include "llviewerimagelist.h"
 #include "llpluginclassmedia.h"
+#include "llplugincookiestore.h"
 
 #include "llurldispatcher.h"
 
@@ -174,6 +175,10 @@ public:
 };
 typedef std::list<LLViewerMediaImpl*> impl_list;
 static impl_list sViewerMediaImplList;
+
+LLPluginCookieStore *LLViewerMedia::sCookieStore = NULL;
+static std::string sUpdatedCookies;
+static const char *PLUGIN_COOKIE_FILE_NAME = "plugin_cookies.txt";
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // LLViewerMedia
@@ -335,6 +340,13 @@ void LLViewerMedia::setVolume(F32 volume)
 // static
 void LLViewerMedia::updateMedia()
 {
+	sUpdatedCookies = getCookieStore()->getChangedCookies();
+	if(!sUpdatedCookies.empty())
+	{
+		lldebugs << "updated cookies will be sent to all loaded plugins: " << llendl;
+		lldebugs << sUpdatedCookies << llendl;
+	}
+	
 	impl_list::iterator iter = sViewerMediaImplList.begin();
 	impl_list::iterator end = sViewerMediaImplList.end();
 
@@ -343,6 +355,236 @@ void LLViewerMedia::updateMedia()
 		LLViewerMediaImpl* pimpl = *iter;
 		pimpl->update();
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// static
+void LLViewerMedia::clearAllCookies()
+{
+	// Clear all cookies for all plugins
+	impl_list::iterator iter = sViewerMediaImplList.begin();
+	impl_list::iterator end = sViewerMediaImplList.end();
+	for (; iter != end; iter++)
+	{
+		LLViewerMediaImpl* pimpl = *iter;
+		if(pimpl->mMediaSource)
+		{
+			pimpl->mMediaSource->clear_cookies();
+		}
+	}
+	
+	// Clear all cookies from the cookie store
+	getCookieStore()->setAllCookies("");
+
+	// FIXME: this may not be sufficient, since the on-disk cookie file won't get written until some browser instance exits cleanly.
+	// It also won't clear cookies for other accounts, or for any account if we're not logged in, and won't do anything at all if there are no webkit plugins loaded.
+	// Until such time as we can centralize cookie storage, the following hack should cover these cases:
+	
+	// HACK: Look for cookie files in all possible places and delete them.
+	// NOTE: this assumes knowledge of what happens inside the webkit plugin (it's what adds 'browser_profile' to the path and names the cookie file)
+	
+	// Places that cookie files can be:
+	// <getOSUserAppDir>/browser_profile/cookies
+	// <getOSUserAppDir>/first_last/browser_profile/cookies  (note that there may be any number of these!)
+	// <getOSUserAppDir>/first_last/plugin_cookies.txt  (note that there may be any number of these!)
+	
+	std::string base_dir = gDirUtilp->getOSUserAppDir() + gDirUtilp->getDirDelimiter();
+	std::string target;
+	std::string filename;
+	
+	lldebugs << "base dir = " << base_dir << llendl;
+
+	// The non-logged-in version is easy
+	target = base_dir;
+	target += "browser_profile";
+	target += gDirUtilp->getDirDelimiter();
+	target += "cookies";
+	lldebugs << "target = " << target << llendl;
+	if(LLFile::isfile(target))
+	{
+		LLFile::remove(target);
+	}
+	
+	// the hard part: iterate over all user directories and delete the cookie file from each one
+	while(gDirUtilp->getNextFileInDir(base_dir, "*_*", filename, false))
+	{
+		target = base_dir;
+		target += filename;
+		target += gDirUtilp->getDirDelimiter();
+		target += "browser_profile";
+		target += gDirUtilp->getDirDelimiter();
+		target += "cookies";
+		lldebugs << "target = " << target << llendl;
+		if(LLFile::isfile(target))
+		{	
+			LLFile::remove(target);
+		}
+		
+		// Other accounts may have new-style cookie files too -- delete them as well
+		target = base_dir;
+		target += filename;
+		target += gDirUtilp->getDirDelimiter();
+		target += PLUGIN_COOKIE_FILE_NAME;
+		lldebugs << "target = " << target << llendl;
+		if(LLFile::isfile(target))
+		{	
+			LLFile::remove(target);
+		}
+	}
+	
+}
+	
+/////////////////////////////////////////////////////////////////////////////////////////
+// static 
+void LLViewerMedia::clearAllCaches()
+{
+	// Clear all plugins' caches
+	impl_list::iterator iter = sViewerMediaImplList.begin();
+	impl_list::iterator end = sViewerMediaImplList.end();
+	for (; iter != end; iter++)
+	{
+		LLViewerMediaImpl* pimpl = *iter;
+		pimpl->clearCache();
+	}
+}
+	
+/////////////////////////////////////////////////////////////////////////////////////////
+// static 
+void LLViewerMedia::setCookiesEnabled(bool enabled)
+{
+	// Set the "cookies enabled" flag for all loaded plugins
+	impl_list::iterator iter = sViewerMediaImplList.begin();
+	impl_list::iterator end = sViewerMediaImplList.end();
+	for (; iter != end; iter++)
+	{
+		LLViewerMediaImpl* pimpl = *iter;
+		if(pimpl->mMediaSource)
+		{
+			pimpl->mMediaSource->enable_cookies(enabled);
+		}
+	}
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// static 
+/////////////////////////////////////////////////////////////////////////////////////////
+// static
+LLPluginCookieStore *LLViewerMedia::getCookieStore()
+{
+	if(sCookieStore == NULL)
+	{
+		sCookieStore = new LLPluginCookieStore;
+	}
+	
+	return sCookieStore;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// static
+void LLViewerMedia::loadCookieFile()
+{
+	// build filename for each user
+	std::string resolved_filename = gDirUtilp->getExpandedFilename(LL_PATH_PER_SL_ACCOUNT, PLUGIN_COOKIE_FILE_NAME);
+
+	if (resolved_filename.empty())
+	{
+		llinfos << "can't get path to plugin cookie file - probably not logged in yet." << llendl;
+		return;
+	}
+	
+	// open the file for reading
+	llifstream file(resolved_filename);
+	if (!file.is_open())
+	{
+		llwarns << "can't load plugin cookies from file \"" << PLUGIN_COOKIE_FILE_NAME << "\"" << llendl;
+		return;
+	}
+	
+	getCookieStore()->readAllCookies(file, true);
+
+	file.close();
+	
+	// send the clear_cookies message to all loaded plugins
+	impl_list::iterator iter = sViewerMediaImplList.begin();
+	impl_list::iterator end = sViewerMediaImplList.end();
+	for (; iter != end; iter++)
+	{
+		LLViewerMediaImpl* pimpl = *iter;
+		if(pimpl->mMediaSource)
+		{
+			pimpl->mMediaSource->clear_cookies();
+		}
+	}
+	
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// static
+void LLViewerMedia::saveCookieFile()
+{
+	// build filename for each user
+	std::string resolved_filename = gDirUtilp->getExpandedFilename(LL_PATH_PER_SL_ACCOUNT, PLUGIN_COOKIE_FILE_NAME);
+
+	if (resolved_filename.empty())
+	{
+		llinfos << "can't get path to plugin cookie file - probably not logged in yet." << llendl;
+		return;
+	}
+
+	// open a file for writing
+	llofstream file (resolved_filename);
+	if (!file.is_open())
+	{
+		llwarns << "can't open plugin cookie file \"" << PLUGIN_COOKIE_FILE_NAME << "\" for writing" << llendl;
+		return;
+	}
+
+	getCookieStore()->writePersistentCookies(file);
+
+	file.close();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// static
+void LLViewerMedia::addCookie(const std::string &name, const std::string &value, const std::string &domain, const LLDate &expires, const std::string &path, bool secure)
+{
+	std::stringstream cookie;
+	
+	cookie << name << "=" << LLPluginCookieStore::quoteString(value);
+	
+	if(expires.notNull())
+	{
+		cookie << "; expires=" << expires.asRFC1123();
+	}
+	
+	cookie << "; domain=" << domain;
+
+	cookie << "; path=" << path;
+	
+	if(secure)
+	{
+		cookie << "; secure";
+	}
+	
+	getCookieStore()->setCookies(cookie.str());
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// static
+void LLViewerMedia::addSessionCookie(const std::string &name, const std::string &value, const std::string &domain, const std::string &path, bool secure)
+{
+	// A session cookie just has a NULL date.
+	addCookie(name, value, domain, LLDate(), path, secure);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// static
+void LLViewerMedia::removeCookie(const std::string &name, const std::string &domain, const std::string &path )
+{
+	// To remove a cookie, add one with the same name, domain, and path that expires in the past.
+	
+	addCookie(name, "", domain, LLDate(LLDate::now().secondsSinceEpoch() - 1.0), path);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -468,6 +710,19 @@ LLPluginClassMedia* LLViewerMediaImpl::newSourceFromMediaType(std::string media_
 		std::string user_data_path = gDirUtilp->getOSUserAppDir();
 		user_data_path += gDirUtilp->getDirDelimiter();
 
+		// Fix for EXT-5960 - make browser profile specific to user (cache, cookies etc.)
+		// If the linden username returned is blank, that can only mean we are
+		// at the login page displaying login Web page or Web browser test via Develop menu.
+		// In this case we just use whatever gDirUtilp->getOSUserAppDir() gives us (this
+		// is what we always used before this change)
+		std::string linden_user_dir = gDirUtilp->getLindenUserDir();
+		if ( ! linden_user_dir.empty() )
+		{
+			// gDirUtilp->getLindenUserDir() is whole path, not just Linden name
+			user_data_path = linden_user_dir;
+			user_data_path += gDirUtilp->getDirDelimiter();
+		};
+
 		// See if the plugin executable exists
 		llstat s;
 		if(LLFile::stat(launcher_name, &s))
@@ -483,6 +738,24 @@ LLPluginClassMedia* LLViewerMediaImpl::newSourceFromMediaType(std::string media_
 			LLPluginClassMedia* media_source = new LLPluginClassMedia(owner);
 			media_source->setSize(default_width, default_height);
 			media_source->setUserDataPath(user_data_path);
+			media_source->setLanguageCode(LLUI::getLanguage());
+			
+			// collect 'cookies enabled' setting from prefs and send to embedded browser
+			bool cookies_enabled = gSavedSettings.getBOOL( "CookiesEnabled" );
+			media_source->enable_cookies( cookies_enabled );
+
+			//TODO: add and expose the below settings to the UI
+			// collect 'plugins enabled' setting from prefs and send to embedded browser
+			//bool plugins_enabled = gSavedSettings.getBOOL( "BrowserPluginsEnabled" );
+			//media_source->setPluginsEnabled( plugins_enabled );
+
+			// collect 'javascript enabled' setting from prefs and send to embedded browser
+			//bool javascript_enabled = gSavedSettings.getBOOL( "BrowserJavascriptEnabled" );
+			//media_source->setJavascriptEnabled( javascript_enabled );
+
+			//TODO: see if this is needed at all and change to an overloaded function if needed.
+			//media_source->setTarget(target);
+			
 			if (media_source->init(launcher_name, plugin_name, false)) //No more user_data_path
 			{
 				return media_source;
@@ -522,8 +795,20 @@ bool LLViewerMediaImpl::initializePlugin(const std::string& media_type)
 		media_source->setLoop(mMediaLoop);
 		media_source->setAutoScale(mMediaAutoScale);
 		media_source->setBrowserUserAgent(LLViewerMedia::getCurrentUserAgent());
-		
+
+		// TODO: Only send cookies to plugins that need them
+		//  Ideally, the plugin should tell us whether it handles cookies or not -- either via the init response or through a separate message.
+		//  Due to the ordering of messages, it's possible we wouldn't get that information back in time to send cookies before sending a navigate message,
+		//  which could cause odd race conditions.
+		std::string all_cookies = LLViewerMedia::getCookieStore()->getAllCookies();
+		lldebugs << "setting cookies: " << all_cookies << llendl;
+		if(!all_cookies.empty())
+		{
+			media_source->set_cookies(all_cookies);
+		}
+
 		mMediaSource = media_source;
+
 		return true;
 	}
 
@@ -625,6 +910,19 @@ void LLViewerMediaImpl::focus(bool focus)
 //			mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_DOWN, 1, 1, 0);
 //			mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_UP, 1, 1, 0);
 		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+void LLViewerMediaImpl::clearCache()
+{
+	if(mMediaSource)
+	{
+		mMediaSource->clear_cache();
+	}
+	else
+	{
+		mClearCache = true;
 	}
 }
 
@@ -888,6 +1186,16 @@ void LLViewerMediaImpl::updateMovieImage(const LLUUID& uuid, BOOL active)
 //////////////////////////////////////////////////////////////////////////////////////////
 void LLViewerMediaImpl::update()
 {
+  	if(mMediaSource != NULL)
+	{
+  		// If we didn't just create the impl, it may need to get cookie updates.
+		if(!sUpdatedCookies.empty())
+		{
+			// TODO: Only send cookies to plugins that need them
+			mMediaSource->set_cookies(sUpdatedCookies);
+		}
+	}
+	
 	if(mMediaSource == NULL)
 	{
 		return;
@@ -1346,6 +1654,13 @@ void LLViewerMediaImpl::handleMediaEvent(LLPluginClassMedia* plugin, LLPluginCla
 		// Just chain the event to observers.
 		emitEvent(plugin, event);
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// virtual
+void LLViewerMediaImpl::handleCookieSet(LLPluginClassMedia* self, const std::string &cookie)
+{
+	LLViewerMedia::getCookieStore()->setCookies(cookie);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

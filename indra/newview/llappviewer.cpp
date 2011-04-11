@@ -1516,6 +1516,8 @@ bool LLAppViewer::cleanup()
 
 	writeDebugInfo();
 
+	LLViewerMedia::saveCookieFile();
+
 	// Let threads finish
 	LLTimer idleTimer;
 	idleTimer.reset();

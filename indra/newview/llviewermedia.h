@@ -43,6 +43,7 @@
 class LLViewerMediaImpl;
 class LLUUID;
 class LLViewerImage;
+class LLPluginCookieStore;
 
 typedef LLPointer<LLViewerMediaImpl> viewer_media_t;
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,6 +89,24 @@ class LLViewerMedia
 
 		static void cleanupClass();
 
+	// Clear all cookies for all plugins
+	static void clearAllCookies();
+	
+	// Clear all plugins' caches
+	static void clearAllCaches();
+	
+	// Set the "cookies enabled" flag for all loaded plugins
+	static void setCookiesEnabled(bool enabled);
+	
+	static LLPluginCookieStore *getCookieStore();
+	static void loadCookieFile();
+	static void saveCookieFile();
+	static void addCookie(const std::string &name, const std::string &value, const std::string &domain, const LLDate &expires, const std::string &path = std::string("/"), bool secure = false );
+	static void addSessionCookie(const std::string &name, const std::string &value, const std::string &domain, const std::string &path = std::string("/"), bool secure = false );
+	static void removeCookie(const std::string &name, const std::string &domain, const std::string &path = std::string("/") );
+
+private:
+	static LLPluginCookieStore *sCookieStore;
 };
 
 // Implementation functions not exported into header file
@@ -138,6 +157,7 @@ public:
 	std::string getMediaHomeURL() { return mHomeURL; }
 	std::string getMimeType() { return mMimeType; }
 	void getTextureSize(S32 *texture_width, S32 *texture_height);
+	void clearCache();
 	void scaleMouse(S32 *mouse_x, S32 *mouse_y);
 
 	void update();
@@ -188,7 +208,8 @@ public:
 	/*virtual*/ BOOL hasMouseCapture() { return gFocusMgr.getMouseCapture() == this; };
 
 	// Inherited from LLPluginClassMediaOwner
-	/*virtual*/ void handleMediaEvent(LLPluginClassMedia* self, LLPluginClassMediaOwner::EMediaEvent);
+	/*virtual*/ void handleMediaEvent(LLPluginClassMedia* plugin, LLPluginClassMediaOwner::EMediaEvent);
+	/*virtual*/ void handleCookieSet(LLPluginClassMedia* self, const std::string &cookie);
 
 	// LLEditMenuHandler overrides
 	/*virtual*/ void	cut();
@@ -247,6 +268,7 @@ public:
 	int mPreviousMediaState;
 	F64 mPreviousMediaTime;
 	bool mMediaSourceFailed;
+	bool mClearCache;
 	bool mTrustedBrowser;
 
 

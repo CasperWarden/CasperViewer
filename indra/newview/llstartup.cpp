@@ -1083,6 +1083,9 @@ bool idle_startup()
 			LLURLHistory::appendToURLCollection("regionuri",gSavedSettings.getString("CmdLineRegionURI"));
 		}
 
+		// Load media plugin cookies
+		LLViewerMedia::loadCookieFile();
+
 		//-------------------------------------------------
 		// Handle startup progress screen
 		//-------------------------------------------------
