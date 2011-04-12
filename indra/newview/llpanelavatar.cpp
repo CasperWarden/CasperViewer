@@ -2166,7 +2166,12 @@ void LLPanelAvatar::processAvatarPropertiesReply(LLMessageSystem *msg, void**)
 		{
 			image_ctrl->setImageAssetID(image_id);
 		}
-		self->childSetValue("about", about_text);
+
+		LLTextEditor *about_txtctrl = self->getChild<LLTextEditor>("about");
+		if (self->mAvatarID == gAgent.getID())
+			about_txtctrl->setText(about_text);
+		else //Cause url parsing is weird like this -KC
+			about_txtctrl->appendColoredText(about_text, false, false, about_txtctrl->getReadOnlyFgColor());
 
 		self->mPanelSecondLife->setPartnerID(partner_id);
 		self->mPanelSecondLife->updatePartnerName();
@@ -2174,7 +2179,11 @@ void LLPanelAvatar::processAvatarPropertiesReply(LLMessageSystem *msg, void**)
 		if (self->mPanelFirstLife)
 		{
 			// Teens don't get these
-			self->mPanelFirstLife->childSetValue("about", fl_about_text);
+			LLTextEditor *aboutfl_txtctrl = self->mPanelFirstLife->getChild<LLTextEditor>("about");
+			if (self->mAvatarID == gAgent.getID())
+				aboutfl_txtctrl->setText(fl_about_text);
+			else //Cause url parsing is weird like this -KC
+				aboutfl_txtctrl->appendColoredText(fl_about_text, false, false, aboutfl_txtctrl->getReadOnlyFgColor());
 			LLTextureCtrl*	image_ctrl = self->mPanelFirstLife->getChild<LLTextureCtrl>("img");
 			if(image_ctrl)
 			{
