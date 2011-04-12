@@ -997,6 +997,7 @@ void LLInventoryModel::deleteObject(const LLUUID& id)
 		}
 		addChangedMask(LLInventoryObserver::REMOVE, id);
 		obj = NULL; // delete obj
+		gInventory.notifyObservers();
 	}
 }
 

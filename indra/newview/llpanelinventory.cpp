@@ -1331,6 +1331,7 @@ void LLTaskLSLBridge::openItem()
 
 BOOL LLTaskLSLBridge::removeItem()
 {
+	LLPreview::hide(mUUID, TRUE);
 	LLLiveLSLEditor::hide(mUUID, mPanel->getTaskUUID());
 	return LLTaskInvFVBridge::removeItem();
 }
