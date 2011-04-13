@@ -4,6 +4,7 @@ syntax: glob
 *.bak
 .DS_Store
 indra/build-VC[0-9]*
+indra/build-vc[0-9]*
 indra/build-darwin*
 indra/llcommon/llversionviewer.h.in.*
 indra/test_apps/terrain_mule/*.dll
