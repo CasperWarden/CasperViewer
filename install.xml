@@ -610,13 +610,6 @@
             <key>url</key>
             <uri>http://phoenixviewer.com/app/glib/glib-2.20.5-linux64-20100515.tar.bz2</uri>
           </map>
-					<key>windows</key>
-					<map>
-						<key>md5sum</key>
-						<string>b1e0e16472c0e5d3b6291870e3f20b0c</string>
-						<key>url</key>
-						<uri>http://phoenixviewer.com/app/glib/glib-2.18.4-windows-03162009.tar.bz2</uri>
-					</map>
 				</map>
 			</map>
 			<key>glui</key>
