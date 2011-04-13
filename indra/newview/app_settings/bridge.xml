@@ -18,7 +18,7 @@
                     <key>creation_date</key>
                         <string>58293486</string>
                     <key>creator_id</key>
-                        <string>a8f79c8f-57d8-4dd7-ae18-89a9042bdfa4</string>
+                        <string>b33c0d4e-704c-4726-97a3-5956cf349336</string>
                     <key>description</key>
                         <string />
                     <key>everyone_mask</key>
@@ -30,7 +30,7 @@
                     <key>from_task_id</key>
                         <string>00000000-0000-0000-0000-000000000000</string>
                     <key>group_id</key>
-                        <string>00000000-0000-0000-0000-000000000000</string>
+                        <string>3a1be8d4-01f3-bc1a-2703-442f0cc8f2dd</string>
                     <key>group_mask</key>
                         <string>0</string>
                     <key>id</key>
@@ -90,9 +90,9 @@
                         </map>
                     <key>scale</key>
                         <array>
-                            <real>0.5</real>
-                            <real>0.5</real>
-                            <real>0.5</real>
+                            <real>0.001</real>
+                            <real>0.001</real>
+                            <real>0.001</real>
                         </array>
                     <key>shadows</key>
                         <integer>0</integer>
@@ -115,7 +115,123 @@
                             <key>glow</key>
                                 <real>0</real>
                             <key>imageid</key>
-                                <uuid>89556747-24cb-43ed-920b-47caed15465f</uuid>
+                                <uuid>8dcd4a48-2d37-4909-9f78-f7a9eb4ef903</uuid>
+                            <key>imagerot</key>
+                                <real>0</real>
+                            <key>media_flags</key>
+                                <integer>0</integer>
+                            <key>offsets</key>
+                                <real>0</real>
+                            <key>offsett</key>
+                                <real>0</real>
+                            <key>scales</key>
+                                <real>1</real>
+                            <key>scalet</key>
+                                <real>1</real>
+                            </map>
+                            <map>
+                            <key>bump</key>
+                                <integer>0</integer>
+                            <key>colors</key>
+                                <array>
+                                    <real>1</real>
+                                    <real>1</real>
+                                    <real>1</real>
+                                    <real>1</real>
+                                </array>
+                            <key>fullbright</key>
+                                <integer>0</integer>
+                            <key>glow</key>
+                                <real>0</real>
+                            <key>imageid</key>
+                                <uuid>8dcd4a48-2d37-4909-9f78-f7a9eb4ef903</uuid>
+                            <key>imagerot</key>
+                                <real>0</real>
+                            <key>media_flags</key>
+                                <integer>0</integer>
+                            <key>offsets</key>
+                                <real>0</real>
+                            <key>offsett</key>
+                                <real>0</real>
+                            <key>scales</key>
+                                <real>1</real>
+                            <key>scalet</key>
+                                <real>1</real>
+                            </map>
+                            <map>
+                            <key>bump</key>
+                                <integer>0</integer>
+                            <key>colors</key>
+                                <array>
+                                    <real>1</real>
+                                    <real>1</real>
+                                    <real>1</real>
+                                    <real>1</real>
+                                </array>
+                            <key>fullbright</key>
+                                <integer>0</integer>
+                            <key>glow</key>
+                                <real>0</real>
+                            <key>imageid</key>
+                                <uuid>8dcd4a48-2d37-4909-9f78-f7a9eb4ef903</uuid>
+                            <key>imagerot</key>
+                                <real>0</real>
+                            <key>media_flags</key>
+                                <integer>0</integer>
+                            <key>offsets</key>
+                                <real>0</real>
+                            <key>offsett</key>
+                                <real>0</real>
+                            <key>scales</key>
+                                <real>1</real>
+                            <key>scalet</key>
+                                <real>1</real>
+                            </map>
+                            <map>
+                            <key>bump</key>
+                                <integer>0</integer>
+                            <key>colors</key>
+                                <array>
+                                    <real>1</real>
+                                    <real>1</real>
+                                    <real>1</real>
+                                    <real>1</real>
+                                </array>
+                            <key>fullbright</key>
+                                <integer>0</integer>
+                            <key>glow</key>
+                                <real>0</real>
+                            <key>imageid</key>
+                                <uuid>8dcd4a48-2d37-4909-9f78-f7a9eb4ef903</uuid>
+                            <key>imagerot</key>
+                                <real>0</real>
+                            <key>media_flags</key>
+                                <integer>0</integer>
+                            <key>offsets</key>
+                                <real>0</real>
+                            <key>offsett</key>
+                                <real>0</real>
+                            <key>scales</key>
+                                <real>1</real>
+                            <key>scalet</key>
+                                <real>1</real>
+                            </map>
+                            <map>
+                            <key>bump</key>
+                                <integer>0</integer>
+                            <key>colors</key>
+                                <array>
+                                    <real>1</real>
+                                    <real>1</real>
+                                    <real>1</real>
+                                    <real>1</real>
+                                </array>
+                            <key>fullbright</key>
+                                <integer>0</integer>
+                            <key>glow</key>
+                                <real>0</real>
+                            <key>imageid</key>
+                                <uuid>8dcd4a48-2d37-4909-9f78-f7a9eb4ef903</uuid>
                             <key>imagerot</key>
                                 <real>0</real>
                             <key>media_flags</key>
@@ -137,9 +253,9 @@
                         <key>path</key>
                             <map>
                             <key>begin</key>
-                                <real>0</real>
+                                <real>0.95</real>
                             <key>curve</key>
-                                <integer>32</integer>
+                                <integer>16</integer>
                             <key>end</key>
                                 <real>1</real>
                             <key>radius_offset</key>
@@ -168,11 +284,11 @@
                         <key>profile</key>
                             <map>
                             <key>begin</key>
-                                <real>0</real>
+                                <real>0.885</real>
                             <key>curve</key>
-                                <integer>5</integer>
+                                <integer>1</integer>
                             <key>end</key>
-                                <real>1</real>
+                                <real>0.905</real>
                             <key>hollow</key>
                                 <real>0</real>
                             </map>

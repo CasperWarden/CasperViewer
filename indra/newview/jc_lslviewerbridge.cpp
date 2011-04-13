@@ -65,9 +65,9 @@
 //  the major and minor version numbers being the same in the defines below;
 //  and on it being in the form of "<major>.<minor>". If you change any of
 //  these, you MUST update the IsAnOldBridge function to match. -- TS
-#define phoenix_bridge_name "#LSL<->Client Bridge v0.12"
+#define phoenix_bridge_name "#LSL<->Client Bridge v0.13"
 #define PHOENIX_BRIDGE_MAJOR_VERSION 0
-#define PHOENIX_BRIDGE_MINOR_VERSION 12
+#define PHOENIX_BRIDGE_MINOR_VERSION 13
 
 const boost::regex AnyBridgePattern("^#LSL<->Client Bridge.*");
 
@@ -464,7 +464,7 @@ void JCLSLBridge::CheckForBridgeDetach(const LLUUID& item_id)
 			//cmdline_printchat("--bridge="+bridge.asString()+" || "+(!isworn(bridge) ? "1" : "0"));
 			//cmdline_printchat("--reattaching");
 			sBridgeStatus = UNINITIALIZED;
-			mPeriod = 1.f;
+			mPeriod = 5.f;
 			mEventTimer.start();
 			llinfos << "bridge was removed, setting for reattach " << llendl;
 		}
