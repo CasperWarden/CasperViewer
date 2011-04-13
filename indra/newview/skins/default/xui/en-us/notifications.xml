@@ -5007,7 +5007,6 @@ Unable to start a new chat session with [RECIPIENT].
    name="ChatterBoxSessionEventError"
    type="notifytip">
 [EVENT]
-[REASON]
     <usetemplate
      name="okbutton"
      yestext="OK"/>
