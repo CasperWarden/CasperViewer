@@ -296,6 +296,15 @@ BOOL LLMuteList::isLinden(const std::string& name) const
 	return last_name == "Linden";
 }
 
+BOOL LLMuteList::isLinden(const LLUUID& id) const
+{
+	LLAvatarName avatar_name;
+	if (LLAvatarNameCache::get(id, &avatar_name))
+	{
+		return avatar_name.mLegacyLastName == "Linden";
+	}
+	return FALSE;
+}
 
 BOOL LLMuteList::add(const LLMute& mute, U32 flags)
 {

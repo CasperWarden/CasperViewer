@@ -15584,10 +15584,10 @@
 			<string>Color4</string>
 			<key>Value</key>
 			<array>
-				<real>0.114</real>
-				<real>0.114</real>
-				<real>0.663</real>
-				<real>1.0</real>
+        <real>0.0</real>
+        <real>0.6</real>
+        <real>0.733</real>
+        <real>1.0</real>
 			</array>
 		</map>
 		<key>PhoenixBoldGroupMods</key>

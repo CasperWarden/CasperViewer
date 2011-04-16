@@ -572,7 +572,7 @@ void LLIMMgr::addMessage(
 {
 	LLUUID other_participant_id = target_id;
 
-	BOOL is_linden = LLMuteList::getInstance()->isLinden(from);
+	BOOL is_linden = LLMuteList::getInstance()->isLinden(other_participant_id);
 
 	// don't process muted IMs
 	if (LLMuteList::getInstance()->isMuted(

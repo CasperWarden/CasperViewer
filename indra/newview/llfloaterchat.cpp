@@ -576,6 +576,7 @@ LLColor4 get_text_color(const LLChat& chat)
 			{
 				//Phoenix:KC - color chat from friends. taking care not to color when RLV hide names is in effect, lol
 				static BOOL* sPhoenixColorFriendsChat = rebind_llcontrol<BOOL>("PhoenixColorFriendsChat", &gSavedSettings, true);
+				static BOOL* sPhoenixColorLindensChat = rebind_llcontrol<BOOL>("PhoenixColorLindensChat", &gSavedSettings, true);
 				if (*sPhoenixColorFriendsChat
 				&& LLAvatarTracker::instance().isBuddy(chat.mFromID)
 				&& (!rlv_handler_t::isEnabled()
@@ -586,6 +587,10 @@ LLColor4 get_text_color(const LLChat& chat)
 				else if(gAgent.getID() == chat.mFromID)
 				{
 					text_color = gSavedSettings.getColor4("UserChatColor");
+				}
+				else if (*sPhoenixColorLindensChat && LLMuteList::getInstance()->isLinden(chat.mFromID))
+				{
+					text_color = gSavedSettings.getColor4("PhoenixLindensChatColor");
 				}
 				else
 				{
