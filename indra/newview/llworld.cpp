@@ -123,6 +123,7 @@ LLWorld::LLWorld() :
 
 void LLWorld::destroyClass()
 {
+	mHoleWaterObjects.clear();
 	gObjectList.destroy();
 	for(region_list_t::iterator region_it = mRegionList.begin(); region_it != mRegionList.end(); )
 	{
