@@ -445,6 +445,7 @@ void LLPanelPick::processPickInfoReply(LLMessageSystem *msg, void **)
 
 		// Update UI controls
         self->mNameEditor->setText(std::string(name));
+        self->mNameEditor->clear();
         if (self->mCreatorID == gAgent.getID())
             self->mDescEditor->setText(std::string(desc));
         else //Cause url parsing is weird like this -KC

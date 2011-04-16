@@ -2168,6 +2168,7 @@ void LLPanelAvatar::processAvatarPropertiesReply(LLMessageSystem *msg, void**)
 		}
 
 		LLTextEditor *about_txtctrl = self->getChild<LLTextEditor>("about");
+		about_txtctrl->clear();
 		if (self->mAvatarID == gAgent.getID())
 			about_txtctrl->setText(about_text);
 		else //Cause url parsing is weird like this -KC
@@ -2180,6 +2181,7 @@ void LLPanelAvatar::processAvatarPropertiesReply(LLMessageSystem *msg, void**)
 		{
 			// Teens don't get these
 			LLTextEditor *aboutfl_txtctrl = self->mPanelFirstLife->getChild<LLTextEditor>("about");
+			aboutfl_txtctrl->clear();
 			if (self->mAvatarID == gAgent.getID())
 				aboutfl_txtctrl->setText(fl_about_text);
 			else //Cause url parsing is weird like this -KC
