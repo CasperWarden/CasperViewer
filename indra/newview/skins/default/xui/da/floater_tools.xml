@@ -33,7 +33,7 @@
 	<check_box label="Stræk begge sider" name="checkbox uniform"/>
 	<check_box label="Stræk teksturer" name="checkbox stretch textures"/>
 	<check_box label="Benyt gitter" name="checkbox snap to grid"/>
-	<button label="Valg..." label_selected="Valg..." name="Options..." height="18" bottom_delta="-15"/>
+	<button label="Valg" label_selected="Valg" name="Options..." width="45" left="225"/>
 	<text name="text status">
 		Træk for at flytte, shift+træk for at kopiere
 	</text>
@@ -226,7 +226,7 @@
 				Vælg kun én prim for at ændre indstillinger.
 			</text>
 			<text name="edit_object">
-				Ret objektets indstillinger:
+				Indstillinger:
 			</text>
 			<check_box label="Låst" name="checkbox locked" tool_tip="Forhindrer objektet i at blive flyttet eller slettet. Ofte brugbar under byggeri for at forhindre utilsigtet ændring."/>
 			<check_box label="Fysisk" name="Physical Checkbox Ctrl" tool_tip="Tillader objekter at blive skubbet og at være påvirkelig af tyngdekraften"/>
@@ -599,7 +599,8 @@
 		Klik og træk for at ændre synsvinkel
 	</string>
 	<string name="status_grab">
-		Træk for at flytte objekter, Ctrl for at løfte, Ctrl-Shift for at rotere
+		Træk for at flytte objekter, Ctrl for at løfte,
+Ctrl-Shift for at rotere
 	</string>
 	<string name="status_place">
 		Klik et sted i verden for at bygge

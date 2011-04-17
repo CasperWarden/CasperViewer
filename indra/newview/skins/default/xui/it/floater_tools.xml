@@ -33,8 +33,8 @@
 	<check_box label="Ridimens. simmetricamente" name="checkbox uniform"/>
 	<check_box label="Ridimensiona le texture" name="checkbox stretch textures"/>
 	<check_box label="Usa righello" name="checkbox snap to grid"/>
-	<button label="Opzioni..." label_selected="Opzioni..." name="Options..."/>
-	<text name="text status" width="280">
+	<button label="Opzioni" label_selected="Opzioni" name="Options..." left="225"/>
+	<text name="text status" width="285">
 		Trascina per muovere, trascina+maiuscolo per copiare
 	</text>
 	<button label="" label_selected="" name="ToolCube" tool_tip="Cubo"/>
@@ -73,12 +73,6 @@
 	<volume_slider left="184" name="slider brush size" width="74" />
 	<text name="Strength:">
 		Potenza
-	</text>
-	<text name="obj_count" left="134">
-		Oggetti selezionati: [COUNT]
-	</text>
-	<text name="prim_count" left="134">
-		primitive: [COUNT]
 	</text>
 	<tab_container name="Object Info Tabs" tab_max_width="150" tab_min_width="30" width="288">
 		<panel label="Generale" name="General">
@@ -226,8 +220,8 @@
 			<text name="select_single">
 				Seleziona solo un prim per modificarne i parametri.
 			</text>
-			<text name="edit_object">
-				Modifica i parametri dell&apos;oggetto:
+			<text name="edit_object" left="130">
+				Parametri:
 			</text>
 			<check_box label="Bloccato" name="checkbox locked" tool_tip="Previene lo spostamento o la cancellazione dell&apos;oggetto. Spesso utile mentre si costruisce per evitare involontarie modifiche."/>
 			<check_box label="Fisico" name="Physical Checkbox Ctrl" tool_tip="Permette all&apos;oggetto di essere spostato e di subire gli effetti della gravità"/>
@@ -239,18 +233,21 @@
 			<spinner label="X" name="Pos X"/>
 			<spinner label="Y" name="Pos Y"/>
 			<spinner label="Z" name="Pos Z"/>
+      <button name="copypos" left_delta="70"/>
 			<text name="label size">
 				Dimensioni (metri)
 			</text>
 			<spinner label="X" name="Scale X"/>
 			<spinner label="Y" name="Scale Y"/>
 			<spinner label="Z" name="Scale Z"/>
+      <button name="copysize" left_delta="70"/>
 			<text name="label rotation">
 				Rotazione (gradi)
 			</text>
 			<spinner label="X" name="Rot X"/>
 			<spinner label="Y" name="Rot Y"/>
 			<spinner label="Z" name="Rot Z"/>
+      <button name="copyrot" left_delta="70"/>
 			<text name="label material">
 				Materiale
 			</text>
@@ -400,7 +397,8 @@
 		</panel>
 		<panel label="Caratteristiche" name="Features">
 			<text name="select_single" width="280">
-				Seleziona solo un prim per modificarne le caratteristiche.
+				Seleziona solo un prim per modificarne
+le caratteristiche.
 			</text>
 			<text name="edit_object">
 				Modifica le caratteristiche dell&apos;oggetto:
@@ -586,8 +584,9 @@
 	<string name="status_rotate">
 		Sposta le fasce colorate per ruotare l&apos;oggetto
 	</string>
-	<string name="status_scale">
-		Clicca e trascina per ridimensionare il lato selezionato
+	<string name="status_scale" width="185">
+		Clicca e trascina per ridimensionare
+il lato selezionato
 	</string>
 	<string name="status_move">
 		Trascina per spostare, maiuscolo+trascina per copiare
@@ -599,7 +598,8 @@
 		Clicca e sposta per cambiare visuale
 	</string>
 	<string name="status_grab">
-		Trascina per muovere, Ctrl per alzare, Ctrl-Shift per ruotare
+		Trascina per muovere, Ctrl per alzare,
+Ctrl-Shift per ruotare
 	</string>
 	<string name="status_place">
 		Clicca inworld per costruire
