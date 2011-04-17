@@ -159,6 +159,7 @@ std::string ICON_NAME[ICON_NAME_COUNT] =
 	"inv_item_skirt.tga",
 	"inv_item_alpha.tga",
 	"inv_item_tattoo.tga",
+	"Inv_Physics.png",
 
 	"inv_item_animation.tga",
 	"inv_item_gesture.tga",
