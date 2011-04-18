@@ -82,11 +82,11 @@ F32 LLViewerImage::sDesiredDiscardBias = 0.f;
 static F32 sDesiredDiscardBiasMin = -2.0f; // -max number of levels to improve image quality by
 static F32 sDesiredDiscardBiasMax = 1.5f; // max number of levels to reduce image quality by
 F32 LLViewerImage::sDesiredDiscardScale = 1.1f;
-S32 LLViewerImage::sBoundTextureMemoryInBytes = 0;
-S32 LLViewerImage::sTotalTextureMemoryInBytes = 0;
+U32 LLViewerImage::sBoundTextureMemoryInBytes = 0;
+U32 LLViewerImage::sTotalTextureMemoryInBytes = 0;
 S32 LLViewerImage::sMaxBoundTextureMemInMegaBytes = 0;
 S32 LLViewerImage::sMaxTotalTextureMemInMegaBytes = 0;
-S32 LLViewerImage::sMaxDesiredTextureMemInBytes = 0 ;
+U32 LLViewerImage::sMaxDesiredTextureMemInBytes = 0 ;
 BOOL LLViewerImage::sDontLoadVolumeTextures = FALSE;
 
 S32 LLViewerImage::sMaxSculptRez = 128 ; //max sculpt image size
