@@ -3220,11 +3220,11 @@ void LLVOAvatar::idleUpdateWindEffect()
 
 bool LLVOAvatar::loadClientTags()
 {
-	std::string client_list_filename = gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS, "client_list.xml");
+	std::string client_list_filename = gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS, "client_list_v2.xml");
 
 	if(!LLFile::isfile(client_list_filename))
 	{
-		client_list_filename = gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "client_list.xml");
+		client_list_filename = gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "client_list_v2.xml");
 	}
 
 	if(LLFile::isfile(client_list_filename))
@@ -3265,16 +3265,19 @@ void LLVOAvatar::resolveClient(LLColor4& avatar_name_color, std::string& client,
 	if(LLVOAvatar::sClientResolutionList.has("isComplete") && LLVOAvatar::sClientResolutionList.has(idx.asString()) && avatar->isReallyFullyLoaded())
 	{
 		LLSD cllsd = LLVOAvatar::sClientResolutionList[idx.asString()];
-		client = cllsd["name"].asString();
-		LLColor4 colour;
-		colour.setValue(cllsd["color"]);
-		if(cllsd["multiple"].asReal() != 0)
+		static BOOL* sPhoenixClientTagsShowAny = rebind_llcontrol<BOOL>("PhoenixClientTagsShowAny", &gSavedSettings, true);
+		if (*sPhoenixClientTagsShowAny || (cllsd.has("tpvd") && cllsd["tpvd"].asBoolean()))
 		{
-			avatar_name_color += colour;
-			avatar_name_color *= 1.0/(cllsd["multiple"].asReal()+1.0f);
-		}
-		else
+			LLColor4 colour;
+			static BOOL* sPhoenixDontUseMultipleColorTags = rebind_llcontrol<BOOL>("PhoenixDontUseMultipleColorTags", &gSavedSettings, true);
+			if ((*sPhoenixDontUseMultipleColorTags || !cllsd.has("color")) && cllsd.has("alt"))
+			{
+				cllsd = LLVOAvatar::sClientResolutionList[cllsd["alt"].asString()];
+			}
+			client = cllsd["name"].asString();
+			colour.setValue(cllsd["color"]);
 			avatar_name_color = colour;
+		}
 	}else
 	{
 		//legacy code
@@ -3553,13 +3556,7 @@ void LLVOAvatar::idleUpdateNameTagText(BOOL new_name)
 		LLSD cllsd = LLVOAvatar::sClientResolutionList[LLPrimitive::tagstring];
 		LLColor4 colour;
 		colour.setValue(cllsd["color"]);
-		if(cllsd["multiple"].asReal() != 0)
-		{
-			avatar_name_tag_color += colour;
-			avatar_name_tag_color *= 1.0/(cllsd["multiple"].asReal()+1.0f);
-		}
-		else
-			avatar_name_tag_color = colour;
+		avatar_name_tag_color = colour;
 	}
 
 	if(*sPhoenixChangeColorOnClient && (!isSelf() || *sPhoenixShowOwnClientColor))

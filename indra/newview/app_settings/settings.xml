@@ -15733,5 +15733,16 @@
 			<key>Value</key>
 			<integer>16</integer>
 		</map>
+		<key>PhoenixClientTagsShowAny</key>
+		<map>
+			<key>Comment</key>
+			<string>Show any client tags for viewers not on TPVD</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>Boolean</string>
+			<key>Value</key>
+			<integer>0</integer>
+		</map>
 	</map>
 </llsd>

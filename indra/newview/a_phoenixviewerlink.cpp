@@ -109,11 +109,11 @@ void PhoenixViewerLink::downloadClientTags()
 	if(gSavedSettings.getBOOL("PhoenixDownloadClientTags"))
 	{
 		//url = "http://phoenixviewer.com/app/client_tags/client_list.xml";
-		std::string url("http://phoenixviewer.com/app/client_list.xml");
-		if(gSavedSettings.getBOOL("PhoenixDontUseMultipleColorTags"))
-		{
-			url="http://phoenixviewer.com/app/client_list_unified_colours.xml";
-		}
+		std::string url("http://phoenixviewer.com/app/client_list_v2.xml");
+		// if(gSavedSettings.getBOOL("PhoenixDontUseMultipleColorTags"))
+		// {
+		//	 url="http://phoenixviewer.com/app/client_list_unified_colours.xml";
+		// }
 		LLSD headers;
 		LLHTTPClient::get(url,new ModularSystemsDownloader( PhoenixViewerLink::updateClientTags),headers);
 		LL_INFOS("CLIENTTAGS DOWNLOADER") << "Getting new tags" << LL_ENDL;
@@ -158,7 +158,7 @@ void PhoenixViewerLink::msblacklist(U32 status,std::string body)
 
 void PhoenixViewerLink::updateClientTags(U32 status,std::string body)
 {
-    std::string client_list_filename = gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS, "client_list.xml");
+    std::string client_list_filename = gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS, "client_list_v2.xml");
 
     std::istringstream istr(body);
     LLSD data;
@@ -173,7 +173,7 @@ void PhoenixViewerLink::updateClientTags(U32 status,std::string body)
 
 void PhoenixViewerLink::updateClientTagsLocal()
 {
-	std::string client_list_filename = gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS, "client_list.xml");
+	std::string client_list_filename = gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS, "client_list_v2.xml");
 
 	llifstream xml_file(client_list_filename);
 	LLSD data;
