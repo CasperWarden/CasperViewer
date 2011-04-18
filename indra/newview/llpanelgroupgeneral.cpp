@@ -808,7 +808,7 @@ void LLPanelGroupGeneral::update(LLGroupChange gc)
 	if (mEditCharter)
 	{
 		mEditCharter->setParseHTML(TRUE);
-		mEditCharter->setParseHTML(TRUE);
+		mEditCharter->clear();
 		mEditCharter->appendColoredText(gdatap->mCharter, false, false,
 										(mAllowEdit && can_change_ident) ?
 										gColors.getColor("TextFgColor") :
