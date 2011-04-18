@@ -166,12 +166,12 @@ U64 LLViewerObjectList::getIndex(const U32 local_id,
 	return (((U64)index) << 32) | (U64)local_id;
 }
 
-BOOL LLViewerObjectList::removeFromLocalIDTable(const LLViewerObject &object)
+BOOL LLViewerObjectList::removeFromLocalIDTable(const LLViewerObject* objectp)
 {
-	if(object.getRegion())
+	if (objectp && objectp->getRegion())
 	{
-		U32 local_id = object.mLocalID;
-		LLHost region_host = object.getRegion()->getHost();
+		U32 local_id = objectp->mLocalID;
+		LLHost region_host = objectp->getRegion()->getHost();
 		U32 ip = region_host.getAddress();
 		U32 port = region_host.getPort();
 		U64 ipport = (((U64)ip) << 32) | (U64)port;
@@ -188,7 +188,7 @@ BOOL LLViewerObjectList::removeFromLocalIDTable(const LLViewerObject &object)
 		}
 		
 		// Found existing entry
-		if (iter->second == object.getID())
+		if (iter->second == objectp->getID())
 		{   // Full UUIDs match, so remove the entry
 			sIndexAndLocalIDToUUID.erase(iter);
 			return TRUE;
@@ -472,7 +472,7 @@ void LLViewerObjectList::processObjectUpdate(LLMessageSystem *mesgsys,
 			//			<< ", regionp " << (U32) regionp << ", object region " << (U32) objectp->getRegion()
 			//			<< llendl;
 			//}
-			removeFromLocalIDTable(*objectp);
+			removeFromLocalIDTable(objectp);
 			setUUIDAndLocal(fullid,
 							local_id,
 							gMessageSystem->getSenderIP(),
@@ -845,6 +845,11 @@ void LLViewerObjectList::clearDebugText()
 
 void LLViewerObjectList::cleanupReferences(LLViewerObject *objectp)
 {
+	if (!objectp)
+	{
+		llwarns << "NULL object pointer passed." << llendl;
+		return;
+	}
 	LLMemType mt(LLMemType::MTYPE_OBJECT);
 	if (mDeadObjects.find(objectp->mID) != mDeadObjects.end())
 	{
@@ -867,7 +872,7 @@ void LLViewerObjectList::cleanupReferences(LLViewerObject *objectp)
 	//				<< objectp->getRegion()->getHost().getPort() << llendl;
 	//}	
 	
-	removeFromLocalIDTable(*objectp);
+	removeFromLocalIDTable(objectp);
 
 	if (objectp->onActiveList())
 	{
