@@ -174,7 +174,8 @@ BOOL LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 	// dereference the array.
 	if(!image) 
 	{
-		llwarns << "ERROR -> decodeImpl: failed to decode image - no image" << LL_ENDL;
+		LL_DEBUGS("Openjpeg")  << "ERROR -> decodeImpl: failed to decode image - no image" << LL_ENDL;
+		base.decodeFailed();
 		return TRUE; // done
 	}
 
@@ -182,13 +183,13 @@ BOOL LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 
 	if( !img_components ) // < 1 ||img_components > 4 )
 	{
-		llwarns << "ERROR -> decodeImpl: failed to decode image wrong number of components: " << img_components << LL_ENDL;
+		LL_DEBUGS("Openjpeg") << "ERROR -> decodeImpl: failed to decode image wrong number of components: " << img_components << LL_ENDL;
 		if (image)
 		{
 			opj_destroy_cstr_info(&cinfo);
 			opj_image_destroy(image);
 		}
-
+		base.decodeFailed();
 		return TRUE; // done
 	}
 
@@ -216,22 +217,22 @@ BOOL LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 	   the difference will be greater than this level */
 	if (decompdifference > base.getRawDiscardLevel())
 	{
-		llwarns << "not enough data for requested discard level, setting mDecoding to FALSE, difference: " << (decompdifference - base.getRawDiscardLevel()) << llendl;
+		LL_DEBUGS("Openjpeg") << "not enough data for requested discard level, setting mDecoding to FALSE, difference: " << (decompdifference - base.getRawDiscardLevel()) << llendl;
 		opj_destroy_cstr_info(&cinfo);
 		opj_image_destroy(image);
-		base.mDecoding = FALSE;
+		base.decodeFailed();
 		return TRUE;
 	}
 
 	if(img_components <= first_channel)
 	{
-		llwarns << "trying to decode more channels than are present in image: numcomps: " << img_components << " first_channel: " << first_channel << LL_ENDL;
+		LL_DEBUGS("Openjpeg") << "trying to decode more channels than are present in image: numcomps: " << img_components << " first_channel: " << first_channel << LL_ENDL;
 		if (image)
 		{
 			opj_destroy_cstr_info(&cinfo);
 			opj_image_destroy(image);
 		}
-			
+		base.decodeFailed();
 		return TRUE;
 	}
 
@@ -280,6 +281,7 @@ BOOL LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 			opj_destroy_cstr_info(&cinfo);
 			opj_image_destroy(image);
 
+			base.decodeFailed();
 			return TRUE; // done
 		}
 	}
@@ -290,7 +292,7 @@ BOOL LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 		opj_destroy_cstr_info(&cinfo);
 		opj_image_destroy(image);
 	}
-
+	
 	return TRUE; // done
 }
 
