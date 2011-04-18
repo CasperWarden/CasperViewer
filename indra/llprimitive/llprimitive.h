@@ -426,7 +426,7 @@ protected:
 
 inline BOOL LLPrimitive::isAvatar() const
 {
-	return ( LL_PCODE_LEGACY_AVATAR == mPrimitiveCode ) ? TRUE : FALSE;
+	return (mPrimitiveCode && LL_PCODE_LEGACY_AVATAR == mPrimitiveCode ) ? TRUE : FALSE;
 }
 
 inline BOOL LLPrimitive::isSittingAvatar() const
