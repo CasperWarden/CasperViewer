@@ -809,10 +809,10 @@ void LLPanelGroupGeneral::update(LLGroupChange gc)
 	{
 		mEditCharter->setParseHTML(TRUE);
 		mEditCharter->clear();
-		mEditCharter->appendColoredText(gdatap->mCharter, false, false,
-										(mAllowEdit && can_change_ident) ?
-										gColors.getColor("TextFgColor") :
-										gColors.getColor("TextFgReadOnlyColor"));
+		if(mAllowEdit && can_change_ident)
+			mEditCharter->setText(gdatap->mCharter);
+		else
+			mEditCharter->appendColoredText(gdatap->mCharter, false, false, gColors.getColor("TextFgReadOnlyColor"));
 		mEditCharter->resetDirty();
 	}
 	
