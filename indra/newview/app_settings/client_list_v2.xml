@@ -23,7 +23,8 @@
 <key>28b4da3f-5f9b-f44e-1387-6a115ab482c5</key><map><key>name</key><string>Diamond</string>					<key>color</key><array><real>0.8156862745098</real><real>0.7921568627451</real><real>0.68235294117647</real><real>1</real></array></map>
 <key>4ca51a79-41c0-91ec-7c58-a5195951bda2</key><map><key>name</key><string>Horny Thel</string>				<key>color</key><array><real>1</real><real>0.27058823529412</real><real>0</real><real>1</real></array></map>
 <key>0bcd5f5d-a4ce-9ea4-f9e8-15132653b3d8</key><map><key>name</key><string>MoyMix</string>					<key>color</key><array><real>0.9921568627451</real><real>0.56078431372549</real><real>0.65490196078431</real><real>1</real></array></map>
-<key>481a055f-36b5-af82-ac49-24709f013e50</key><map><key>name</key><string>Nano</string>					<key>color</key><array><real>0.70588235294118</real><real>0.84705882352941</real><real>0</real><real>1</real></array></map>
+<key>380ae30b-f2c7-b07c-041e-5688e89a6fc1</key><map><key>name</key><string>Nano</string>					<key>color</key><array><real>0.66666666666667</real><real>1</real><real>0.19607843137255</real><real>1</real></array></map>
+<key>481a055f-36b5-af82-ac49-24709f013e50</key><map><key>name</key><string>Unkonwn</string>					<key>color</key><array><real>0.70588235294118</real><real>0.84705882352941</real><real>0</real><real>1</real></array></map> <!--was nano, but isnt-->
 <key>049af712-22c9-b2c4-50c7-90a9f1d1e5ef</key><map><key>name</key><string>GNR</string>						<key>color</key><array><real>0.90196078431373</real><real>0.90196078431373</real><real>0.90196078431373</real><real>1</real></array></map>
 <key>c58fca06-33b3-827d-d81c-a886a631affc</key><map><key>name</key><string>Whale</string>					<key>color</key><array><real>1</real><real>0.61176470588235</real><real>0</real><real>1</real></array></map>
 <key>5aa5c70d-d787-571b-0495-4fc1bdef1500</key><map><key>name</key><string>LGG Proxy</string>				<key>color</key><array><real>0.99607843137255</real><real>0.22745098039216</real><real>0.12156862745098</real><real>1</real></array></map>
@@ -55,7 +56,7 @@
 <key>8078ffb3-840c-d037-caf3-5cd02c2e7040</key><map><key>name</key><string>Loading...</string>				<key>alt</key><string>ccda2b3b-e72c-a112-e126-fee238b67218</string></map>
 <key>602243f4-8fb1-ac00-d5bc-7ab50c4433b7</key><map><key>name</key><string>Loading...</string>				<key>alt</key><string>ccda2b3b-e72c-a112-e126-fee238b67218</string></map>
 <key>0ae2f973-98c1-a4e8-9f4b-9db2044ab079</key><map><key>name</key><string>Loading...</string>				<key>alt</key><string>ccda2b3b-e72c-a112-e126-fee238b67218</string></map>
-<key>397554b9-3e2f-4255-5fde-76f93e71295b</key><map><key>name</key><string>ARK Genesis</string>				<key>color</key><array><real>0.74901960784314</real><real>0.74901960784314</real><real>0.74901960784314</real><real>1</real></array></map>
+<key>397554b9-3e2f-4255-5fde-76f93e71295b</key><map><key>name</key><string>Genesis</string>					<key>color</key><array><real>0.74901960784314</real><real>0.74901960784314</real><real>0.74901960784314</real><real>1</real></array></map>
 <key>745ac6b7-5b03-450d-6b01-577da127d7d2</key><map><key>name</key><string>Zidonuke</string>				<key>color</key><array><real>0</real><real>0</real><real>0.58823529411765</real><real>1</real></array></map>
 <key>adcbe893-7643-fd12-f61c-0b39717e2e32</key><map><key>name</key><string>tyk3n</string>					<key>color</key><array><real>0.9921568627451</real><real>0.5921568627451</real><real>0.5843137254902</real><real>1</real></array></map>
 <key>ccb509cf-cc69-e569-38f1-5086c687afd1</key><map><key>name</key><string>Ruby</string>					<key>color</key><array><real>0.86274509803922</real><real>0.29411764705882</real><real>0.38823529411765</real><real>1</real></array></map>
