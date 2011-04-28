@@ -109,7 +109,7 @@ void PhoenixViewerLink::downloadClientTags()
 	if(gSavedSettings.getBOOL("PhoenixDownloadClientTags"))
 	{
 		//url = "http://phoenixviewer.com/app/client_tags/client_list.xml";
-		std::string url("http://phoenixviewer.com/app/client_list_v2.xml");
+		std::string url("http://phoenixviewer.com/app/client_tags/client_list_v2.xml");
 		// if(gSavedSettings.getBOOL("PhoenixDontUseMultipleColorTags"))
 		// {
 		//	 url="http://phoenixviewer.com/app/client_list_unified_colours.xml";
