@@ -9108,8 +9108,7 @@ void LLVOAvatar::processAvatarAppearance( LLMessageSystem* mesgsys )
 
 				if( !param )
 				{
-					llwarns << "Number of params in AvatarAppearance msg does not match number of params in avatar xml file." << llendl;
-					return;
+					break;
 				}
 
 				U8 value;
@@ -9143,11 +9142,6 @@ void LLVOAvatar::processAvatarAppearance( LLMessageSystem* mesgsys )
 		while( param && (param->getGroup() != VISUAL_PARAM_GROUP_TWEAKABLE) ) // don't worry about VISUAL_PARAM_GROUP_TWEAKABLE_NO_TRANSMIT
 		{
 			param = getNextVisualParam();
-		}
-		if( param )
-		{
-			llwarns << "Number of params in AvatarAppearance msg does not match number of params in avatar xml file." << llendl;
-			return;
 		}
 
 		if (params_changed)
