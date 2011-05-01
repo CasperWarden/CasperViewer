@@ -457,6 +457,12 @@ void JCLSLBridge::attachbridge(LLViewerInventoryItem* item)
 //KC: Called by LLVOAvatar::detachObject
 void JCLSLBridge::CheckForBridgeDetach(const LLUUID& item_id)
 {
+	// Check for disconnect. --Techwolf Lupindo 2011-5-1
+	if (!gAgent.getRegion())
+	{
+		return;
+	}
+	
 	if (sBuildBridge && item_id.notNull() && mBridge) // do sanity checks first....
 	{
 		if (item_id == mBridge->getUUID())
