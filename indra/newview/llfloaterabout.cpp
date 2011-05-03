@@ -58,6 +58,7 @@
 #include "lltrans.h"
 #include "llappviewer.h" 
 #include "llglheaders.h"
+#include "llviewerwindow.h"
 #include "llwindow.h"
 
 // [RLVa:KB]
@@ -103,6 +104,8 @@ LLFloaterAbout::LLFloaterAbout()
 	{
 		return;
 	}
+
+	childSetAction("copy_btn", onClickCopy, this);
 
 	// For some reason, adding style doesn't work unless this is true.
 	support_widget->setParseHTML(TRUE);
@@ -190,6 +193,22 @@ void LLFloaterAbout::show(void*)
 	sInstance->open();	 /*Flawfinder: ignore*/
 }
 
+
+void LLFloaterAbout::onClickCopy(void* user_data) 
+{ 
+  LLFloaterAbout* self = (LLFloaterAbout*)user_data; 
+
+if (self) 
+  { 
+    LLViewerTextEditor* support_widget = self->getChild<LLViewerTextEditor>("support_editor", true); 
+
+if (support_widget) 
+    { 
+      std::string buffer = support_widget->getText(); 
+      gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(buffer)); 
+    } 
+  } 
+} 
 
 std::string LLFloaterAbout::get_viewer_release_notes_url()
 {

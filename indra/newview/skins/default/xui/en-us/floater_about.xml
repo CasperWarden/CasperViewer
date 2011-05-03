@@ -3,17 +3,23 @@
      can_resize="false" height="440" min_height="100" min_width="100"
      name="floater_about" rect_control="FloaterAboutRect"
      title="About Phoenix Viewer" width="470">
-  <text_editor bottom_delta="-260" embedded_items="false"
-     follows="left|top|right|bottom" font="SansSerif" height="238" left="6"
-     max_length="65536" mouse_opaque="true" name="support_editor" width="458"
+  <tab_container follows="all" bottom="10" left="10"
+     height="405" width="450" name="about_tab" tab_position="top">
+  <panel border="true" height="386" label="Info"
+     help_topic="about_support_tab" name="support_panel">
+  <text_editor bottom="24" embedded_items="false"
+     follows="left|top|right|bottom" font="SansSerif" height="356" left="6"
+     max_length="65536" mouse_opaque="true" name="support_editor" width="423"
      word_wrap="true" />
-  <string name="you_are_at">
-    You are at [POSITION]
-  </string>
-	<text_editor bottom="-434" embedded_items="false"
-	     follows="left|top|right|bottom" font="SansSerifSmall" height="168" left="6"
-  max_length="65536" mouse_opaque="true" name="credits_editor" width="458"
-  word_wrap="true"> 
+    <button follows="left|top" label="Copy to Clipboard" name="copy_btn"
+   left="5" bottom="0" top_pad="5" height="20" width="180" />
+  </panel>
+  <panel border="true" label="Credits" height="386"
+    help_topic="about_credits_tab" name="credits_panel">
+    <text_editor bottom="6" embedded_items="false"
+     follows="left|top|right|bottom" font="SansSerifSmall" height="374" left="6"
+     max_length="65536" mouse_opaque="true" name="credits_editor" width="423"
+     word_wrap="true"> 
 Phoenix is brought to you by:
 Arrehn Oberlander, Jessica Lyon, Kadah Coba, Kitty Barnett, Liny Odell, LordGreggreg Back, Mobius Ryba, Tankmaster Finesmith, Techwolf Lupindo, Tonya Souther, Vortex Saito, WoLf Loonie, and Wolfspirit Magic.
 
@@ -36,30 +42,42 @@ Thank you to the following residents for helping to ensure that this is the best
 Able Whitman, Adeon Writer, adonaira Aabye, Aeron Kohime, Agathos Frascati, Aimee Trescothick, Aleric Inglewood, Alissa Sabre, Aminom Marvin, Angela Talamasca, Aralara Rajal, Armin Weatherwax, Ashrilyn Hayashida, Athanasius Skytower, Aura Dirval, Barney Boomslang, Biancaluce Robbiani, Biker Offcourse, Borg Capalini, Bulli Schumann, catherine pfeffer, Chalice Yao, Corre Porta, Court Goodman, Cummere Mayo, Dale Innis, Darien Caldwell, Darjeeling Schoonhoven, Daten Thielt, dimentox travanti, Dirk Talamasca, Drew Dwi, Duckless Vandyke, Elanthius Flagstaff, Electro Burnstein, emiley tomsen, Escort DeFarge, Eva Rau, Ezian Ecksol, Fire Centaur, Fluf Fredriksson, Francisco Koolhoven, Frontera Thor, Frungi Stastny, Gally Young, gearsawe stonecutter, Gigs Taggart, Gordon Wendt, Gudmund Shepherd, Gypsy Paz, Harleen Gretzky, Henri Beauchamp, Inma Rau, Irene Muni, Iskar Ariantho, Jacek Antonelli, JB Kraft, Jessicka Graves, Joeseph Albanese, Joshua Philgarlic, Khyota Wulluf, kirstenlee Cinquetti, Latif Khalifa, Lex Neva, Lilibeth Andree, Lisa Lowe, Lunita Savira, Loosey Demonia, lum pfohl, Marcos Fonzarelli, MartinRJ Fayray, Marusame Arai, Matthew Dowd, Maya Remblai, McCabe Maxsted, Meghan Dench, Melchoir Tokhes, Menos Short, Michelle2 Zenovka, Mimika Oh, Minerva Memel, Mm Alder, Ochi Wolfe, Omei Turnbull, Pesho Replacement, Phantom Ninetails, phoenixflames kukulcan, Polo Gufler, prez pessoa, princess niven, Prokofy Neva, Qie Niangao, Rem Beattie, RodneyLee Jessop, Saijanai Kuhn, Seg Baphomet, Sergen Davies, Shirley Marquez, Siana Gearz, SignpostMarv Martin, Sindy Tsure, Sira Arbizu, Skips Jigsaw, Sougent Harrop, Spritely Pixel, Squirrel Wood, StarSong Bright, Subversive Writer, Sugarcult Dagger, Sylumm Grigorovich, Tammy Nowotny, Tanooki Darkes, Tayra Dagostino, Theoretical Chemistry, Thickbrick Sleaford, valerie rosewood, Vex Streeter, Vixen Heron, Whoops Babii, Winter Ventura, Xiki Luik, Yann Dufaux, Yina Yao, Yukinoroh Kamachi, Zolute Infinity, Zwagoth Klaar, and many others.
 
 
-    3Dconnexion SDK Copyright (C) 1992-2007 3Dconnexion
-    APR Copyright (C) 2000-2004 The Apache Software Foundation
-    cURL Copyright (C) 1996-2002, Daniel Stenberg, (daniel@haxx.se)
-    DBus/dbus-glib Copyright (C) 2002, 2003  CodeFactory AB / Copyright (C) 2003, 2004 Red Hat, Inc.
-    expat Copyright (C) 1998, 1999, 2000 Thai Open Source Software Center Ltd.
-    FreeType Copyright (C) 1996-2002, The FreeType Project (www.freetype.org).
-    GL Copyright (C) 1999-2004 Brian Paul.
-    Havok.com(TM) Copyright (C) 1999-2001, Telekinesys Research Limited.
-    jpeg2000 Copyright (C) 2001, David Taubman, The University of New South Wales (UNSW)
-    jpeglib Copyright (C) 1991-1998, Thomas G. Lane.
-    ogg/vorbis Copyright (C) 2001, Xiphophorus
-    OpenSSL Copyright (C) 1998-2002 The OpenSSL Project.
-    SDL Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002 Sam Lantinga
-    SSLeay Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
-    xmlrpc-epi Copyright (C) 2000 Epinions, Inc.
-    zlib Copyright (C) 1995-2002 Jean-loup Gailly and Mark Adler.
-    google-perftools Copyright (c) 2005, Google Inc.
+To be a success in business, be daring, be first, be different. --Henry Marchant</text_editor>
+  </panel>
+  <panel border="true" label="Licences" height="386"
+    help_topic="about_licence_tab" name="credits_panel">
+    <text_editor bottom="6" embedded_items="false"
+     follows="left|top|right|bottom" font="SansSerifSmall" height="374" left="6"
+     max_length="65536" mouse_opaque="true" name="credits_editor" width="423"
+     word_wrap="true"> 
 
-    All rights reserved.  See licenses.txt for details.
+3Dconnexion SDK Copyright (C) 1992-2007 3Dconnexion
+APR Copyright (C) 2000-2004 The Apache Software Foundation
+cURL Copyright (C) 1996-2002, Daniel Stenberg, (daniel@haxx.se)
+DBus/dbus-glib Copyright (C) 2002, 2003  CodeFactory AB /
+    Copyright (C) 2003, 2004 Red Hat, Inc.
+expat Copyright (C) 1998, 1999, 2000 Thai Open Source Software Center Ltd.
+FreeType Copyright (C) 1996-2002, The FreeType Project (www.freetype.org).
+GL Copyright (C) 1999-2004 Brian Paul.
+Havok.com(TM) Copyright (C) 1999-2001, Telekinesys Research Limited.
+jpeg2000 Copyright (C) 2001, David Taubman, The University of
+    New South Wales (UNSW)
+jpeglib Copyright (C) 1991-1998, Thomas G. Lane.
+ogg/vorbis Copyright (C) 2001, Xiphophorus
+OpenSSL Copyright (C) 1998-2002 The OpenSSL Project.
+SDL Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002 Sam Lantinga
+SSLeay Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
+xmlrpc-epi Copyright (C) 2000 Epinions, Inc.
+zlib Copyright (C) 1995-2002 Jean-loup Gailly and Mark Adler.
+google-perftools Copyright (c) 2005, Google Inc.
 
-    Voice chat Audio coding: Polycom(R) Siren14(TM) (ITU-T Rec. G.722.1 Annex C)
+All rights reserved.  See licenses.txt for details.
 
-
-    To be a success in business, be daring, be first, be different. --Henry Marchant</text_editor>
-
-
+Voice chat Audio coding: Polycom(R) Siren14(TM) (ITU-T Rec. G.722.1 Annex C)
+</text_editor>
+</panel>
+</tab_container>
+<string name="you_are_at">
+  You are at [POSITION]
+</string>
 </floater>
