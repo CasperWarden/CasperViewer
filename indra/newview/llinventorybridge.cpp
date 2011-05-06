@@ -159,6 +159,7 @@ std::string ICON_NAME[ICON_NAME_COUNT] =
 	"inv_item_skirt.tga",
 	"inv_item_alpha.tga",
 	"inv_item_tattoo.tga",
+	"inv_item_physics.png",
 
 	"inv_item_animation.tga",
 	"inv_item_gesture.tga",
@@ -2588,6 +2589,11 @@ void LLFolderBridge::createNewHair(void* user_data)
 void LLFolderBridge::createNewEyes(void* user_data)
 {
 	LLFolderBridge::createWearable((LLFolderBridge*)user_data, WT_EYES);
+}
+
+void LLFolderBridge::createNewPhysics(void* user_data)
+{
+	LLFolderBridge::createWearable((LLFolderBridge*)user_data, WT_PHYSICS);
 }
 
 // static
