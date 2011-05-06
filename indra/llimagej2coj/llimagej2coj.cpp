@@ -174,8 +174,11 @@ BOOL LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 	// dereference the array.
 	if(!image) 
 	{
-		LL_DEBUGS("Openjpeg")  << "ERROR -> decodeImpl: failed to decode image - no image" << LL_ENDL;
-		base.decodeFailed();
+		LL_WARNS ("Openjpeg")  << "Failed to decode image at discard: " << (S32)base.getRawDiscardLevel() << ". No image." << LL_ENDL;
+		if (base.getRawDiscardLevel() == 0)
+		{
+			base.decodeFailed();
+		}
 		return TRUE; // done
 	}
 
@@ -183,13 +186,16 @@ BOOL LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 
 	if( !img_components ) // < 1 ||img_components > 4 )
 	{
-		LL_DEBUGS("Openjpeg") << "ERROR -> decodeImpl: failed to decode image wrong number of components: " << img_components << LL_ENDL;
+		LL_WARNS("Openjpeg") << "Failed to decode image at discard: " << (S32)base.getRawDiscardLevel() << ". Wrong number of components: " << img_components << LL_ENDL;
 		if (image)
 		{
 			opj_destroy_cstr_info(&cinfo);
 			opj_image_destroy(image);
 		}
-		base.decodeFailed();
+		if (base.getRawDiscardLevel() == 0)
+		{
+			base.decodeFailed();
+		}
 		return TRUE; // done
 	}
 
@@ -217,22 +223,28 @@ BOOL LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 	   the difference will be greater than this level */
 	if (decompdifference > base.getRawDiscardLevel())
 	{
-		LL_DEBUGS("Openjpeg") << "not enough data for requested discard level, setting mDecoding to FALSE, difference: " << (decompdifference - base.getRawDiscardLevel()) << llendl;
+		LL_WARNS("Openjpeg") << "Not enough data for requested discard level " << (S32)base.getRawDiscardLevel() << ", difference: " << (decompdifference - base.getRawDiscardLevel()) << llendl;
 		opj_destroy_cstr_info(&cinfo);
 		opj_image_destroy(image);
-		base.decodeFailed();
+		if (base.getRawDiscardLevel() == 0)
+		{
+			base.decodeFailed();
+		}
 		return TRUE;
 	}
 
 	if(img_components <= first_channel)
 	{
-		LL_DEBUGS("Openjpeg") << "trying to decode more channels than are present in image: numcomps: " << img_components << " first_channel: " << first_channel << LL_ENDL;
+		LL_WARNS("Openjpeg") << "Trying to decode more channels than are present in image, numcomps: " << img_components << " first_channel: " << first_channel << LL_ENDL;
 		if (image)
 		{
 			opj_destroy_cstr_info(&cinfo);
 			opj_image_destroy(image);
 		}
-		base.decodeFailed();
+		if (base.getRawDiscardLevel() == 0)
+		{
+			base.decodeFailed();
+		}
 		return TRUE;
 	}
 
@@ -277,11 +289,14 @@ BOOL LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 		}
 		else // Some rare OpenJPEG versions have this bug.
 		{
-			llwarns << "ERROR -> decodeImpl: failed to decode image! (NULL comp data - OpenJPEG bug)" << llendl;
+			LL_WARNS("Openjpeg") << "Failed to decode image! (NULL comp data - OpenJPEG bug)" << LL_ENDL;
 			opj_destroy_cstr_info(&cinfo);
 			opj_image_destroy(image);
 
-			base.decodeFailed();
+			if (base.getRawDiscardLevel() == 0)
+			{
+				base.decodeFailed();
+			}
 			return TRUE; // done
 		}
 	}
