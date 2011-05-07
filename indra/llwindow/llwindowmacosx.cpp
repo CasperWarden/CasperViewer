@@ -3194,6 +3194,17 @@ void LLWindowMacOSX::spawnWebBrowser(const std::string& escaped_url)
 	}
 }
 
+void LLWindowMacOSX::openFile(const std::string& file_name )
+{
+        llinfos << "Opening file " << file_name << llendl;
+        FSRef appRef;
+        OSStatus os_result = FSPathMakeRef((UInt8*)file_name.c_str(),
+                                           &appRef,NULL);
+        if(os_result >= 0)
+        {
+                os_result = LSOpenFSRef(&appRef, NULL);
+        }
+}
 
 BOOL LLWindowMacOSX::dialog_color_picker ( F32 *r, F32 *g, F32 *b)
 {
