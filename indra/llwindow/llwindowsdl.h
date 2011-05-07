@@ -120,8 +120,7 @@ public:
 	/*virtual*/ void bringToFront();
 
 	/*virtual*/ void spawnWebBrowser(const std::string& escaped_url);
-	/*virtual*/ void openFile(const std::string& file_name);
-
+	
 	static std::vector<std::string> getDynamicFallbackFontList();
 
 	// Not great that these are public, but they have to be accessible
