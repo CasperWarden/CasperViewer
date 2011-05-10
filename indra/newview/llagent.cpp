@@ -7839,13 +7839,18 @@ void LLAgent::sendAgentSetAppearance()
 		gMessageSystem->addBinaryDataFast(_PREHASH_TextureEntry, NULL, 0);
 	}
 
-
+	BOOL send_v1_message = gSavedSettings.getBOOL("PhoenixDontSendAvPhysicsParms");
 	S32 transmitted_params = 0;
 	for (LLViewerVisualParam* param = (LLViewerVisualParam*)mAvatarObject->getFirstVisualParam();
 		 param;
 		 param = (LLViewerVisualParam*)mAvatarObject->getNextVisualParam())
 	{
-		if (param->getGroup() == VISUAL_PARAM_GROUP_TWEAKABLE) // do not transmit params of group VISUAL_PARAM_GROUP_TWEAKABLE_NO_TRANSMIT
+		// Do not transmit params of group
+		//  VISUAL_PARAM_GROUP_TWEAKABLE_NO_TRANSMIT. If we're
+		//  sending the version 1 compatible message, then strip out   
+		//  V2-only parameters that have IDs of 1100 or higher.   
+		if ((param->getGroup() == VISUAL_PARAM_GROUP_TWEAKABLE) &&
+			((param->getID() < 1100) || (!send_v1_message)))
 		{
 			msg->nextBlockFast(_PREHASH_VisualParam );
 			
@@ -7861,7 +7866,7 @@ void LLAgent::sendAgentSetAppearance()
 		}
 	}
 
-//	llinfos << "Avatar XML num VisualParams transmitted = " << transmitted_params << llendl;
+	llinfos << "Avatar XML num VisualParams transmitted = " << transmitted_params << llendl;
 	sendReliableMessage();
 }
 
