@@ -246,8 +246,10 @@ struct LLAvatarTexData
 
 struct LLTextureMaskData
 {
-	LLTextureMaskData( const LLUUID& id )
-		: mAvatarID(id), mLastDiscardLevel(S32_MAX) {}
+	LLTextureMaskData( const LLUUID& id ) :
+		mAvatarID(id), 
+		mLastDiscardLevel(S32_MAX) 
+	{}
 	LLUUID				mAvatarID;
 	S32					mLastDiscardLevel;
 };
@@ -9135,7 +9137,7 @@ void LLVOAvatar::processAvatarAppearance( LLMessageSystem* mesgsys )
 					mSupportsPhysics = true;
 				}
 
-				if(param->getID() == 507 && newWeight != getActualBoobGrav())
+				else if(param->getID() == 507 && newWeight != getActualBoobGrav())
 				{
 					llwarns << "Boob Grav SET to " << newWeight << " for " << getFullname() << llendl;
 					setActualBoobGrav(newWeight);
@@ -9163,6 +9165,14 @@ void LLVOAvatar::processAvatarAppearance( LLMessageSystem* mesgsys )
 		{
 			param = getNextVisualParam();
 		}
+
+		if (param)
+		{
+		        if (param->getName() == "breast_physics_mass")
+		        {
+		                llinfos << getFullname() << " does not have avatar physics." << llendl;
+                        }
+                }
 
 		if (params_changed)
 		{

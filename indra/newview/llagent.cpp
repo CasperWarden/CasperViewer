@@ -7840,6 +7840,7 @@ void LLAgent::sendAgentSetAppearance()
 	}
 
 	BOOL send_v1_message = gSavedSettings.getBOOL("PhoenixDontSendAvPhysicsParms");
+	BOOL wearing_physics = (getWearable(WT_PHYSICS) != NULL);
 	S32 transmitted_params = 0;
 	for (LLViewerVisualParam* param = (LLViewerVisualParam*)mAvatarObject->getFirstVisualParam();
 		 param;
@@ -7850,7 +7851,8 @@ void LLAgent::sendAgentSetAppearance()
 		//  sending the version 1 compatible message, then strip out   
 		//  V2-only parameters that have IDs of 1100 or higher.   
 		if ((param->getGroup() == VISUAL_PARAM_GROUP_TWEAKABLE) &&
-			((param->getID() < 1100) || (!send_v1_message)))
+			((param->getID() < 1100) || 
+				(!send_v1_message && wearing_physics)))
 		{
 			msg->nextBlockFast(_PREHASH_VisualParam );
 			
