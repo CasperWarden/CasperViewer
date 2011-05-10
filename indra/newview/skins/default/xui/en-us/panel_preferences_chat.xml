@@ -56,7 +56,12 @@
 	     control_name="ScriptErrorColor" enabled="true" follows="left|top"
 	     height="47"  label="Errors" left_delta="54" mouse_opaque="true"
 	     name="script_error" width="44" />
-	<color_swatch border_color="0.45098 0.517647 0.607843 1" bottom="-150"
+  <color_swatch border_color="0.45098 0.517647 0.607843 1" bottom="-150"
+	     can_apply_immediately="true" color="0.0 0.9 0.7 1"
+	     control_name="PhoenixLindensChatColor" enabled="true" follows="left|top"
+	     height="47"  label="Linden" left="94" mouse_opaque="true"
+	     name="Linden" width="44" />
+  <color_swatch border_color="0.45098 0.517647 0.607843 1" bottom="-150"
 	     can_apply_immediately="true" color="0.7 0.9 0.7 1"
 	     control_name="ObjectChatColor" enabled="true" follows="left|top"
 	     height="47"  label="Objects" left="148" mouse_opaque="true"
@@ -127,12 +132,16 @@
 	     mouse_opaque="true" name="chat_full_width_check" radio_style="false"
 	     width="239" />
 	<text type="string" length="1" bg_visible="false" border_drop_shadow_visible="false" border_visible="false"
-	      bottom_delta="-22" drop_shadow_visible="true" enabled="true" follows="left|top"
+	      bottom_delta="-15" drop_shadow_visible="true" enabled="true" follows="left|top"
 	     font="SansSerifSmall" h_pad="0" halign="left" height="10" left="12"
 	     mouse_opaque="false" name="text_box6" v_pad="0" width="135">
 		Chat Options:
 	</text>
-	<check_box bottom_delta="-8" enabled="true"
+  <check_box bottom_delta="-5" enabled="true"
+       follows="left|top" font="SansSerifSmall" height="16" initial_value="false"
+       label="Color text for Linden text chat" left="148" mouse_opaque="true"
+       name="PhoenixColorLindensChat" radio_style="false" width="237" />
+	<check_box bottom_delta="-20" enabled="true"
 	     follows="left|top" font="SansSerifSmall" height="16" initial_value="false"
 	     label="Close chat bar after hitting return" left="148" mouse_opaque="true"
 	     name="close_chat_on_return_check" radio_style="false" width="237" />
@@ -159,16 +168,16 @@
 	     label="Color text in chat from my friends in a different color" left="148" mouse_opaque="true"
 	     name="PhoenixColorFriendsChat" radio_style="false" width="237" />
 	<text type="string" length="1" bg_visible="false" border_drop_shadow_visible="false" border_visible="false"
-	     bottom="-365" drop_shadow_visible="true" enabled="true" follows="left|top"
+	     bottom="-373" drop_shadow_visible="true" enabled="true" follows="left|top"
 	     font="SansSerifSmall" h_pad="0" halign="left" height="10" left="12"
 	     mouse_opaque="false" name="text_box7" v_pad="0" width="128">
 		Bubble Chat:
 	</text>
-	<check_box bottom="-370" control_name="UseChatBubbles" enabled="true" follows="left|top"
+	<check_box bottom_delta="-7" control_name="UseChatBubbles" enabled="true" follows="left|top"
 	     font="SansSerifSmall" height="16" initial_value="false"
 	     label="Show chat bubbles" left="148" mouse_opaque="true"
 	     name="bubble_text_chat" radio_style="false" width="237" />
-	<slider bottom="-386" can_edit_text="false" control_name="ChatBubbleOpacity"
+	<slider bottom_delta="-15" can_edit_text="false" control_name="ChatBubbleOpacity"
 	     decimal_digits="3" enabled="true" follows="left|top" height="12"
 	     increment="0.05" initial_val="1" label="Opacity" left="148" max_val="1"
 	     min_val="0" mouse_opaque="true" name="bubble_chat_opacity" show_text="true"
@@ -180,7 +189,7 @@
 	     mouse_opaque="false" name="text_translate_chat" v_pad="0" width="128">
 		Translate Chat:
 	</text>
-	<check_box bottom="-417" control_name="TranslateChat" enabled="true" follows="left|top"
+	<check_box bottom="-420" control_name="TranslateChat" enabled="true" follows="left|top"
 	     font="SansSerifSmall" height="16" initial_value="false"
 	     label="Use machine translation while chatting (powered by Google)" left="148" mouse_opaque="true"
 	     name="translate_chat" radio_style="false" width="237" />
