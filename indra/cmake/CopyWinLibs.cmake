@@ -42,6 +42,19 @@ copy_if_different(
     )
 set(all_targets ${all_targets} ${out_targets})
 
+set(debug_src_dir "${CMAKE_SOURCE_DIR}/../fmodapi375win/api")
+set(debug_files
+    fmod.dll
+    )
+    
+copy_if_different(
+    ${debug_src_dir} 
+    "${CMAKE_CURRENT_BINARY_DIR}/Debug"
+    out_targets 
+    ${debug_files}
+    )
+set(all_targets ${all_targets} ${out_targets})
+
 # Debug config runtime files required for the plugin test mule
 set(plugintest_debug_src_dir "${CMAKE_SOURCE_DIR}/../libraries/i686-win32/lib/debug")
 set(plugintest_debug_files
@@ -221,6 +234,19 @@ set(release_files
     libhunspell.dll
     lgggrowl++.dll
     lgggrowl.dll
+    )
+    
+copy_if_different(
+    ${release_src_dir} 
+    "${CMAKE_CURRENT_BINARY_DIR}/Release"
+    out_targets 
+    ${release_files}
+    )
+set(all_targets ${all_targets} ${out_targets})
+
+set(release_src_dir "${CMAKE_SOURCE_DIR}/../fmodapi375win/api")
+set(release_files
+    fmod.dll
     )
     
 copy_if_different(
