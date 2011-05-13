@@ -176,8 +176,8 @@
 	     follows="left|top" font="SansSerifSmall" height="16"
 	     initial_value="true" label="Custom" left="385" mouse_opaque="true"
 	     name="CustomSettings" radio_style="false" width="256" />
-	<view_border bevel_style="none" border_thickness="1" bottom="-375" follows="top|left"
-	     height="260" left="5" name="GraphicsBorder" width="485" />
+	<view_border bevel_style="none" border_thickness="1" bottom="-415" follows="top|left"
+	     height="300" left="5" name="GraphicsBorder" width="485" />
 	<text type="string" length="1" bg_visible="false" border_drop_shadow_visible="false" border_visible="false"
 	     bottom="-130" drop_shadow_visible="true" enabled="true" follows="left|top"
 	     font="SansSerifSmall" h_pad="0" halign="left" height="12"
@@ -249,6 +249,24 @@
 	     follows="left|top" font="SansSerifSmall" height="16" initial_value="true"
 	     label="Avatar Cloth" left_delta="0" mouse_opaque="true" name="AvatarCloth"
 	     radio_style="false" width="256" />
+	<check_box bottom_delta="-20" control_name="AvatarPhysics" enabled="true"
+	     follows="left|top" font="SansSerifSmall" height="16" initial_value="true"
+	     label="Enable Avatar Physics" left_delta="0" mouse_opaque="true"
+	     name="AvatarPhysics" radio_style="false" width="256" />
+	<slider
+		bottom_delta="-20"
+		control_name="RenderAvatarPhysicsLODFactor"
+		follows="left|top"
+		height="16"
+		initial_value="100"
+		increment=".05"
+		label="  Avatar Physics:"
+		label_width="85"
+		layout="topleft"
+		left_delta="2"
+		name="AvatarPhysicsDetail"
+		show_text="false"
+		width="160"/>
 	<text type="string" length="1" bg_visible="false" border_drop_shadow_visible="false" border_visible="false"
 	     bottom="-131" drop_shadow_visible="true" enabled="true" follows="left|top"
 	     font="SansSerifSmall" h_pad="0" halign="left" height="12"
@@ -401,10 +419,10 @@
 			High
 		</radio_item>
 	</radio_group>
-	<button bottom="-400" enabled="true" font="SansSerif" halign="center" height="20"
+	<button bottom="-440" enabled="true" font="SansSerif" halign="center" height="20"
 	     label="Recommended Settings" left="130" mouse_opaque="true"
 	     name="Defaults" scale_image="true" width="170" />
-	<button bottom="-400" enabled="true" font="SansSerif" halign="center" height="20"
+	<button bottom="-440" enabled="true" font="SansSerif" halign="center" height="20"
 	     label="Hardware Options" label_selected="Hardware Options"
 	     left="310" mouse_opaque="true" name="GraphicsHardwareButton"
 	     scale_image="true" width="170" />
