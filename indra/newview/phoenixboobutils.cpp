@@ -28,6 +28,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+// As of the inclusion on LL V2 AV physics in build 1060, this file is no longer used, but kept in case of backing out LL V2 AV Physics.
 #include "llviewerprecompiledheaders.h"
 
 #include "phoenixboobutils.h"

@@ -347,7 +347,7 @@
         <line_editor bevel_style="in" border_style="line" border_thickness="1" bottom_delta="0" enabled="true" follows="left|top" font="SansSerif" handle_edit_keys_directly="true" height="20" left_delta="57" max_length="4096" mouse_opaque="true" name="xed_location" control_name="PhoenixLSLExternalEditor" select_all_on_focus_received="false" width="425" word_wrap="false"/>
       </panel>
 	  
-	  <!--Effects-->
+	  <!--Effects -removed post 1080 build do to impmentation of LL v2 AV Physics
       <panel border="true" bottom="-580" follows="left|top|right|bottom" height="525" label="Effects" left="1" mouse_opaque="true" name="Effects" width="418">
         <button bottom="-25" follows="left|top" font="SansSerifSmall" height="18" label="?" name="PhoenixHelp_Effects" tool_tip="Click here for help regarding the settings in this page." right="490" width="18"/>
         <check_box bottom="-20" enabled="true" follows="left|top" font="SansSerifSmall" height="16" label="Enable enhanced physics on avatar breasts" left="5" mouse_opaque="true" name="EmBreastsToggle" control_name="PhoenixBreastPhysicsToggle" width="126"/>
@@ -357,7 +357,7 @@
         <slider bottom_delta="-20" left_delta="0" name="PhoenixBoobFriction" control_name="PhoenixBoobFriction" decimal_digits="0" enabled="true" follows="left|top" height="18" increment="1" label="Breast friction:" label_width="100" max_val="100" min_val="1" mouse_opaque="true" show_text="true" width="250" auto_resize="false" tool_tip=""/>
         <slider bottom_delta="-20" left_delta="0" name="PhoenixBoobVelMin" control_name="PhoenixBoobVelMin" decimal_digits="0" enabled="true" follows="left|top" height="18" increment="1" label="Breast min vel:" label_width="100" max_val="100" min_val="1" mouse_opaque="true" show_text="true" width="250" auto_resize="false" tool_tip=""/>
         <button bottom_delta="-20" follows="left|top" font="SansSerifSmall" height="20" label="Default Settings" name="PhoenixBreastReset" tool_tip="Revert the values to the default settings." left="150" width="100"/>
-      </panel>
+      </panel>-->
 	  
 	  <!--Advanced Graphics-->
       <panel border="true" bottom="-580" follows="left|top|right|bottom" height="525" label="Advanced Graphics" left="1" mouse_opaque="true" name="Graphics" width="418">

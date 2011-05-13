@@ -1211,6 +1211,7 @@
 			<key>Value</key>
 			<integer>0</integer>
 		</map>
+    <!--removed post 1080 build do to impmentation of LL v2 AV Physics
 		<key>PhoenixBoobFriction</key>
 		<map>
 			<key>Comment</key>
@@ -1244,7 +1245,7 @@
 			<key>Value</key>
 			<real>54.0</real>
 		</map>
-		<key>PhoenixBreastPhysicsToggle</key>
+    <key>PhoenixBreastPhysicsToggle</key>
 		<map>
 			<key>Comment</key>
 			<string>Enables/Disables breast physics</string>
@@ -1298,7 +1299,7 @@
 			<string>F32</string>
 			<key>Value</key>
 			<real>0.1</real>
-		</map>
+		</map>-->
 		<key>PhoenixBroadcastEffects</key>
 		<map>
 			<key>Comment</key>

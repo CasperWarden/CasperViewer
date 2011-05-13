@@ -560,6 +560,7 @@ BOOL LLWearable::isDirty()
 			
 			U8 a = F32_to_U8( param->getWeight(), param->getMinWeight(), param->getMaxWeight() );
 
+			/* removed post 1060 build do to impmentation of LL v2 AV Physics
 			if(avatar->getAppearanceFlag() == true)
 			{
 				//boob
@@ -576,7 +577,7 @@ BOOL LLWearable::isDirty()
 				{
 						a = F32_to_U8( avatar->getActualBoobGrav(), param->getMinWeight(), param->getMaxWeight() );
 				}
-			}
+			}*/
 
 			
 			U8 b = F32_to_U8( weight,             param->getMinWeight(), param->getMaxWeight() );
@@ -669,8 +670,8 @@ void LLWearable::writeToAvatar( BOOL set_by_user )
 			F32 weight = get_if_there(mVisualParamMap, param_id, param->getDefaultWeight());
 
 			//ZOMG: When switching shapes from inventory
-			if(param_id == 507)
-				avatar->setActualBoobGrav(weight);
+			//if(param_id == 507)
+			//	avatar->setActualBoobGrav(weight);
 
 			// only animate with user-originated changes
 			if (set_by_user)
@@ -811,8 +812,8 @@ void LLWearable::readFromAvatar()
 		{
 			
 			//pretty sure is right
-			if(param->getID() == 507)
-				avatar->setActualBoobGrav(param->getWeight());
+			//if(param->getID() == 507)
+			//	avatar->setActualBoobGrav(param->getWeight());
 
 			mVisualParamMap[param->getID()] = param->getWeight();
 		}
@@ -865,8 +866,8 @@ void LLWearable::copyDataFrom( LLWearable* src )
 		{
 			S32 id = param->getID();
 			F32 weight = get_if_there(src->mVisualParamMap, id, param->getDefaultWeight() );
-			if(id == 507)
-				avatar->setActualBoobGrav(weight);
+			//if(id == 507)
+			//	avatar->setActualBoobGrav(weight);
 			
 
 			mVisualParamMap[id] = weight;
