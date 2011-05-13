@@ -148,7 +148,11 @@
 				<on_click function="Edit.TakeOff" userdata="alpha" />
 				<on_enable function="Edit.EnableTakeOff" userdata="alpha" />
 			</menu_item_call>
-			<menu_item_call bottom="-238" enabled="true" height="19" label="All Clothes" left="0" mouse_opaque="true" name="All Clothes" width="118">
+			<menu_item_call bottom="-238" enabled="false" height="19" label="Physics" left="0" mouse_opaque="true" name="Physics" width="118">
+				<on_click function="Edit.TakeOff" userdata="physics" />
+				<on_enable function="Edit.EnableTakeOff" userdata="physics" />
+			</menu_item_call>
+			<menu_item_call bottom="-257" enabled="true" height="19" label="All Clothes" left="0" mouse_opaque="true" name="All Clothes" width="118">
 				<on_click function="Edit.TakeOff" userdata="all" />
 			</menu_item_call>
 		</menu>

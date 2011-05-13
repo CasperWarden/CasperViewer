@@ -60,7 +60,8 @@ class LLPidLockFile
 	public:
 		LLPidLockFile( ) :
 			mSaving(FALSE), mWaiting(FALSE), 
-			mClean(TRUE), mPID(getpid())
+			mClean(TRUE), mPID(getpid()),
+			mNameTable(NULL)
 		{
 			mLockName = gDirUtilp->getTempDir() + "/savelock";
 		}

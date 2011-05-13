@@ -7455,7 +7455,8 @@ void LLAgent::createStandardWearables(BOOL female)
 		TRUE,  //WT_UNDERPANTS
 		FALSE,  //WT_SKIRT
 		FALSE, //WT_ALPHA
-		FALSE  //WT_TATTOO
+		FALSE,  //WT_TATTOO
+		FALSE   //WT_PHYSICS
 	};
 
 	for( S32 i=0; i < WT_COUNT; i++ )
@@ -7838,13 +7839,20 @@ void LLAgent::sendAgentSetAppearance()
 		gMessageSystem->addBinaryDataFast(_PREHASH_TextureEntry, NULL, 0);
 	}
 
-
+	BOOL send_v1_message = gSavedSettings.getBOOL("PhoenixDontSendAvPhysicsParms");
+	BOOL wearing_physics = (getWearable(WT_PHYSICS) != NULL);
 	S32 transmitted_params = 0;
 	for (LLViewerVisualParam* param = (LLViewerVisualParam*)mAvatarObject->getFirstVisualParam();
 		 param;
 		 param = (LLViewerVisualParam*)mAvatarObject->getNextVisualParam())
 	{
-		if (param->getGroup() == VISUAL_PARAM_GROUP_TWEAKABLE) // do not transmit params of group VISUAL_PARAM_GROUP_TWEAKABLE_NO_TRANSMIT
+		// Do not transmit params of group
+		//  VISUAL_PARAM_GROUP_TWEAKABLE_NO_TRANSMIT. If we're
+		//  sending the version 1 compatible message, then strip out   
+		//  V2-only parameters that have IDs of 1100 or higher.   
+		if ((param->getGroup() == VISUAL_PARAM_GROUP_TWEAKABLE) &&
+			((param->getID() < 1100) || 
+				(!send_v1_message && wearing_physics)))
 		{
 			msg->nextBlockFast(_PREHASH_VisualParam );
 			
@@ -7860,7 +7868,7 @@ void LLAgent::sendAgentSetAppearance()
 		}
 	}
 
-//	llinfos << "Avatar XML num VisualParams transmitted = " << transmitted_params << llendl;
+	llinfos << "Avatar XML num VisualParams transmitted = " << transmitted_params << llendl;
 	sendReliableMessage();
 }
 
@@ -8029,6 +8037,7 @@ void LLAgent::setWearableOutfit(
 	wearables_to_remove[WT_SKIRT]		= remove && gRlvWearableLocks.canRemove(WT_SKIRT);
 	wearables_to_remove[WT_ALPHA]		= remove && gRlvWearableLocks.canRemove(WT_ALPHA);
 	wearables_to_remove[WT_TATTOO]		= remove && gRlvWearableLocks.canRemove(WT_TATTOO);
+	wearables_to_remove[WT_PHYSICS]     = remove && gRlvWearableLocks.canRemove(WT_PHYSICS);
 // [/RLVa:KB]
 
 	S32 count = wearables.count();
@@ -8310,6 +8319,7 @@ void LLAgent::userRemoveAllClothesStep2( BOOL proceed, void* userdata )
 		gAgent.removeWearable( WT_SKIRT );
 		gAgent.removeWearable( WT_ALPHA );
 		gAgent.removeWearable( WT_TATTOO );
+		gAgent.removeWearable( WT_PHYSICS );
 	}
 }
 
