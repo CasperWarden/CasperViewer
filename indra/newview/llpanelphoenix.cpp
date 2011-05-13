@@ -242,8 +242,9 @@ BOOL LLPanelPhoenix::postBuild()
 	getChild<LLButton>("revert_production_voice_btn")->setClickedCallback(onClickVoiceRevertProd, this);
 	getChild<LLButton>("revert_debug_voice_btn")->setClickedCallback(onClickVoiceRevertDebug, this);
 
-	//getChild<LLButton>("PhoenixBreastReset")->setClickedCallback(onClickBoobReset, this);
-	
+#ifdef OLD_BREAST_PHYSICS
+	getChild<LLButton>("PhoenixBreastReset")->setClickedCallback(onClickBoobReset, this);
+#endif	
 
 	childSetCommitCallback("production_voice_field", onCommitApplyControl);//onCommitVoiceProductionServerName);
 	childSetCommitCallback("debug_voice_field", onCommitApplyControl);//onCommitVoiceDebugServerName);
@@ -545,7 +546,8 @@ void LLPanelPhoenix::onClickVoiceRevertProd(void* data)
 	gSavedSettings.setString("vivoxProductionServerName", "bhr.vivox.com");
 	self->getChild<LLLineEditor>("production_voice_field")->setValue("bhr.vivox.com");
 }
-/* removed post 1080 build do to impmentation of LL v2 AV Physics
+//removed post 1080 build do to impmentation of LL v2 AV Physics
+#ifdef OLD_BREAST_PHYSICS
 void LLPanelPhoenix::onClickBoobReset(void* data)
 {
 	LLPanelPhoenix* self = (LLPanelPhoenix*)data;
@@ -571,7 +573,7 @@ void LLPanelPhoenix::onClickBoobReset(void* data)
 	self->getChild<LLSliderCtrl>("PhoenixBoobVelMin")->setValue(var->getDefault());
 	var->resetToDefault();
 }
-*/
+#endif
 void LLPanelPhoenix::onCustomBeam(void* data)
 {
 	//LLPanelPhoenix* self =(LLPanelPhoenix*)data;

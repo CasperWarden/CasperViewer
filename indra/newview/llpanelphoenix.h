@@ -72,7 +72,9 @@ private:
 	//static void onSelectSkin(LLUICtrl* ctrl, void* data);
 	//static void onClickClassic(void* data);
 	//static void onClickSilver(void* data);
-	//static void onClickBoobReset(void* data);
+#ifdef OLD_BREAST_PHYSICS
+	static void onClickBoobReset(void* data);
+#endif
 	static void onClickVoiceRevertProd(void* data);
 	static void onCustomBeam(void* data);
 	static void onCustomBeamColor(void* data);

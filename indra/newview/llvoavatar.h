@@ -50,7 +50,9 @@
 #include "llvoavatardefines.h"
 #include "llavatarname.h"
 
-//#include "phoenixboobutils.h"
+#ifdef OLD_BREAST_PHYSICS
+#include "phoenixboobutils.h"
+#endif
 
 extern const LLUUID ANIM_AGENT_BODY_NOISE;
 extern const LLUUID ANIM_AGENT_BREATHE_ROT;
@@ -113,7 +115,9 @@ public:
 	void idleUpdateLipSync(bool voice_enabled);
 	void idleUpdateLoadingEffect();
 	void idleUpdateWindEffect();
-	//void idleUpdateBoobEffect();
+#ifdef OLD_BREAST_PHYSICS
+	void idleUpdateBoobEffect();
+#endif
 	void 			idleUpdateNameTag(const LLVector3& root_pos_last);
 	void			idleUpdateNameTagText(BOOL new_name);
 	LLVector3		idleUpdateNameTagPosition(const LLVector3& root_pos_last);
@@ -535,7 +539,8 @@ private:
 	BOOL			mAppearanceAnimSetByUser;
 	F32				mLastAppearanceBlendTime;
 
-/* removed post 1080 build do to impmentation of LL v2 AV Physics
+//removed post 1080 build do to impmentation of LL v2 AV Physics
+#ifdef OLD_BREAST_PHYSICS
 	//--------------------------------------------------------------------
 	// boob bounce stuff
 	//--------------------------------------------------------------------
@@ -559,7 +564,7 @@ public:
 			mFirstSetActualBoobGravRan = true;
 		}
 	}
-*/
+#endif
 	//--------------------------------------------------------------------
 	// Attachments
 	//--------------------------------------------------------------------

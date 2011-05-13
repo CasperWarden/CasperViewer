@@ -7858,9 +7858,11 @@ void LLAgent::sendAgentSetAppearance()
 			
 			// We don't send the param ids.  Instead, we assume that the receiver has the same params in the same sequence.
 			F32 param_value;
-			//if(param->getID() == 507)
-			//	param_value = mAvatarObject->getActualBoobGrav();
-			//else
+#ifdef OLD_BREAST_PHYSICS
+			if(param->getID() == 507)
+				param_value = mAvatarObject->getActualBoobGrav();
+			else
+#endif
 				param_value = param->getWeight();
 			const U8 new_weight = F32_to_U8(param_value, param->getMinWeight(), param->getMaxWeight());
 			msg->addU8Fast(_PREHASH_ParamValue, new_weight );

@@ -88,7 +88,6 @@ set(viewer_SOURCE_FILES
 	a_phoenixviewerlink.cpp
 	DiamondAoInt.cpp
 	phoenix.cpp
-	phoenixboobutils.cpp
 	exporttracker.cpp
 	chatbar_as_cmdline.cpp
 	floaterlocalassetbrowse.cpp
@@ -563,7 +562,6 @@ set(viewer_HEADER_FILES
 	chatbar_as_cmdline.h
 	DiamondAoInt.h
     phoenix.h
-	phoenixboobutils.h
 	exporttracker.h
 	floaterlocalassetbrowse.h
 	floateravatarlist.h
@@ -1028,6 +1026,14 @@ set(viewer_HEADER_FILES
 	llviewerdisplayname.h
 	llfloaterdisplayname.h
     )
+
+# OLD_BREAST_PHYSICS requires related commented sections in the fallowing xml's
+# app_settings/settings.xml
+# skins/default/xui/en-us/panel_preferences_phoenix.xml
+if (OLD_BREAST_PHYSICS)
+  LIST(APPEND viewer_SOURCE_FILES phoenixboobutils.cpp)
+  LIST(APPEND viewer_HEADER_FILES phoenixboobutils.h)
+endif (OLD_BREAST_PHYSICS)
 
 source_group("CMake Rules" FILES ViewerInstall.cmake)
 

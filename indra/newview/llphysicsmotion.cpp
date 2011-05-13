@@ -507,7 +507,9 @@ BOOL LLPhysicsMotionController::onUpdate(F32 time, U8* joint_mask)
 				}
 				mCharacter->updateVisualParams();
 			}
-			//((LLVOAvatar*)mCharacter)->idleUpdateBoobEffect(); //Fall back to emerald physics	
+#ifdef OLD_BREAST_PHYSICS
+			((LLVOAvatar*)mCharacter)->idleUpdateBoobEffect(); //Fall back to emerald physics	
+#endif
 			return TRUE;
 		}
         

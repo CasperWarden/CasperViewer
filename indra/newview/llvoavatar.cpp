@@ -753,8 +753,9 @@ F32 LLVOAvatar::sPhysicsLODFactor = 1.f;
 BOOL LLVOAvatar::sUseImpostors = FALSE;
 BOOL LLVOAvatar::sJointDebug = FALSE;
 
-//PhoenixGlobalBoobConfig LLVOAvatar::sBoobConfig;
-
+#ifdef OLD_BREAST_PHYSICS
+PhoenixGlobalBoobConfig LLVOAvatar::sBoobConfig;
+#endif
 
 
 F32 LLVOAvatar::sUnbakedTime = 0.f;
@@ -821,7 +822,9 @@ LLVOAvatar::LLVOAvatar(const LLUUID& id,
 	mFullyLoadedInitialized(FALSE),
 	mHasBakedHair( FALSE ),
 	mSupportsAlphaLayers(FALSE),
-	//mFirstSetActualBoobGravRan( false ),
+#ifdef OLD_BREAST_PHYSICS
+	mFirstSetActualBoobGravRan( false ),
+#endif
 	mSupportsPhysics( false )
 {
 	LLMemType mt(LLMemType::MTYPE_AVATAR);
@@ -1046,15 +1049,17 @@ LLVOAvatar::LLVOAvatar(const LLUUID& id,
 
 	}
 
-	/*  - As of the inclusion on LL V2 AV physics in build 1060, this file is not longer used, but kept incase of backing out LL V2 AV Physics.
-	grab the boob savedparams (prob a better place for this)
+	//As of the inclusion on LL V2 AV physics in build 1060, this file is not longer used, but kept incase of backing out LL V2 AV Physics.
+#ifdef OLD_BREAST_PHYSICS
+	//grab the boob savedparams (prob a better place for this)
 	sBoobConfig.mass             = PhoenixBoobUtils::convertMass(gSavedSettings.getF32("PhoenixBoobMass"));
 	sBoobConfig.hardness         = PhoenixBoobUtils::convertHardness(gSavedSettings.getF32("PhoenixBoobHardness"));
 	sBoobConfig.velMax           = PhoenixBoobUtils::convertVelMax(gSavedSettings.getF32("PhoenixBoobVelMax"));
 	sBoobConfig.velMin           = PhoenixBoobUtils::convertVelMin(gSavedSettings.getF32("PhoenixBoobVelMin"));
 	sBoobConfig.friction         = PhoenixBoobUtils::convertFriction(gSavedSettings.getF32("PhoenixBoobFriction"));
 	sBoobConfig.enabled          = gSavedSettings.getBOOL("PhoenixBreastPhysicsToggle");
-	sBoobConfig.XYInfluence		 = gSavedSettings.getF32("PhoenixBoobXYInfluence");*/
+	sBoobConfig.XYInfluence		 = gSavedSettings.getF32("PhoenixBoobXYInfluence");
+#endif
 
 
 	if (gNoRender)
@@ -3056,7 +3061,8 @@ void LLVOAvatar::idleUpdateAppearanceAnimation()
 // ------------------------------------------------------------
 // Danny: ZOMG Boob Phsyics go!
 // ------------------------------------------------------------	
-/* removed post 1080 build do to impmentation of LL v2 AV Physics
+//removed post 1080 build do to impmentation of LL v2 AV Physics
+#ifdef OLD_BREAST_PHYSICS
 void LLVOAvatar::idleUpdateBoobEffect()
 {
 	if(mFirstSetActualBoobGravRan)
@@ -3093,7 +3099,7 @@ void LLVOAvatar::idleUpdateBoobEffect()
 		mBoobState = newBoobState;
 	}
 }
-*/
+#endif
 void LLVOAvatar::idleUpdateLipSync(bool voice_enabled)
 {
 	// Use the Lipsync_Ooh and Lipsync_Aah morphs for lip sync
@@ -9138,13 +9144,14 @@ void LLVOAvatar::processAvatarAppearance( LLMessageSystem* mesgsys )
 				{
 					mSupportsPhysics = true;
 				}
-/* As of the inclusion on LL V2 AV physics in build 1060, this file is not longer used, but kept incase of backing out LL V2 AV Physics.
+//As of the inclusion on LL V2 AV physics in build 1060, this file is not longer used, but kept incase of backing out LL V2 AV Physics.
+#ifdef OLD_BREAST_PHYSICS
 				else if(param->getID() == 507 && newWeight != getActualBoobGrav())
 				{
 					llwarns << "Boob Grav SET to " << newWeight << " for " << getFullname() << llendl;
 					setActualBoobGrav(newWeight);
 				}
-*/
+#endif
 				if (is_first_appearance_message || (param->getWeight() != newWeight))
 				{
 					//llinfos << "Received update for param " << param->getDisplayName() << " at value " << newWeight << llendl;
