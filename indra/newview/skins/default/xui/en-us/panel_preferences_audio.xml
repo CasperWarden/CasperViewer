@@ -39,7 +39,7 @@
 	     mouse_opaque="true" name="auto_streaming_video" radio_style="false"
        tool_tip="If you have this enabled, regardless of whether you have media stopped or not, 
 when you enter a new parcel your media will automatically turn on after a few seconds." />
-  <check_box bottom_delta="-20" control_name="PhoenixAllowScriptedMedia" enabled="true"
+  <check_box bottom_delta="-20" control_name="PhoenixAllowScriptedMedia2" enabled="true"
 	     follows="left|top" font="SansSerifSmall" height="16" width="338"
 	     initial_value="true" label="Let scripts control my play button" left="162"
 	     mouse_opaque="true" name="scripted_media" radio_style="false"

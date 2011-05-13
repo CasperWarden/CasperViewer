@@ -409,7 +409,7 @@ void LLViewerParcelMedia::processParcelMediaCommandMessage( LLMessageSystem *msg
 		if(( command == PARCEL_MEDIA_COMMAND_PLAY ) ||
 		   ( command == PARCEL_MEDIA_COMMAND_LOOP ))
 		{
-			if( !(gSavedSettings.getBOOL("PhoenixAllowScriptedMedia") ||
+			if( !(gSavedSettings.getBOOL("PhoenixAllowScriptedMedia2") ||
 				sManuallyAllowedScriptedMedia||
 				gSavedSettings.getBOOL("ParcelMediaAutoPlayEnable") ))
 			{
@@ -451,7 +451,7 @@ void LLViewerParcelMedia::processParcelMediaCommandMessage( LLMessageSystem *msg
 
 	if (flags & (1<<PARCEL_MEDIA_COMMAND_TIME))
 	{
-		if( !(gSavedSettings.getBOOL("PhoenixAllowScriptedMedia") ||
+		if( !(gSavedSettings.getBOOL("PhoenixAllowScriptedMedia2") ||
 			sManuallyAllowedScriptedMedia||
 			gSavedSettings.getBOOL("ParcelMediaAutoPlayEnable") ))
 		{
