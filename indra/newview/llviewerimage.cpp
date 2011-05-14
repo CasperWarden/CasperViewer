@@ -1513,8 +1513,22 @@ bool LLViewerImage::doLoadedCallbacks()
 
 		destroyRawImage();
 		readBackRawImage(gl_discard);
-		llassert_always(mRawImage.notNull());
-		llassert_always(!mNeedsAux || mAuxRawImage.notNull());
+
+		// Bandaid fix to keep the viewer from crashing. Not nice, but it helps for the time being. -Zi
+//		llassert_always(mRawImage.notNull());
+		if(mRawImage.isNull())
+		{
+			lldebugs << "mRawImage == null!" << llendl;
+			return FALSE;
+		}
+
+//		llassert_always(!mNeedsAux || mAuxRawImage.notNull());
+		if(mNeedsAux && mAuxRawImage.isNull())
+		{
+			lldebugs << "mNeedsAux: " << mNeedsAux << " mAuxRawImage.isNull(): " << mAuxRawImage.isNull() << llendl;
+			return FALSE;
+		}
+		// Bandaid fix to keep the viewer from crashing. Not nice, but it helps for the time being. -Zi
 	}
 
 	//
