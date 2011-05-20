@@ -8192,7 +8192,10 @@ bool LLAgent::onSetWearableDialog( const LLSD& notification, const LLSD& respons
 		break;
 	}
 
-	delete wearable;
+//	Don't delete the wearable we were passed here, because it's the one we're using now -Zi
+//	Fixes PHOE-59, PHOE-1047 (partly). This might introduce a minor memory leak, but it's
+//	better than crashing for the rest of the V1.x lifetime.
+//	delete wearable;
 	return false;
 }
 
