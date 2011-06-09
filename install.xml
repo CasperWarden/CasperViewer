@@ -1089,9 +1089,9 @@
 					<key>linux64</key>
 					<map>
 						<key>md5sum</key>
-						<string>964c71e6ee22be1bcaf6d480e74cdd14</string>
-						<key>url</key>
-						<uri>http://s3.amazonaws.com/viewer-source-downloads/install_pkgs/ogg-vorbis-1.2.0-linux64-20080909.tar.bz2</uri>
+            <string>dded849d4d46fb5d94f088c86407ec98</string>
+            <key>url</key>
+            <uri>http://phoenixviewer.com/app/oggvorbislib/ogg-vorbis-linux64-1.2.2-1.3.2-20110514.tar.bz2</uri>
 					</map>
 					<key>windows</key>
 					<map>
