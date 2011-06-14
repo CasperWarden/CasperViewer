@@ -55,6 +55,7 @@
 #include "lluri.h"
 #include "llweb.h"
 #include "llsecondlifeurls.h"
+#include "llvoiceclient.h"
 #include "lltrans.h"
 #include "llappviewer.h" 
 #include "llglheaders.h"
@@ -351,6 +352,12 @@ std::string LLFloaterAbout::get_viewer_misc_info()
 
 	support.append("Qt Webkit Version: 4.7.1");
 	support.append("\n");
+	
+
+	support.append("Vivox Version: ");
+	support.append( gVoiceClient ? gVoiceClient->getAPIVersion() : "Unknown" );
+	support.append("\n");
+
 
 	if (gPacketsIn > 0)
 	{
