@@ -348,10 +348,7 @@ void LLWLParamManager::loadPreset(const std::string & name,bool propagate)
 	}
 
 	// bugfix for SL-46920: preventing filenames that break stuff.
-	char * curl_str = curl_escape(name.c_str(), name.size());
-	std::string escaped_filename(curl_str);
-	curl_free(curl_str);
-	curl_str = NULL;
+	std::string escaped_filename = CurlHelper::escape( name );
 
 	escaped_filename += ".xml";
 
@@ -397,10 +394,7 @@ void LLWLParamManager::loadPreset(const std::string & name,bool propagate)
 void LLWLParamManager::savePreset(const std::string & name)
 {
 	// bugfix for SL-46920: preventing filenames that break stuff.
-	char * curl_str = curl_escape(name.c_str(), name.size());
-	std::string escaped_filename(curl_str);
-	curl_free(curl_str);
-	curl_str = NULL;
+	std::string escaped_filename = CurlHelper::escape(name);
 
 	escaped_filename += ".xml";
 
@@ -685,11 +679,7 @@ bool LLWLParamManager::removeParamSet(const std::string& name, bool delete_from_
 		std::string path_name(gDirUtilp->getExpandedFilename( LL_PATH_USER_SETTINGS , "windlight/skies", ""));
 		
 		// use full curl escaped name
-		char * curl_str = curl_escape(name.c_str(), name.size());
-		std::string escaped_name(curl_str);
-		curl_free(curl_str);
-		curl_str = NULL;
-		
+		std::string escaped_name  = CurlHelper::escape( name );
 		gDirUtilp->deleteFilesInDir(path_name, escaped_name + ".xml");
 	}
 
