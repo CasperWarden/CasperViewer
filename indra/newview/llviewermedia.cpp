@@ -795,6 +795,11 @@ bool LLViewerMediaImpl::initializePlugin(const std::string& media_type)
 		media_source->setAutoScale(mMediaAutoScale);
 		media_source->setBrowserUserAgent(LLViewerMedia::getCurrentUserAgent());
 
+		if(gSavedSettings.getBOOL("BrowserIgnoreSSLCertErrors"))
+		{
+			media_source->ignore_ssl_cert_errors(true);
+		}
+
 		// TODO: Only send cookies to plugins that need them
 		//  Ideally, the plugin should tell us whether it handles cookies or not -- either via the init response or through a separate message.
 		//  Due to the ordering of messages, it's possible we wouldn't get that information back in time to send cookies before sending a navigate message,
