@@ -27,6 +27,7 @@ include_directories(
     ${LLIMAGE_INCLUDE_DIRS}
     ${LLRENDER_INCLUDE_DIRS}
     ${LLWINDOW_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/../include
 )
 
 

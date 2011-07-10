@@ -13,6 +13,8 @@ if (NOT STANDALONE)
     endif (VIEWER)
     set(ARCH_PREBUILT_DIRS_RELEASE ${ARCH_PREBUILT_DIRS})
     set(ARCH_PREBUILT_DIRS_DEBUG ${ARCH_PREBUILT_DIRS})
+    # include viewer 2.x style prebuilts libs for searching when linking.
+    set(ARCH_PREBUILT_DIRS ${ARCH_PREBUILT_DIRS} ${CMAKE_SOURCE_DIR}/../lib/release)
   elseif (DARWIN)
     set(ARCH_PREBUILT_DIRS_RELEASE ${LIBS_PREBUILT_DIR}/${LL_ARCH_DIR}/lib_release)
     set(ARCH_PREBUILT_DIRS ${ARCH_PREBUILT_DIRS_RELEASE})

@@ -20,6 +20,7 @@ include_directories(
     ${LLRENDER_INCLUDE_DIRS}
     ${LLXML_INCLUDE_DIRS}
     ${LLWINDOW_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/../include
     )
 
 set(llplugin_SOURCE_FILES
