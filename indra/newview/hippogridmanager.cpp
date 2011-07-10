@@ -433,7 +433,7 @@ void HippoGridManager::setCurrentGrid(const std::string &grid)
 	if (it != mGridInfo.end()) {
 		mCurrentGrid = grid;
 	} else if (!mGridInfo.empty()) {
-		llwarns << "Unknown grid '" << grid << "'. Setting to default grid." << llendl;
+		llwarns << "Unknown grid '" << grid << "'. Setting to default grid: " << mDefaultGrid << llendl;
 		mCurrentGrid = mDefaultGrid;
 	}
 }

@@ -1059,6 +1059,7 @@ void LLPanelLogin::loadLoginPage()
 	LLMediaCtrl* web_browser = sInstance->getChild<LLMediaCtrl>("login_html");
 
 	// navigate to the "real" page
+	LL_INFOS("Login Page") << "Loading " << oStr.str() << LL_ENDL;
 	web_browser->navigateTo( oStr.str(), "text/html" );
 }
 
