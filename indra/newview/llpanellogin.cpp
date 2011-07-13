@@ -946,9 +946,9 @@ void LLPanelLogin::loadLoginPage()
 	// Channel and Version
 	std::string version = llformat("%d.%d.%d (%d)",
 						LL_VERSION_MAJOR, LL_VERSION_MINOR, LL_VERSION_PATCH, LL_VIEWER_BUILD);
-
-	char* curl_channel = curl_escape(LL_CHANNEL, 0);
-	char* curl_version = curl_escape(version.c_str(), 0);
+  
+	std::string curl_channel = CurlHelper::escape(LL_CHANNEL);
+	std::string curl_version = CurlHelper::escape(version);
 	
 	oStr << "&channel=" << curl_channel;
 	oStr << "&version=" << curl_version;
@@ -956,26 +956,8 @@ void LLPanelLogin::loadLoginPage()
 	if(LL_CHANNEL != PHOENIX_RELEASE_CHANNEL)
 		oStr << "&unsupported=1";
 
-	curl_free(curl_channel);
-	curl_free(curl_version);
-
 	// grid=blah code was here. Due to the implementation of the Phoenix login manager, sending
 	// this information is a very bad idea. Don't do it.
-
-	// This is to work out if dropping Tiger support is sane. Also to suggest updates on the login screen.
-#ifdef LL_DARWIN
-	oStr << "&os=darwin";
-#if defined __i386__
-	oStr << "&arch=i386";
-#elif defined __ppc__
-	oStr << "&arch=ppc";
-#else
-	oStr << "&arch=unknown";
-#endif
-	SInt32 osx_version;
-	if(Gestalt(gestaltSystemVersion, &osx_version) == noErr)
-		oStr << "&osversion=" << osx_version;
-#endif // LL_DARWIN
 
 	if (gHippoGridManager->getConnectedGrid()->isSecondLife()) {
 		// find second life grid from login URI
@@ -989,9 +971,8 @@ void LLPanelLogin::loadLoginPage()
 				i = tmp.rfind('/');
 			if (i != std::string::npos) {
 				tmp = tmp.substr(i+1);
-				char* curl_grid = curl_escape(tmp.c_str(), 0);
+				std::string curl_grid = CurlHelper::escape(tmp.c_str());
 				oStr << "&grid=" << curl_grid;
-				curl_free(curl_grid);
 			}
 		}
 	}
@@ -1048,12 +1029,10 @@ void LLPanelLogin::loadLoginPage()
 		lastname = gSavedSettings.getString("LastName");
 	}
 
-	char* curl_region = curl_escape(region.c_str(), 0);
+	std::string curl_region = Curl_Helper::escape(region.c_str());
 
 	oStr <<"firstname=" << firstname <<
 		"&lastname=" << lastname << "&location=" << location <<	"&region=" << curl_region;
-
-	curl_free(curl_region);
 
 	if (!password.empty())
 	{
@@ -1080,6 +1059,7 @@ void LLPanelLogin::loadLoginPage()
 	LLMediaCtrl* web_browser = sInstance->getChild<LLMediaCtrl>("login_html");
 
 	// navigate to the "real" page
+	LL_INFOS("Login Page") << "Loading " << oStr.str() << LL_ENDL;
 	web_browser->navigateTo( oStr.str(), "text/html" );
 }
 

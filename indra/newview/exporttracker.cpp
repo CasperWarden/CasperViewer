@@ -800,7 +800,7 @@ BOOL JCExportTracker::mirror(const LLInventoryItem* item, LLViewerObject* contai
 			while(cat)
 			{
 				std::string folder = cat->getName();
-				folder = curl_escape(folder.c_str(), folder.size());
+				folder = CurlHelper::escape(folder.c_str());
 				tree.insert(tree.begin(),folder);
 				cat = gInventory.getCategory(cat->getParentUUID());
 			}

@@ -40,13 +40,12 @@ elseif (LINUX)
     else (STANDALONE)
        set(WEBKIT_PLUGIN_LIBRARIES
            llqtwebkit
-           qgif
-           qjpeg
            QtWebKit
            QtOpenGL
            QtNetwork
            QtGui
            QtCore
+           jscore
            fontconfig
            X11
            Xrender

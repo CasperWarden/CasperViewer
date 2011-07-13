@@ -515,6 +515,8 @@ Nicholaz Beresford
 	VWR-2412
 	VWR-2682
 	VWR-2684
+Nicky Dasmijn
+	VWR-24343
 Nounouch Hapmouche
 	VWR-238
 Patric Mills

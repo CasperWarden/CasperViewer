@@ -58,6 +58,42 @@
 
 #include "llsocks5.h"
 
+namespace CurlHelper
+{
+	void escapeHyphen( std::string &aString )
+	{
+		size_t i = aString.size();
+
+		while( i > 0 )
+		{
+			if( aString[i-1] == '-' )
+				aString.replace( i-1, 1, "%2D" );
+			--i;
+		}
+	}
+
+	std::string escape( char const *aString, size_t nSize )
+	{
+		char *pEscaped = curl_escape( aString,nSize );
+		std::string sRet(pEscaped);
+		curl_free( pEscaped );
+		escapeHyphen( sRet );
+		return sRet;
+	}
+
+	std::string escape( char const *aString )
+	{
+		return escape( aString, 0 );
+	}
+
+	std::string escape( std::string const &aString )
+	{
+		return escape( aString.c_str(), aString.size() );
+	}
+
+};
+
+
 //////////////////////////////////////////////////////////////////////////////
 /*
 	The trick to getting curl to do keep-alives is to reuse the

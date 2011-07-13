@@ -792,10 +792,10 @@ std::string LLWLParamManager::escapeString(const std::string& str)
 {
 	// Don't use LLURI::escape() because it doesn't encode '-' characters
 	// which may break handling of some system presets like "A-12AM".
-	char* curl_str = curl_escape(str.c_str(), str.size());
-	std::string escaped_str(curl_str);
-	curl_free(curl_str);
-	//std::string escaped_str(CurlHelper::escape(str));
+	//char* curl_str = curl_escape(str.c_str(), str.size());
+	//std::string escaped_str(curl_str);
+	//curl_free(curl_str);
+	std::string escaped_str(CurlHelper::escape(str));
 
 	return escaped_str;
 }

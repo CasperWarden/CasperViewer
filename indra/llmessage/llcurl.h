@@ -53,6 +53,12 @@ class LLMutex;
 // For whatever reason, this is not typedef'd in curl.h
 typedef size_t (*curl_header_callback)(void *ptr, size_t size, size_t nmemb, void *stream);
 
+namespace CurlHelper
+{
+	std::string escape( char const *aString );
+	std::string escape( std::string const &aString );
+};
+
 class LLCurl
 {
 	LOG_CLASS(LLCurl);
