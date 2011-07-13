@@ -2,31 +2,25 @@
  * @file llwlparamset.cpp
  * @brief Implementation for the LLWLParamSet class.
  *
- * $LicenseInfo:firstyear=2005&license=viewergpl$
- * 
- * Copyright (c) 2005-2009, Linden Research, Inc.
- * 
+ * $LicenseInfo:firstyear=2005&license=viewerlgpl$
  * Second Life Viewer Source Code
- * The source code in this file ("Source Code") is provided by Linden Lab
- * to you under the terms of the GNU General Public License, version 2.0
- * ("GPL"), unless you have obtained a separate licensing agreement
- * ("Other License"), formally executed by you and Linden Lab.  Terms of
- * the GPL can be found in doc/GPL-license.txt in this distribution, or
- * online at http://secondlifegrid.net/programs/open_source/licensing/gplv2
+ * Copyright (C) 2010, Linden Research, Inc.
  * 
- * There are special exceptions to the terms and conditions of the GPL as
- * it is applied to this Source Code. View the full text of the exception
- * in the file doc/FLOSS-exception.txt in this software distribution, or
- * online at
- * http://secondlifegrid.net/programs/open_source/licensing/flossexception
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation;
+ * version 2.1 of the License only.
  * 
- * By copying, modifying or distributing this software, you acknowledge
- * that you have read and understood your obligations described above,
- * and agree to abide by those obligations.
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  * 
- * ALL LINDEN LAB SOURCE CODE IS PROVIDED "AS IS." LINDEN LAB MAKES NO
- * WARRANTIES, EXPRESS, IMPLIED OR OTHERWISE, REGARDING ITS ACCURACY,
- * COMPLETENESS OR PERFORMANCE.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
  * $/LicenseInfo$
  */
 
@@ -35,8 +29,8 @@
 #include "llwlparamset.h"
 #include "llwlanimator.h"
 
-#include "llfloaterwindlight.h"
 #include "llwlparammanager.h"
+#include "llglslshader.h"
 #include "lluictrlfactory.h"
 #include "llsliderctrl.h"
 
@@ -100,7 +94,7 @@ void LLWLParamSet::update(LLGLSLShader * shader) const
 			
 			shader->uniform4fv(param, 1, val.mV);	
 		} 
-		else 
+		else // param is the uniform name
 		{
 			LLVector4 val;
 			
@@ -124,7 +118,6 @@ void LLWLParamSet::update(LLGLSLShader * shader) const
 			{
 				val.mV[0] = i->second.asBoolean();
 			}
-			
 			
 			shader->uniform4fv(param, 1, val.mV);
 		}
@@ -266,7 +259,6 @@ void LLWLParamSet::setEastAngle(float val)
 void LLWLParamSet::mix(LLWLParamSet& src, LLWLParamSet& dest, F32 weight)
 {
 	// set up the iterators
-	LLSD::map_iterator cIt = mParamValues.beginMap();
 
 	// keep cloud positions and coverage the same
 	/// TODO masking will do this later
@@ -279,55 +271,39 @@ void LLWLParamSet::mix(LLWLParamSet& src, LLWLParamSet& dest, F32 weight)
 	LLSD srcVal;
 	LLSD destVal;
 
-	// do the interpolation for all the ones saved as vectors
-	// skip the weird ones
-	for(; cIt != mParamValues.endMap(); cIt++) {
+	// Iterate through values
+	for(LLSD::map_iterator iter = mParamValues.beginMap(); iter != mParamValues.endMap(); ++iter)
+	{
 
-		// check params to make sure they're actually there
-		if(src.mParamValues.has(cIt->first))
+		// If param exists in both src and dest, set the holder variables, otherwise skip
+		if(src.mParamValues.has(iter->first) && dest.mParamValues.has(iter->first))
 		{
-			srcVal = src.mParamValues[cIt->first];
+			srcVal = src.mParamValues[iter->first];
+			destVal = dest.mParamValues[iter->first];
 		}
 		else
 		{
 			continue;
 		}
 		
-		if(dest.mParamValues.has(cIt->first))
+		if(iter->second.isReal())									// If it's a real, interpolate directly
 		{
-			destVal = dest.mParamValues[cIt->first];
+			iter->second = srcVal.asReal() + ((destVal.asReal() - srcVal.asReal()) * weight);
 		}
-		else
+		else if(iter->second.isArray() && iter->second[0].isReal()	// If it's an array of reals, loop through the reals and interpolate on those
+				&& iter->second.size() == srcVal.size() && iter->second.size() == destVal.size())
+		{
+			// Actually do interpolation: old value + (difference in values * factor)
+			for(int i=0; i < iter->second.size(); ++i) 
+			{
+				// iter->second[i] = (1.f-weight)*(F32)srcVal[i].asReal() + weight*(F32)destVal[i].asReal();	// old way of doing it -- equivalent but one more operation
+				iter->second[i] = srcVal[i].asReal() + ((destVal[i].asReal() - srcVal[i].asReal()) * weight);
+			}
+		}
+		else														// Else, skip
 		{
 			continue;
 		}		
-				
-		// skip if not a vector
-		if(!cIt->second.isArray()) 
-		{
-			continue;
-		}
-
-		// only Real vectors allowed
-		if(!cIt->second[0].isReal()) 
-		{
-			continue;
-		}
-		
-		// make sure all the same size
-		if(	cIt->second.size() != srcVal.size() ||
-			cIt->second.size() != destVal.size())
-		{
-			continue;
-		}
-		
-		// more error checking might be necessary;
-		
-		for(int i=0; i < cIt->second.size(); ++i) 
-		{
-			cIt->second[i] = (1.0f - weight) * (F32) srcVal[i].asReal() + 
-				weight * (F32) destVal[i].asReal();
-		}
 	}
 
 	// now mix the extra parameters

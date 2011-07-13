@@ -118,22 +118,36 @@ BOOL wlfPanel_AdvSettings::postBuild()
 			if (mIt->first.length() > 0)
 				WWcomboBox->add(mIt->first);
 		}
-		WWcomboBox->add(LLStringUtil::null);
-		WWcomboBox->setSimple(LLWaterParamManager::instance()->mCurParams.mName);
+
+		//RegionWL settings may not be on this list, add it
+		const std::string& wwset = LLEnvManagerNew::instance().getWaterPresetName();
+		if (!WWcomboBox->setSimple(wwset))
+		{
+			WWcomboBox->addSeparator();
+			WWcomboBox->add(wwset);
+			WWcomboBox->setSimple(wwset);
+		}
 		WWcomboBox->setCommitCallback(onChangeWWPresetName);
 	}
 
 	LLComboBox* WLcomboBox = getChild<LLComboBox>("WLPresetsCombo");
 	if(WLcomboBox != NULL) {
-		std::map<std::string, LLWLParamSet>::iterator mIt = 
+		std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
 			LLWLParamManager::instance()->mParamList.begin();
 		for(; mIt != LLWLParamManager::instance()->mParamList.end(); mIt++) 
 		{
-			if (mIt->first.length() > 0)
-				WLcomboBox->add(mIt->first);
+			if (mIt->first.name.length() > 0)
+				WLcomboBox->add(mIt->first.name);
 		}
-		WLcomboBox->add(LLStringUtil::null);
-		WLcomboBox->setSimple(LLWLParamManager::instance()->mCurParams.mName);
+
+		//RegionWL settings may not be on this list, add it
+		const std::string& wlset = LLEnvManagerNew::instance().getSkyPresetName();
+		if (!WLcomboBox->setSimple(wlset))
+		{
+			WLcomboBox->addSeparator();
+			WLcomboBox->add(wlset);
+			WLcomboBox->setSimple(wlset);
+		}
 		WLcomboBox->setCommitCallback(onChangeWLPresetName);
 	}
 	
@@ -192,10 +206,16 @@ void wlfPanel_AdvSettings::onChangeWWPresetName(LLUICtrl* ctrl, void * userData)
 		return;
 	}
 
-	// LLWaterParamManager::instance()->mAnimator.mIsRunning = false;
-	// LLWaterParamManager::instance()->mAnimator.mUseLindenTime = false;
-	LLWaterParamManager::instance()->loadPreset(
-		combo_box->getSelectedValue().asString());
+	const std::string& wwset = combo_box->getSelectedValue().asString();
+	if (LLWaterParamManager::instance()->hasParamSet(wwset))
+	{
+		LLEnvManagerNew::instance().setUseWaterPreset(wwset);
+	}
+	else
+	{
+		//if that failed, use region's
+		LLEnvManagerNew::instance().useRegionWater();
+	}
 }
 
 void wlfPanel_AdvSettings::onChangeWLPresetName(LLUICtrl* ctrl, void * userData)
@@ -207,10 +227,16 @@ void wlfPanel_AdvSettings::onChangeWLPresetName(LLUICtrl* ctrl, void * userData)
 		return;
 	}
 
-	LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
-	LLWLParamManager::instance()->loadPreset(
-		combo_box->getSelectedValue().asString());
+	const LLWLParamKey key(combo_box->getSelectedValue().asString(), LLEnvKey::SCOPE_LOCAL);
+	if (LLWLParamManager::instance()->hasParamSet(key))
+	{
+		LLEnvManagerNew::instance().setUseSkyPreset(key.name);
+	}
+	else
+	{
+		//if that failed, use region's
+		LLEnvManagerNew::instance().useRegionSky();
+	}
 }
 
 void wlfPanel_AdvSettings::onClickWWNext(void* user_data)
@@ -218,15 +244,14 @@ void wlfPanel_AdvSettings::onClickWWNext(void* user_data)
 	wlfPanel_AdvSettings* self = (wlfPanel_AdvSettings*) user_data;
 	
 	LLWaterParamManager * param_mgr = LLWaterParamManager::instance();
-	LLWaterParamSet& currentParams = param_mgr->mCurParams;
 
 	// find place of current param
 	std::map<std::string, LLWaterParamSet>::iterator mIt = 
-		param_mgr->mParamList.find(currentParams.mName);
+		param_mgr->mParamList.find(LLEnvManagerNew::instance().getWaterPresetName());
 
 	// if at the end, loop
 	std::map<std::string, LLWaterParamSet>::iterator last = param_mgr->mParamList.end(); --last;
-	if(mIt == last) 
+	if (mIt == param_mgr->mParamList.end() || mIt == last) 
 	{
 		mIt = param_mgr->mParamList.begin();
 	}
@@ -234,9 +259,9 @@ void wlfPanel_AdvSettings::onClickWWNext(void* user_data)
 	{
 		mIt++;
 	}
-	/*param_mgr->mAnimator.mIsRunning = false;
-	param_mgr->mAnimator.mUseLindenTime = false;*/
-	param_mgr->loadPreset(mIt->first, true);
+
+	//param_mgr->loadPreset(mIt->first, true);
+	LLEnvManagerNew::instance().setUseWaterPreset(mIt->first);
 	LLComboBox* comboBox = self->getChild<LLComboBox>("WWPresetsCombo");
 	comboBox->setSimple(mIt->first);
 }
@@ -246,14 +271,17 @@ void wlfPanel_AdvSettings::onClickWWPrev(void* user_data)
 	wlfPanel_AdvSettings* self = (wlfPanel_AdvSettings*) user_data;
 	
 	LLWaterParamManager * param_mgr = LLWaterParamManager::instance();
-	LLWaterParamSet & currentParams = param_mgr->mCurParams;
 
 	// find place of current param
 	std::map<std::string, LLWaterParamSet>::iterator mIt = 
-		param_mgr->mParamList.find(currentParams.mName);
+		param_mgr->mParamList.find(LLEnvManagerNew::instance().getWaterPresetName());
 
+	if (mIt == param_mgr->mParamList.end())
+	{
+		mIt = param_mgr->mParamList.begin();
+	}
 	// if at the beginning, loop
-	if(mIt == param_mgr->mParamList.begin()) 
+	else if(mIt == param_mgr->mParamList.begin()) 
 	{
 		std::map<std::string, LLWaterParamSet>::iterator last = param_mgr->mParamList.end(); --last;
 		mIt = last;
@@ -262,9 +290,9 @@ void wlfPanel_AdvSettings::onClickWWPrev(void* user_data)
 	{
 		mIt--;
 	}
-	/*param_mgr->mAnimator.mIsRunning = false;
-	param_mgr->mAnimator.mUseLindenTime = false;*/
-	param_mgr->loadPreset(mIt->first, true);
+
+	//param_mgr->loadPreset(mIt->first, true);
+	LLEnvManagerNew::instance().setUseWaterPreset(mIt->first);
 	LLComboBox* comboBox = self->getChild<LLComboBox>("WWPresetsCombo");
 	comboBox->setSimple(mIt->first);
 }
@@ -272,65 +300,70 @@ void wlfPanel_AdvSettings::onClickWWPrev(void* user_data)
 void wlfPanel_AdvSettings::onClickWLNext(void* user_data)
 {
 	wlfPanel_AdvSettings* self = (wlfPanel_AdvSettings*) user_data;
-	
-	// find place of current param
-	std::map<std::string, LLWLParamSet>::iterator mIt = 
-		LLWLParamManager::instance()->mParamList.find(LLWLParamManager::instance()->mCurParams.mName);
 
-	// shouldn't happen unless you delete every preset but Default
-	if (mIt == LLWLParamManager::instance()->mParamList.end())
+	LLWLParamManager* param_mgr = LLWLParamManager::instance();
+
+	// find place of current param
+	LLWLParamKey key(LLEnvManagerNew::instance().getSkyPresetName(), LLEnvKey::SCOPE_LOCAL);
+	std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
+		param_mgr->mParamList.find(key);
+
+ 	// shouldn't happen unless you delete every preset but Default
+	if (mIt == param_mgr->mParamList.end())
 	{
 		llwarns << "No more presets left!" << llendl;
 		return;
 	}
 
 	// if at the end, loop
-	std::map<std::string, LLWLParamSet>::iterator last = LLWLParamManager::instance()->mParamList.end(); --last;
+	std::map<LLWLParamKey, LLWLParamSet>::iterator last = param_mgr->mParamList.end(); --last;
 	if(mIt == last) 
 	{
-		mIt = LLWLParamManager::instance()->mParamList.begin();
+		mIt = param_mgr->mParamList.begin();
 	}
 	else
 	{
 		mIt++;
 	}
-	LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
-	LLWLParamManager::instance()->loadPreset(mIt->first, true);
+	param_mgr->mAnimator.deactivate();
+	LLEnvManagerNew::instance().setUseSkyPreset(mIt->first.name);
 	LLComboBox* comboBox = self->getChild<LLComboBox>("WLPresetsCombo");
-	comboBox->setSimple(mIt->first);
+	comboBox->setSimple(mIt->first.name);
 }
 
 void wlfPanel_AdvSettings::onClickWLPrev(void* user_data)
 {
 	wlfPanel_AdvSettings* self = (wlfPanel_AdvSettings*) user_data;
-	
-	// find place of current param
-	std::map<std::string, LLWLParamSet>::iterator mIt = 
-		LLWLParamManager::instance()->mParamList.find(LLWLParamManager::instance()->mCurParams.mName);
 
-	// shouldn't happen unless you delete every preset but Default
-	if (mIt == LLWLParamManager::instance()->mParamList.end())
+	LLWLParamManager* param_mgr = LLWLParamManager::instance();
+
+	// find place of current param
+	LLWLParamKey key(LLEnvManagerNew::instance().getSkyPresetName(), LLEnvKey::SCOPE_LOCAL);
+	std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
+		param_mgr->mParamList.find(key);
+
+ 	// shouldn't happen unless you delete every preset but Default
+	if (mIt == param_mgr->mParamList.end())
 	{
 		llwarns << "No more presets left!" << llendl;
 		return;
 	}
 
 	// if at the beginning, loop
-	if(mIt == LLWLParamManager::instance()->mParamList.begin()) 
+	if(mIt == param_mgr->mParamList.begin()) 
 	{
-		std::map<std::string, LLWLParamSet>::iterator last = LLWLParamManager::instance()->mParamList.end(); --last;
+		std::map<LLWLParamKey, LLWLParamSet>::iterator last = param_mgr->mParamList.end(); --last;
 		mIt = last;
 	}
 	else
 	{
 		mIt--;
 	}
-	LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
-	LLWLParamManager::instance()->loadPreset(mIt->first, true);
+	param_mgr->mAnimator.deactivate();
+	//LLWLParamManager::instance()->loadPreset(mIt->first.name, true);
+	LLEnvManagerNew::instance().setUseSkyPreset(mIt->first.name);
 	LLComboBox* comboBox = self->getChild<LLComboBox>("WLPresetsCombo");
-	comboBox->setSimple(mIt->first);
+	comboBox->setSimple(mIt->first.name);
 }
 
 void wlfPanel_AdvSettings::onOpenAdvancedSky(void* userData)
@@ -349,8 +382,7 @@ void wlfPanel_AdvSettings::onChangeDayTime(LLUICtrl* ctrl, void* userData)
 
 	if (sldr) {
 		// deactivate animator
-		LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-		LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
+		LLWLParamManager::instance()->mAnimator.deactivate();
 
 		F32 val = sldr->getValueF32() + 0.25f;
 		if(val > 1.0) 

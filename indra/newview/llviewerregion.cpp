@@ -54,6 +54,7 @@
 #include "llfloaterreporter.h"
 #include "llfloaterregioninfo.h"
 #include "llhttpnode.h"
+#include "llregioninfomodel.h"
 #include "llsdutil.h"
 #include "llstartup.h"
 #include "lltrans.h"
@@ -595,6 +596,9 @@ std::string LLViewerRegion::accessToShortString(U8 sim_access)
 void LLViewerRegion::processRegionInfo(LLMessageSystem* msg, void**)
 {
 	// send it to 'observers'
+	// *TODO: switch the floaters to using LLRegionInfoModel
+	llinfos << "Processing region info" << llendl;
+	LLRegionInfoModel::instance().update(msg);
 	LLFloaterGodTools::processRegionInfo(msg);
 	LLFloaterRegionInfo::processRegionInfo(msg);
 	LLFloaterReporter::processRegionInfo(msg);
@@ -1407,6 +1411,7 @@ void LLViewerRegion::setSeedCapability(const std::string& url)
 	capabilityNames.append("DispatchRegionInfo");
 	capabilityNames.append("EstateChangeInfo");
 	capabilityNames.append("EventQueueGet");
+	capabilityNames.append("EnvironmentSettings");
 	capabilityNames.append("FetchInventory");
 	capabilityNames.append("FetchLib");
 	capabilityNames.append("FetchLibDescendents");
@@ -1500,6 +1505,21 @@ bool LLViewerRegion::capabilitiesReceived() const
 void LLViewerRegion::setCapabilitiesReceived(bool received)
 {
 	mCapabilitiesReceived = received;
+
+	// Tell interested parties that we've received capabilities,
+	// so that they can safely use getCapability().
+	if (received)
+	{
+		mCapabilitiesReceivedSignal(getRegionID());
+
+		// This is a single-shot signal. Forget callbacks to save resources.
+		mCapabilitiesReceivedSignal.disconnect_all_slots();
+	}
+}
+
+boost::signals2::connection LLViewerRegion::setCapabilitiesReceivedCallback(const caps_received_signal_t::slot_type& cb)
+{
+	return mCapabilitiesReceivedSignal.connect(cb);
 }
 
 void LLViewerRegion::logActiveCapabilities() const

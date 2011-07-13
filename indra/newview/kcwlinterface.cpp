@@ -146,7 +146,8 @@ void KCWindlightInterface::ApplySettings(const LLSD& settings)
 
 		if (settings.has("water"))
 		{
-			LLWaterParamManager::instance()->loadPreset(settings["water"].asString(), true);
+			// LLWaterParamManager::instance()->loadPreset(settings["water"].asString(), true);
+			LLEnvManagerNew::instance().useWaterPreset(settings["water"].asString());
 			WLset = true;
 		}
 	}
@@ -187,7 +188,7 @@ void KCWindlightInterface::ApplySkySettings(const LLSD& settings)
 			//llinfos << "WL set : " << settings["sky_default"] << llendl;
 			ApplyWindLightPreset(settings["sky_default"].asString());
 		}
-		else if (!LLWLParamManager::instance()->mAnimator.mUseLindenTime) //reset to default
+		else //reset to default
 		{
 			//llinfos << "WL set : Default" << llendl;
 			ApplyWindLightPreset("Default");
@@ -201,21 +202,17 @@ void KCWindlightInterface::ApplyWindLightPreset(const std::string& preset)
 		return;
 
 	LLWLParamManager* wlprammgr = LLWLParamManager::instance();
-	if ( (preset != "Default") && (wlprammgr->mParamList.find(preset) != wlprammgr->mParamList.end()) )
+	LLWLParamKey key(preset, LLEnvKey::SCOPE_LOCAL);
+	if ( (preset != "Default") && (wlprammgr->hasParamSet(key)) )
 	{
-		wlprammgr->mAnimator.mIsRunning = false;
-		wlprammgr->mAnimator.mUseLindenTime = false;
-		wlprammgr->loadPreset(preset);
+		LLEnvManagerNew::instance().useSkyPreset(preset);
 		WLset = true;
 		mWeChangedIt = true;
 	}
 	else
 	{
-		wlprammgr->mAnimator.mIsRunning = true;
-		wlprammgr->mAnimator.mUseLindenTime = true;
-		wlprammgr->loadPreset("Default", true);
-		//KC: reset last to Default
-		gSavedPerAccountSettings.setString("PhoenixLastWLsetting", "Default");
+		if (!LLEnvManagerNew::instance().getUseRegionSettings())
+			LLEnvManagerNew::instance().useRegionSettings();
 		WLset = false;
 		mWeChangedIt = false;
 	}
@@ -230,10 +227,6 @@ void KCWindlightInterface::ResetToRegion(bool force)
 	if (mWeChangedIt || force) //dont reset anything if we didnt do it
 	{
 		ApplyWindLightPreset("Default");
-
-		LLWaterParamManager::instance()->loadPreset("Default", true);
-		//KC: reset last to Default
-		gSavedPerAccountSettings.setString("PhoenixLastWWsetting", "Default");
 	}
 }
 
@@ -368,7 +361,8 @@ bool KCWindlightInterface::ParsePacelForWLSettings(const std::string& desc, LLSD
 					//llinfos << "sky flag: " << match[1] << " : " << match[2] << " : " << match[3] << " : " << match[5] << llendl;
 
 					std::string preset(match[5]);
-					if(wlprammgr->mParamList.find(preset) != wlprammgr->mParamList.end())
+					LLWLParamKey key(preset, LLEnvKey::SCOPE_LOCAL);
+					if(wlprammgr->hasParamSet(key))
 					{
 						if (match[2].matched && match[3].matched)
 						{
@@ -397,7 +391,7 @@ bool KCWindlightInterface::ParsePacelForWLSettings(const std::string& desc, LLSD
 				{
 					std::string preset(match[5]);
 					//llinfos << "got water: " << preset << llendl;
-					if(wwprammgr->mParamList.find(preset) != wwprammgr->mParamList.end())
+					if(wwprammgr->hasParamSet(preset))
 					{
 						settings["water"] = preset;
 						found_settings = true;

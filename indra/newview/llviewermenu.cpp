@@ -78,6 +78,7 @@
 #include "lldrawable.h"
 #include "lldrawpoolalpha.h"
 #include "lldrawpooltree.h"
+#include "llenvmanager.h"
 #include "llface.h"
 #include "llfirstuse.h"
 #include "llfloater.h"
@@ -9036,7 +9037,6 @@ class LLWorldEnvSettings : public view_listener_t
 // [/RLVa:KB]
 
 		std::string tod = userdata.asString();
-		LLVector3 sun_direction;
 		
 		if (tod == "editor")
 		{
@@ -9056,54 +9056,24 @@ class LLWorldEnvSettings : public view_listener_t
 		
 		if (tod == "sunrise")
 		{
-			// set the value, turn off animation
-			LLWLParamManager::instance()->mAnimator.setDayTime(0.25);
-			LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-			LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
-
-			// then call update once
-			LLWLParamManager::instance()->mAnimator.update(
-				LLWLParamManager::instance()->mCurParams);
+			LLEnvManagerNew::instance().setUseSkyPreset("Sunrise");
 		}
 		else if (tod == "noon")
 		{
-			// set the value, turn off animation
-			LLWLParamManager::instance()->mAnimator.setDayTime(0.567);
-			LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-			LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
-
-			// then call update once
-			LLWLParamManager::instance()->mAnimator.update(
-				LLWLParamManager::instance()->mCurParams);
+			LLEnvManagerNew::instance().setUseSkyPreset("Midday");
 		}
 		else if (tod == "sunset")
 		{
-			// set the value, turn off animation
-			LLWLParamManager::instance()->mAnimator.setDayTime(0.75);
-			LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-			LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
-
-			// then call update once
-			LLWLParamManager::instance()->mAnimator.update(
-				LLWLParamManager::instance()->mCurParams);
+			LLEnvManagerNew::instance().setUseSkyPreset("Sunset");
 		}
 		else if (tod == "midnight")
 		{
-			// set the value, turn off animation
-			LLWLParamManager::instance()->mAnimator.setDayTime(0.0);
-			LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-			LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
-
-			// then call update once
-			LLWLParamManager::instance()->mAnimator.update(
-				LLWLParamManager::instance()->mCurParams);
+			LLEnvManagerNew::instance().setUseSkyPreset("Midnight");
 		}
-		else
+		else //default
 		{
-			LLWLParamManager::instance()->mAnimator.mIsRunning = true;
-			LLWLParamManager::instance()->mAnimator.mUseLindenTime = true;	
-			//KC: reset last to Default
-			gSavedPerAccountSettings.setString("PhoenixLastWLsetting", "Default");
+			//LLEnvManagerNew::instance().setUseDayCycle(LLEnvManagerNew::instance().getDayCycleName());
+			LLEnvManagerNew::instance().useRegionSettings();
 		}
 		return true;
 	}

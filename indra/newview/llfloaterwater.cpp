@@ -225,7 +225,8 @@ bool LLFloaterWater::newPromptCallback(const LLSD& notification, const LLSD& res
 			param_mgr->savePreset(text);
 			
 			//KC: workaround for not selecting the new preset in the combo box
-			param_mgr->loadPreset(text);
+			//param_mgr->loadPreset(text, true);
+			LLEnvManagerNew::instance().useWaterPreset(text);
 
 		// otherwise, send a message to the user
 		} 
@@ -818,8 +819,9 @@ void LLFloaterWater::onChangePresetName(LLUICtrl* ctrl, void * userData)
 		return;
 	}
 	
-	LLWaterParamManager::instance()->loadPreset(
-		combo_box->getSelectedValue().asString());
+	//LLWaterParamManager::instance()->loadPreset(
+	//	combo_box->getSelectedValue().asString(), true);
+	LLEnvManagerNew::instance().useWaterPreset(combo_box->getSelectedValue().asString());
 	sWaterMenu->syncMenu();
 }
 
@@ -842,9 +844,8 @@ void LLFloaterWater::onClickNext(void* user_data)
 	{
 		mIt++;
 	}
-	/*param_mgr->mAnimator.mIsRunning = false;
-	param_mgr->mAnimator.mUseLindenTime = false;*/
-	param_mgr->loadPreset(mIt->first, true);
+	LLEnvManagerNew::instance().useWaterPreset(mIt->first);
+	// param_mgr->loadPreset(mIt->first, true);
 }
 
 void LLFloaterWater::onClickPrev(void* user_data)
@@ -866,7 +867,6 @@ void LLFloaterWater::onClickPrev(void* user_data)
 	{
 		mIt--;
 	}
-	/*param_mgr->mAnimator.mIsRunning = false;
-	param_mgr->mAnimator.mUseLindenTime = false;*/
-	param_mgr->loadPreset(mIt->first, true);
+	LLEnvManagerNew::instance().useWaterPreset(mIt->first);
+	// param_mgr->loadPreset(mIt->first, true);
 }

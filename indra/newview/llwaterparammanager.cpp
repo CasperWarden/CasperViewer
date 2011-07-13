@@ -39,10 +39,12 @@
 #include "pipeline.h"
 #include "llsky.h"
 
+#include "lldiriterator.h"
 #include "llsliderctrl.h"
 #include "llspinctrl.h"
 #include "llcheckboxctrl.h"
 #include "lluictrlfactory.h"
+#include "llviewercontrol.h"
 #include "llviewercamera.h"
 #include "llcombobox.h"
 #include "lllineeditor.h"
@@ -97,106 +99,61 @@ LLWaterParamManager::~LLWaterParamManager()
 {
 }
 
-void LLWaterParamManager::loadAllPresets(const std::string& file_name)
+void LLWaterParamManager::loadAllPresets()
 {
-	std::string path_name(gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "windlight/water", ""));
-	LL_DEBUGS2("AppInit", "ShaderLoading") << "Loading Default water settings from " << path_name << LL_ENDL;
-			
-	bool found = true;			
-	while(found) 
-	{
-		std::string name;
-		found = gDirUtilp->getNextFileInDir(path_name, "*.xml", name, false);
-		if(found)
-		{
+	// First, load system (coming out of the box) water presets.
+	loadPresetsFromDir(getSysDir());
 
-			name=name.erase(name.length()-4);
-
-			// bugfix for SL-46920: preventing filenames that break stuff.
-			char * curl_str = curl_unescape(name.c_str(), name.size());
-			std::string unescaped_name(curl_str);
-			curl_free(curl_str);
-			curl_str = NULL;
-
-			LL_DEBUGS2("AppInit", "Shaders") << "name: " << name << LL_ENDL;
-			loadPreset(unescaped_name,FALSE);
-		}
-	}
-
-	// And repeat for user presets, note the user presets will modify any system presets already loaded
-
-	std::string path_name2(gDirUtilp->getExpandedFilename( LL_PATH_USER_SETTINGS , "windlight/water", ""));
-	LL_DEBUGS2("AppInit", "Shaders") << "Loading User water settings from " << path_name2 << LL_ENDL;
-			
-	found = true;			
-	while(found) 
-	{
-		std::string name;
-		found = gDirUtilp->getNextFileInDir(path_name2, "*.xml", name, false);
-		if(found)
-		{
-			name=name.erase(name.length()-4);
-
-			// bugfix for SL-46920: preventing filenames that break stuff.
-			char * curl_str = curl_unescape(name.c_str(), name.size());
-			std::string unescaped_name(curl_str);
-			curl_free(curl_str);
-			curl_str = NULL;
-
-			LL_DEBUGS2("AppInit", "Shaders") << "name: " << name << LL_ENDL;
-			loadPreset(unescaped_name,FALSE);
-		}
-	}
-
+	// Then load user presets. Note that user day presets will modify any system ones already loaded.
+	loadPresetsFromDir(getUserDir());
 }
 
-void LLWaterParamManager::loadPreset(const std::string & name,bool propagate)
+void LLWaterParamManager::loadPresetsFromDir(const std::string& dir)
 {
-	// Check if we already have the preset before we try loading it again.
-	if(mParamList.find(name) != mParamList.end())
+	LL_INFOS2("AppInit", "Shaders") << "Loading water presets from " << dir << LL_ENDL;
+
+	LLDirIterator dir_iter(dir, "*.xml");
+	while (1)
 	{
-		if(propagate)
+		std::string file;
+		if (!dir_iter.next(file))
 		{
-			//KC: save last
-			gSavedPerAccountSettings.setString("PhoenixLastWWsetting", name);
-			
-			getParamSet(name, mCurParams);
-			propagateParameters();
+			break; // no more files
 		}
-		return;
+
+		std::string path = dir + file;
+		if (!loadPreset(path, false))
+		{
+			llwarns << "Error loading water preset from " << path << llendl;
+		}
+	}
+}
+
+bool LLWaterParamManager::loadPreset(const std::string& path, bool propagate)
+{
+	llifstream xml_file;
+	std::string name(gDirUtilp->getBaseFileName(LLURI::unescape(path), /*strip_exten = */ true));
+
+	xml_file.open(path.c_str());
+	if (!xml_file)
+	{
+		return false;
 	}
 
-	// bugfix for SL-46920: preventing filenames that break stuff.
-	char * curl_str = curl_escape(name.c_str(), name.size());
-	std::string escaped_filename(curl_str);
-	curl_free(curl_str);
-	curl_str = NULL;
+	LL_DEBUGS2("AppInit", "Shaders") << "Loading water " << name << LL_ENDL;
 
-	escaped_filename += ".xml";
+	LLSD params_data;
+	LLPointer<LLSDParser> parser = new LLSDXMLParser();
+	parser->parse(xml_file, params_data, LLSDSerialize::SIZE_UNLIMITED);
+	xml_file.close();
 
-	std::string pathName(gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "windlight/water", escaped_filename));
-	LL_DEBUGS2("AppInit", "Shaders") << "Loading water settings from " << pathName << LL_ENDL;
-	
-	std::ifstream presetsXML;
-	presetsXML.open(pathName.c_str());
-	
-	// That failed, try loading from the users area instead.
-	if(!presetsXML)
+	if (hasParamSet(name))
 	{
-		pathName=gDirUtilp->getExpandedFilename( LL_PATH_USER_SETTINGS , "windlight/water", escaped_filename);
-		LL_DEBUGS2("AppInit", "Shaders") << "Loading User water setting from " << pathName << LL_ENDL;
-		presetsXML.open(pathName.c_str());
+		setParamSet(name, params_data);
 	}
-
-	if (presetsXML)
+	else
 	{
-		loadPresetXML(name, presetsXML);
-		presetsXML.close();
-	} 
-	else 
-	{
-		llwarns << "Can't find " << name << llendl;
-		return;
+		addParamSet(name, params_data);
 	}
 
 	if(propagate)
@@ -207,6 +164,8 @@ void LLWaterParamManager::loadPreset(const std::string & name,bool propagate)
 		getParamSet(name, mCurParams);
 		propagateParameters();
 	}
+
+	return true;
 }
 
 bool LLWaterParamManager::loadPresetXML(const std::string& name, std::istream& preset_stream, bool propagate /* = false */, bool check_if_real /* = false */)
@@ -280,17 +239,19 @@ void LLWaterParamManager::loadPresetNotecard(const std::string& name, const LLUU
 
 void LLWaterParamManager::savePreset(const std::string & name)
 {
+	llassert(!name.empty());
+
+
 	// bugfix for SL-46920: preventing filenames that break stuff.
 	char * curl_str = curl_escape(name.c_str(), name.size());
 	std::string escaped_filename(curl_str);
 	curl_free(curl_str);
 	curl_str = NULL;
-
-	escaped_filename += ".xml";
+	//std::string escaped_filename(CurlHelper::escape(name));
 
 	// make an empty llsd
 	LLSD paramsData(LLSD::emptyMap());
-	std::string pathName(gDirUtilp->getExpandedFilename( LL_PATH_USER_SETTINGS , "windlight/water", escaped_filename));
+	std::string pathName(getUserDir() + escaped_filename + ".xml");
 
 	// fill it with LLSD windlight params
 	paramsData = mParamList[name].getAll();
@@ -400,6 +361,26 @@ void LLWaterParamManager::updateShaderUniforms(LLGLSLShader * shader)
 	}
 }
 
+void LLWaterParamManager::applyParams(const LLSD& params, bool interpolate)
+{
+	if (params.size() == 0)
+	{
+		llwarns << "Undefined water params" << llendl;
+		return;
+	}
+
+	if (interpolate)
+	{
+		LLWLParamManager::instance()->mAnimator.startInterpolation(params);
+	}
+	else
+	{
+		mCurParams.setAll(params);
+	}
+}
+
+//static LLFastTimer::DeclareTimer FTM_UPDATE_WATERPARAM("Update Water Params");
+
 void LLWaterParamManager::update(LLViewerCamera * cam)
 {
 	LLFastTimer ftm(LLFastTimer::FTM_UPDATE_WLPARAM);
@@ -479,10 +460,11 @@ void LLWaterParamManager::cleanupClass(void)
 bool LLWaterParamManager::addParamSet(const std::string& name, LLWaterParamSet& param)
 {
 	// add a new one if not one there already
-	std::map<std::string, LLWaterParamSet>::iterator mIt = mParamList.find(name);
+	preset_map_t::iterator mIt = mParamList.find(name);
 	if(mIt == mParamList.end()) 
 	{	
 		mParamList[name] = param;
+		mPresetListChangeSignal();
 		return true;
 	}
 
@@ -491,23 +473,15 @@ bool LLWaterParamManager::addParamSet(const std::string& name, LLWaterParamSet& 
 
 BOOL LLWaterParamManager::addParamSet(const std::string& name, LLSD const & param)
 {
-	// add a new one if not one there already
-	std::map<std::string, LLWaterParamSet>::const_iterator finder = mParamList.find(name);
-	if(finder == mParamList.end())
-	{
-		mParamList[name].setAll(param);
-		return TRUE;
-	}
-	else
-	{
-		return FALSE;
-	}
+	LLWaterParamSet param_set;
+	param_set.setAll(param);
+	return addParamSet(name, param_set);
 }
 
 bool LLWaterParamManager::getParamSet(const std::string& name, LLWaterParamSet& param)
 {
 	// find it and set it
-	std::map<std::string, LLWaterParamSet>::iterator mIt = mParamList.find(name);
+	preset_map_t::iterator mIt = mParamList.find(name);
 	if(mIt != mParamList.end()) 
 	{
 		param = mParamList[name];
@@ -516,6 +490,12 @@ bool LLWaterParamManager::getParamSet(const std::string& name, LLWaterParamSet& 
 	}
 
 	return false;
+}
+
+bool LLWaterParamManager::hasParamSet(const std::string& name)
+{
+	LLWaterParamSet dummy;
+	return getParamSet(name, dummy);
 }
 
 bool LLWaterParamManager::setParamSet(const std::string& name, LLWaterParamSet& param)
@@ -541,27 +521,72 @@ bool LLWaterParamManager::setParamSet(const std::string& name, const LLSD & para
 bool LLWaterParamManager::removeParamSet(const std::string& name, bool delete_from_disk)
 {
 	// remove from param list
-	std::map<std::string, LLWaterParamSet>::iterator mIt = mParamList.find(name);
-	if(mIt != mParamList.end()) 
+	preset_map_t::iterator it = mParamList.find(name);
+	if (it == mParamList.end())
 	{
-		mParamList.erase(mIt);
+		LL_WARNS("WindLight") << "No water preset named " << name << LL_ENDL;
+		return false;
 	}
 
-	if(delete_from_disk)
-	{
+	mParamList.erase(it);
 
-		std::string path_name(gDirUtilp->getExpandedFilename( LL_PATH_USER_SETTINGS , "windlight/water", ""));
-		
-		// use full curl escaped name
-		char * curl_str = curl_escape(name.c_str(), name.size());
-		std::string escaped_name(curl_str);
-		curl_free(curl_str);
-		curl_str = NULL;
-		
-		gDirUtilp->deleteFilesInDir(path_name, escaped_name + ".xml");
+	// remove from file system if requested
+	if (delete_from_disk)
+	{
+		if (gDirUtilp->deleteFilesInDir(getUserDir(), LLURI::escape(name) + ".xml") < 1)
+		{
+			LL_WARNS("WindLight") << "Error removing water preset " << name << " from disk" << LL_ENDL;
+		}
 	}
 
+	// signal interested parties
+	mPresetListChangeSignal();
 	return true;
+}
+
+bool LLWaterParamManager::isSystemPreset(const std::string& preset_name) const
+{
+	// *TODO: file system access is excessive here.
+	return gDirUtilp->fileExists(getSysDir() + LLURI::escape(preset_name) + ".xml");
+}
+
+void LLWaterParamManager::getPresetNames(preset_name_list_t& presets) const
+{
+	presets.clear();
+
+	for (preset_map_t::const_iterator it = mParamList.begin(); it != mParamList.end(); ++it)
+	{
+		presets.push_back(it->first);
+	}
+}
+
+void LLWaterParamManager::getPresetNames(preset_name_list_t& user_presets, preset_name_list_t& system_presets) const
+{
+	user_presets.clear();
+	system_presets.clear();
+
+	for (preset_map_t::const_iterator it = mParamList.begin(); it != mParamList.end(); ++it)
+	{
+		if (isSystemPreset(it->first))
+		{
+			system_presets.push_back(it->first);
+		}
+		else
+		{
+			user_presets.push_back(it->first);
+		}
+	}
+}
+
+void LLWaterParamManager::getUserPresetNames(preset_name_list_t& user_presets) const
+{
+	preset_name_list_t dummy;
+	getPresetNames(user_presets, dummy);
+}
+
+boost::signals2::connection LLWaterParamManager::setPresetListChangeCallback(const preset_list_signal_t::slot_type& cb)
+{
+	return mPresetListChangeSignal.connect(cb);
 }
 
 F32 LLWaterParamManager::getFogDensity(void)
@@ -589,12 +614,26 @@ LLWaterParamManager * LLWaterParamManager::instance()
 	{
 		sInstance = new LLWaterParamManager();
 
-		sInstance->loadAllPresets(LLStringUtil::null);
+		LL_DEBUGS("Windlight") << "Initializing water" << LL_ENDL;
 
-		sInstance->getParamSet("Default", sInstance->mCurParams);
+		sInstance->loadAllPresets();
+
+		LLEnvManagerNew::instance().usePrefs();
 	}
 
 	return sInstance;
+}
+
+// static
+std::string LLWaterParamManager::getSysDir()
+{
+	return gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "windlight/water", "");
+}
+
+// static
+std::string LLWaterParamManager::getUserDir()
+{
+	return gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS , "windlight/water", "");
 }
 
 // static

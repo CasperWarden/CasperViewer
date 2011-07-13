@@ -138,6 +138,7 @@
 #include "llfollowcam.h"
 #include "llfloaterteleporthistory.h"
 #include "jc_lslviewerbridge.h"
+#include "llenvmanager.h"
 
 #include "llfloaterstats.h"
 #include "floaterao.h"
@@ -927,6 +928,8 @@ void LLAgent::togglePhantom()
 //-----------------------------------------------------------------------------
 void LLAgent::setRegion(LLViewerRegion *regionp)
 {
+	bool teleport = true;
+
 	llassert(regionp);
 	if (mRegionp != regionp)
 	{
@@ -964,6 +967,8 @@ void LLAgent::setRegion(LLViewerRegion *regionp)
 				gSky.mVOGroundp->setRegion(regionp);
 			}
 
+			// Notify windlight managers
+			teleport = (gAgent.getTeleportState() != LLAgent::TELEPORT_NONE);
 		}
 		else
 		{
@@ -995,6 +1000,15 @@ void LLAgent::setRegion(LLViewerRegion *regionp)
 	mRegionsVisited.insert(handle);
 
 	LLSelectMgr::getInstance()->updateSelectionCenter();
+
+	if (teleport)
+	{
+		LLEnvManagerNew::instance().onTeleport();
+	}
+	else
+	{
+		LLEnvManagerNew::instance().onRegionCrossing();
+	}
 }
 
 

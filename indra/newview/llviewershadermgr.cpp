@@ -1324,3 +1324,13 @@ void LLViewerShaderMgr::updateShaderUniforms(LLGLSLShader * shader)
 	LLWLParamManager::instance()->updateShaderUniforms(shader);
 	LLWaterParamManager::instance()->updateShaderUniforms(shader);
 }
+
+LLViewerShaderMgr::shader_iter LLViewerShaderMgr::beginShaders() const
+{
+	return mShaderList.begin();
+}
+
+LLViewerShaderMgr::shader_iter LLViewerShaderMgr::endShaders() const
+{
+	return mShaderList.end();
+}

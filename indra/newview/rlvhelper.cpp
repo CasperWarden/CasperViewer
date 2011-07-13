@@ -956,8 +956,10 @@ void RlvWLSnapshot::restoreSnapshot(const RlvWLSnapshot* pWLSnapshot)
 	LLWLParamManager* pWLParams = LLWLParamManager::instance();
 	if ( (pWLSnapshot) && (pWLParams) )
 	{
-		pWLParams->mAnimator.mIsRunning = pWLSnapshot->fIsRunning;
-		pWLParams->mAnimator.mUseLindenTime = pWLSnapshot->fUseLindenTime;
+		if (pWLSnapshot->fIsRunning)
+		{
+			pWLParams->mAnimator.activate(pWLSnapshot->fUseLindenTime ? LLWLAnimator::TIME_LINDEN : LLWLAnimator::TIME_CUSTOM);
+		}
 		pWLParams->mCurParams = pWLSnapshot->WLParams;
 		pWLParams->propagateParameters();
 	}
@@ -978,8 +980,8 @@ RlvWLSnapshot* RlvWLSnapshot::takeSnapshot()
 	if (pWLParams)
 	{
 		pWLSnapshot = new RlvWLSnapshot();
-		pWLSnapshot->fIsRunning = pWLParams->mAnimator.mIsRunning;
-		pWLSnapshot->fUseLindenTime = pWLParams->mAnimator.mUseLindenTime;
+		pWLSnapshot->fIsRunning = pWLParams->mAnimator.getIsRunning();
+		pWLSnapshot->fUseLindenTime = pWLParams->mAnimator.getUseLindenTime();
 		pWLSnapshot->WLParams = pWLParams->mCurParams;
 	}
 	return pWLSnapshot;

@@ -37,6 +37,7 @@
 #include <vector>
 #include "llfloater.h"
 #include "llpanel.h"
+#include "llwlparammanager.h" // for LLWLParamKey
 
 class LLLineEditor;
 class LLMessageSystem;

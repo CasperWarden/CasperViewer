@@ -33,11 +33,12 @@
 #ifndef LL_WATER_PARAMMANAGER_H
 #define LL_WATER_PARAMMANAGER_H
 
-#include <vector>
+#include <list>
 #include <map>
 #include "llwaterparamset.h"
 #include "llviewercamera.h"
 #include "v4color.h"
+#include <boost/signals2.hpp>
 
 #include "llassettype.h" // Ugh.
 
@@ -226,16 +227,12 @@ class LLWaterParamManager
 {
 	LOG_CLASS(LLWaterParamManager);
 public:
-
-	LLWaterParamManager();
-	~LLWaterParamManager();
+	typedef std::list<std::string> preset_name_list_t;
+	typedef std::map<std::string, LLWaterParamSet> preset_map_t;
+	typedef boost::signals2::signal<void()> preset_list_signal_t;
 
 	/// load a preset file
 	void loadAllPresets(const std::string & fileName);
-
-	/// load an individual preset into the sky
-
-	void loadPreset(const std::string & name,bool propagate=true);
 	
 	/// load an individual preset into the sky from an LLSD stream
 	/// Returns whether the stream was actually reasonable XML to load from.
@@ -252,6 +249,9 @@ public:
 
 	/// send the parameters to the shaders
 	void propagateParameters(void);
+
+	// display specified water
+	void applyParams(const LLSD& params, bool interpolate);
 
 	/// update information for the shader
 	void update(LLViewerCamera * cam);
@@ -274,6 +274,9 @@ public:
 	/// get a param from the list
 	bool getParamSet(const std::string& name, LLWaterParamSet& param);
 
+	/// check whether the preset is in the list
+	bool hasParamSet(const std::string& name);
+
 	/// set the param in the list with a new param
 	bool setParamSet(const std::string& name, LLWaterParamSet& param);
 	
@@ -283,6 +286,24 @@ public:
 	/// gets rid of a parameter and any references to it
 	/// returns true if successful
 	bool removeParamSet(const std::string& name, bool delete_from_disk);
+
+	/// @return true if the preset comes out of the box
+	bool isSystemPreset(const std::string& preset_name) const;
+
+	/// @return all named water presets.
+	const preset_map_t& getPresets() const { return mParamList; }
+
+	/// @return user and system preset names as a single list
+	void getPresetNames(preset_name_list_t& presets) const;
+
+	/// @return user and system preset names separately
+	void getPresetNames(preset_name_list_t& user_presets, preset_name_list_t& system_presets) const;
+
+	/// @return list of user presets names
+	void getUserPresetNames(preset_name_list_t& user_presets) const;
+
+	/// Emitted when a preset gets added or deleted.
+	boost::signals2::connection setPresetListChangeCallback(const preset_list_signal_t::slot_type& cb);
 
 	/// set the normap map we want for water
 	bool setNormalMapID(const LLUUID& img);
@@ -326,14 +347,30 @@ public:
 	WaterFloatControl mScaleBelow;
 	WaterFloatControl mBlurMultiplier;
 	
-	// list of all the parameters, listed by name
-	std::map<std::string, LLWaterParamSet> mParamList;
-
 	F32 mDensitySliderValue;
 
 private:
+	LLWaterParamManager();
+	~LLWaterParamManager();
+
+	void loadAllPresets();
+	void loadPresetsFromDir(const std::string& dir);
+
+public:
+	bool loadPreset(const std::string& path, bool propagate=true);
+
+private:
+	static std::string getSysDir();
+	static std::string getUserDir();
+
 	LLVector4 mWaterPlane;
 	F32 mWaterFogKS;
+
+public:
+	// list of all the parameters, listed by name
+	preset_map_t mParamList;
+
+	preset_list_signal_t mPresetListChangeSignal;
 
 	// our parameter manager singleton instance
 	static LLWaterParamManager * sInstance;

@@ -81,11 +81,11 @@ LLFloaterWindLight::LLFloaterWindLight() : LLFloater(std::string("windlight floa
 
 	if(comboBox != NULL) {
 		
-		std::map<std::string, LLWLParamSet>::iterator mIt = 
+		std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
 			LLWLParamManager::instance()->mParamList.begin();
 		for(; mIt != LLWLParamManager::instance()->mParamList.end(); mIt++) 
 		{
-			comboBox->add(mIt->first);
+			comboBox->add(mIt->first.name);
 		}
 
 		// entry for when we're in estate time
@@ -277,13 +277,13 @@ bool LLFloaterWindLight::newPromptCallback(const LLSD& notification, const LLSD&
 
 		// add the current parameters to the list
 		// see if it's there first
-		std::map<std::string, LLWLParamSet>::iterator mIt = 
-			LLWLParamManager::instance()->mParamList.find(text);
+
+		const LLWLParamKey key(text, LLEnvKey::SCOPE_LOCAL);
 
 		// if not there, add a new one
-		if(mIt == LLWLParamManager::instance()->mParamList.end()) 
+		if(!LLWLParamManager::instance()->hasParamSet(key)) 
 		{
-			LLWLParamManager::instance()->addParamSet(text, 
+			LLWLParamManager::instance()->addParamSet(key, 
 				LLWLParamManager::instance()->mCurParams);
 			comboBox->add(text);
 			comboBox->sortByName();
@@ -302,10 +302,12 @@ bool LLFloaterWindLight::newPromptCallback(const LLSD& notification, const LLSD&
 				keyCombo->add(text);
 				keyCombo->sortByName();
 			}
-			LLWLParamManager::instance()->savePreset(text);
+			const LLWLParamKey key(text, LLEnvKey::SCOPE_LOCAL);
+			LLWLParamManager::instance()->savePreset(key);
 
 			//KC: workaround for not selecting the new preset in the combo box
-			LLWLParamManager::instance()->loadPreset(text);
+			//LLWLParamManager::instance()->loadPreset(text);
+			LLEnvManagerNew::instance().useSkyPreset(text);
 
 		// otherwise, send a message to the user
 		} 
@@ -923,7 +925,8 @@ bool LLFloaterWindLight::saveAlertCallback(const LLSD& notification, const LLSD&
 		param_mgr->setParamSet(param_mgr->mCurParams.mName, param_mgr->mCurParams);
 		
 		// comment this back in to save to file
-		param_mgr->savePreset(param_mgr->mCurParams.mName);
+		const LLWLParamKey key(param_mgr->mCurParams.mName, LLEnvKey::SCOPE_LOCAL);
+		param_mgr->savePreset(key);
 	}
 	return false;
 }
@@ -1005,7 +1008,8 @@ bool LLFloaterWindLight::deleteAlertCallback(const LLSD& notification, const LLS
 			{
 				LLWLParamManager::instance()->mCurParams.mName = "Default";
 			}
-			LLWLParamManager::instance()->loadPreset(LLWLParamManager::instance()->mCurParams.mName, true);
+			//LLWLParamManager::instance()->loadPreset(LLWLParamManager::instance()->mCurParams.mName, true);
+			LLEnvManagerNew::instance().useSkyPreset(LLWLParamManager::instance()->mCurParams.mName);
 		}
 	}
 	return false;
@@ -1024,7 +1028,8 @@ void LLFloaterWindLight::onChangePresetName(LLUICtrl* ctrl, void * userData)
 	}
 	//impfixme fix of an mystherious crash? : kittyviewer: if(!data.empty())
 	//
-	LLWLParamManager::instance()->loadPreset(combo_box->getSelectedValue().asString());
+	//LLWLParamManager::instance()->loadPreset(combo_box->getSelectedValue().asString());
+	LLEnvManagerNew::instance().useSkyPreset(combo_box->getSelectedValue().asString());
 	LL_INFOS("WindLight") << "Current inventory ID: " << LLWLParamManager::instance()->mCurParams.mInventoryID << LL_ENDL;
 	sWindLight->syncMenu();
 }
@@ -1100,14 +1105,13 @@ void LLFloaterWindLight::onCloudScrollYToggled(LLUICtrl* ctrl, void* userData)
 
 void LLFloaterWindLight::deactivateAnimator()
 {
-	LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
+	LLWLParamManager::instance()->mAnimator.deactivate();
 }
 
 void LLFloaterWindLight::onClickNext(void* user_data)
 {
 	// find place of current param
-	std::map<std::string, LLWLParamSet>::iterator mIt = 
+	std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
 		LLWLParamManager::instance()->mParamList.find(LLWLParamManager::instance()->mCurParams.mName);
 
 	// shouldn't happen unless you delete every preset but Default
@@ -1118,7 +1122,7 @@ void LLFloaterWindLight::onClickNext(void* user_data)
 	}
 
 	// if at the end, loop
-	std::map<std::string, LLWLParamSet>::iterator last = LLWLParamManager::instance()->mParamList.end(); --last;
+	std::map<LLWLParamKey, LLWLParamSet>::iterator last = LLWLParamManager::instance()->mParamList.end(); --last;
 	if(mIt == last) 
 	{
 		mIt = LLWLParamManager::instance()->mParamList.begin();
@@ -1127,15 +1131,15 @@ void LLFloaterWindLight::onClickNext(void* user_data)
 	{
 		mIt++;
 	}
-	LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
-	LLWLParamManager::instance()->loadPreset(mIt->first, true);
+	LLWLParamManager::instance()->mAnimator.deactivate();
+	// LLWLParamManager::instance()->loadPreset(mIt->first.name, true);
+	LLEnvManagerNew::instance().useSkyPreset(mIt->first.name);
 }
 
 void LLFloaterWindLight::onClickPrev(void* user_data)
 {
 	// find place of current param
-	std::map<std::string, LLWLParamSet>::iterator mIt = 
+	std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
 		LLWLParamManager::instance()->mParamList.find(LLWLParamManager::instance()->mCurParams.mName);
 
 	// shouldn't happen unless you delete every preset but Default
@@ -1148,16 +1152,16 @@ void LLFloaterWindLight::onClickPrev(void* user_data)
 	// if at the beginning, loop
 	if(mIt == LLWLParamManager::instance()->mParamList.begin()) 
 	{
-		std::map<std::string, LLWLParamSet>::iterator last = LLWLParamManager::instance()->mParamList.end(); --last;
+		std::map<LLWLParamKey, LLWLParamSet>::iterator last = LLWLParamManager::instance()->mParamList.end(); --last;
 		mIt = last;
 	}
 	else
 	{
 		mIt--;
 	}
-	LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
-	LLWLParamManager::instance()->loadPreset(mIt->first, true);
+	LLWLParamManager::instance()->mAnimator.deactivate();
+	// LLWLParamManager::instance()->loadPreset(mIt->first.name, true);
+	LLEnvManagerNew::instance().useSkyPreset(mIt->first.name);
 }
 
 //static

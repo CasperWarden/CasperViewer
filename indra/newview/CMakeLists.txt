@@ -154,6 +154,8 @@ set(viewer_SOURCE_FILES
     llcontainerview.cpp
     llcurrencyuimanager.cpp
     llcylinder.cpp
+
+    lldaycyclemanager.cpp
     lldebugmessagebox.cpp
     lldebugview.cpp
     lldelayedgestureerror.cpp
@@ -172,6 +174,7 @@ set(viewer_SOURCE_FILES
     lldrawpoolwlsky.cpp
     lldriverparam.cpp
     lldynamictexture.cpp
+    llenvmanager.cpp
     llemote.cpp
     lleventinfo.cpp
     lleventnotifier.cpp
@@ -379,6 +382,7 @@ set(viewer_SOURCE_FILES
     llpreviewtexture.cpp
     llproductinforequest.cpp
     llprogressview.cpp
+    llregioninfomodel.cpp
     llregionposition.cpp
     llremoteparcelrequest.cpp
     llsavedsettingsglue.cpp
@@ -509,6 +513,7 @@ set(viewer_SOURCE_FILES
     llwind.cpp
     llwlanimator.cpp
     llwldaycycle.cpp
+    llwlhandlers.cpp
     llwlparammanager.cpp
     llwlparamset.cpp
     llworld.cpp
@@ -636,6 +641,7 @@ set(viewer_HEADER_FILES
     llcontainerview.h
     llcurrencyuimanager.h
     llcylinder.h
+    lldaycyclemanager.h
     lldebugmessagebox.h
     lldebugview.h
     lldelayedgestureerror.h
@@ -657,6 +663,7 @@ set(viewer_HEADER_FILES
     lldynamictexture.h
     llemote.h
     lleventinfo.h
+    llenvmanager.h
     lleventnotifier.h
     lleventpoll.h
     llface.h
@@ -862,6 +869,7 @@ set(viewer_HEADER_FILES
     llpreviewtexture.h
     llproductinforequest.h
     llprogressview.h
+    llregioninfomodel.h
     llregionposition.h
     llremoteparcelrequest.h
     llresourcedata.h
@@ -996,6 +1004,7 @@ set(viewer_HEADER_FILES
     llwindebug.h
     llwlanimator.h
     llwldaycycle.h
+    llwlhandlers.h
     llwlparammanager.h
     llwlparamset.h
     llworld.h

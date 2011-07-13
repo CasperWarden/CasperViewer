@@ -11,6 +11,7 @@ include_directories(
 
 set(llvfs_SOURCE_FILES
     lldir.cpp
+    lldiriterator.cpp
     lllfsthread.cpp
     llpidlock.cpp
     llvfile.cpp
@@ -22,6 +23,7 @@ set(llvfs_HEADER_FILES
     CMakeLists.txt
 
     lldir.h
+    lldiriterator.h
     lllfsthread.h
     llpidlock.h
     llvfile.h

@@ -132,7 +132,7 @@ void LLFloaterEnvSettings::syncMenu()
 	param_mgr->setDensitySliderValue(param_mgr->mFogDensity.mExp);
 
 	// turn off Use Estate Time button if it's already being used
-	if(LLWLParamManager::instance()->mAnimator.mUseLindenTime)
+	if(LLWLParamManager::instance()->mAnimator.getUseLindenTime())
 	{
 		childDisable("EnvUseEstateTimeButton");
 	} else {
@@ -217,8 +217,7 @@ void LLFloaterEnvSettings::onChangeDayTime(LLUICtrl* ctrl, void* userData)
 	sldr = sEnvSettings->getChild<LLSliderCtrl>("EnvTimeSlider");
 
 	// deactivate animator
-	LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
+	LLWLParamManager::instance()->mAnimator.deactivate();
 
 	F32 val = sldr->getValueF32() + 0.25f;
 	if(val > 1.0) 
@@ -237,8 +236,7 @@ void LLFloaterEnvSettings::onChangeCloudCoverage(LLUICtrl* ctrl, void* userData)
 	sldr = sEnvSettings->getChild<LLSliderCtrl>("EnvCloudSlider");
 	
 	// deactivate animator
-	//LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-	//LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
+	LLWLParamManager::instance()->mAnimator.deactivate();
 
 	F32 val = sldr->getValueF32();
 	LLWLParamManager::instance()->mCurParams.set("cloud_shadow", val);
@@ -296,10 +294,8 @@ void LLFloaterEnvSettings::onUseEstateTime(void* userData)
 		box->selectByValue("");
 	}
 
-	LLWLParamManager::instance()->mAnimator.mIsRunning = true;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = true;
-	//KC: reset last to Default
-	gSavedPerAccountSettings.setString("PhoenixLastWLsetting", "Default");
+	LLWLParamManager::instance()->mAnimator.activate(LLWLAnimator::TIME_LINDEN);
+	LLEnvManagerNew::instance().setUseDayCycle(LLEnvManagerNew::instance().getDayCycleName());
 }
 
 std::string LLFloaterEnvSettings::timeToString(F32 curTime)

@@ -41,6 +41,7 @@
 
 #include <vector>
 #include "llwlparamset.h"
+#include "llwlparammanager.h" // for LLWLParamKey
 
 struct WaterColorControl;
 struct WaterloatControl;

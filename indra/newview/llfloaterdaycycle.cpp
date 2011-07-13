@@ -72,11 +72,11 @@ LLFloaterDayCycle::LLFloaterDayCycle() : LLFloater(std::string("Day Cycle Floate
 
 	if(keyCombo != NULL) 
 	{
-		std::map<std::string, LLWLParamSet>::iterator mIt = 
+		std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
 			LLWLParamManager::instance()->mParamList.begin();
 		for(; mIt != LLWLParamManager::instance()->mParamList.end(); mIt++) 
 		{
-			keyCombo->add(std::string(mIt->first));
+			keyCombo->add(std::string(mIt->first.name));
 		}
 
 		// set defaults on combo boxes
@@ -162,7 +162,7 @@ void LLFloaterDayCycle::syncMenu()
 	secSpin->setValue(sec);
 
 	// turn off Use Estate Time button if it's already being used
-	if(	LLWLParamManager::instance()->mAnimator.mUseLindenTime == true)
+	if(	LLWLParamManager::instance()->mAnimator.getUseLindenTime())
 	{
 		LLFloaterDayCycle::sDayCycle->childDisable("WLUseLindenTime");
 	} 
@@ -181,11 +181,11 @@ void LLFloaterDayCycle::syncSliderTrack()
 	sSliderToKey.clear();
 
 	// add sliders
-	std::map<F32, std::string>::iterator mIt = 
+	std::map<F32, LLWLParamKey>::iterator mIt = 
 		LLWLParamManager::instance()->mDay.mTimeMap.begin();
 	for(; mIt != LLWLParamManager::instance()->mDay.mTimeMap.end(); mIt++) 
 	{
-		addSliderKey(mIt->first * sHoursPerDay, mIt->second);
+		addSliderKey(mIt->first * sHoursPerDay, mIt->second.name);
 	}
 }
 
@@ -284,7 +284,7 @@ void LLFloaterDayCycle::onRunAnimSky(void* userData)
 	tSldr = sDayCycle->getChild<LLMultiSliderCtrl>("WLTimeSlider");
 
 	// turn off linden time
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
+	//LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
 
 	// set the param manager's track to the new one
 	LLWLParamManager::instance()->resetAnimator(
@@ -301,8 +301,7 @@ void LLFloaterDayCycle::onStopAnimSky(void* userData)
 	}
 
 	// turn off animation and using linden time
-	LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
+	LLWLParamManager::instance()->mAnimator.deactivate();
 }
 
 void LLFloaterDayCycle::onUseLindenTime(void* userData)
@@ -311,10 +310,8 @@ void LLFloaterDayCycle::onUseLindenTime(void* userData)
 	LLComboBox* box = wl->getChild<LLComboBox>("WLPresetsCombo");
 	box->selectByValue("");	
 
-	LLWLParamManager::instance()->mAnimator.mIsRunning = true;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = true;	
-	//KC: reset last to Default
-	gSavedPerAccountSettings.setString("PhoenixLastWLsetting", "Default");
+	LLWLParamManager::instance()->mAnimator.activate(LLWLAnimator::TIME_LINDEN);
+	LLEnvManagerNew::instance().setUseDayCycle(LLEnvManagerNew::instance().getDayCycleName());
 }
 
 void LLFloaterDayCycle::onLoadDayCycle(void* userData)
@@ -353,8 +350,7 @@ void LLFloaterDayCycle::onTimeSliderMoved(LLUICtrl* ctrl, void* userData)
 	
 	// set the value, turn off animation
 	LLWLParamManager::instance()->mAnimator.setDayTime((F64)val);
-	LLWLParamManager::instance()->mAnimator.mIsRunning = false;
-	LLWLParamManager::instance()->mAnimator.mUseLindenTime = false;
+	LLWLParamManager::instance()->mAnimator.deactivate();
 
 	// then call update once
 	LLWLParamManager::instance()->mAnimator.update(

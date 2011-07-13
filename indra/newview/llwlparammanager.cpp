@@ -37,6 +37,7 @@
 #include "pipeline.h"
 #include "llsky.h"
 
+#include "lldiriterator.h"
 #include "llsliderctrl.h"
 #include "llspinctrl.h"
 #include "llcheckboxctrl.h"
@@ -54,6 +55,8 @@
 #include "llagent.h"
 #include "llviewerregion.h"
 
+#include "lldaycyclemanager.h"
+#include "llenvmanager.h"
 #include "llwlparamset.h"
 #include "llpostprocess.h"
 #include "llfloaterwindlight.h"
@@ -73,9 +76,9 @@
 #include "llassetuploadresponders.h"
 
 #include "curl/curl.h"
+#include "llstreamtools.h"
 
 LLWLParamManager * LLWLParamManager::sInstance = NULL;
-std::vector<LLWLPresetsObserver*> LLWLParamManager::sObservers;
 
 LLWLParamManager::LLWLParamManager() :
 
@@ -118,298 +121,237 @@ LLWLParamManager::~LLWLParamManager()
 {
 }
 
-void LLWLParamManager::loadPresets(const std::string& file_name)
+void LLWLParamManager::clearParamSetsOfScope(LLWLParamKey::EScope scope)
 {
-	std::string path_name(gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "windlight/skies", ""));
-	LL_DEBUGS2("AppInit", "ShaderLoading") << "Loading Default WindLight settings from " << path_name << LL_ENDL;
-			
-	bool found = true;			
-	while(found) 
+	if (LLWLParamKey::SCOPE_LOCAL == scope)
 	{
-		std::string name;
-		found = gDirUtilp->getNextFileInDir(path_name, "*.xml", name, false);
-		if(found)
+		LL_WARNS("Windlight") << "Tried to clear windlight sky presets from local system!  This shouldn't be called..." << LL_ENDL;
+		return;
+	}
+
+	std::set<LLWLParamKey> to_remove;
+	for(std::map<LLWLParamKey, LLWLParamSet>::iterator iter = mParamList.begin(); iter != mParamList.end(); ++iter)
+	{
+		if(iter->first.scope == scope)
 		{
-
-			name=name.erase(name.length()-4);
-
-			// bugfix for SL-46920: preventing filenames that break stuff.
-			char * curl_str = curl_unescape(name.c_str(), name.size());
-			std::string unescaped_name(curl_str);
-			curl_free(curl_str);
-			curl_str = NULL;
-
-			LL_DEBUGS2("AppInit", "Shaders") << "name: " << name << LL_ENDL;
-			loadPreset(unescaped_name,FALSE);
+			to_remove.insert(iter->first);
 		}
 	}
 
-	// And repeat for user presets, note the user presets will modify any system presets already loaded
-
-	std::string path_name2(gDirUtilp->getExpandedFilename( LL_PATH_USER_SETTINGS , "windlight/skies", ""));
-	LL_INFOS2("AppInit", "Shaders") << "Loading User WindLight settings from " << path_name2 << LL_ENDL;
-			
-	found = true;			
-	while(found) 
+	for(std::set<LLWLParamKey>::iterator iter = to_remove.begin(); iter != to_remove.end(); ++iter)
 	{
-		std::string name;
-		found = gDirUtilp->getNextFileInDir(path_name2, "*.xml", name, false);
-		if(found)
-		{
-			name=name.erase(name.length()-4);
-
-			// bugfix for SL-46920: preventing filenames that break stuff.
-			char * curl_str = curl_unescape(name.c_str(), name.size());
-			std::string unescaped_name(curl_str);
-			curl_free(curl_str);
-			curl_str = NULL;
-
-			LL_DEBUGS2("AppInit", "Shaders") << "name: " << name << LL_ENDL;
-			loadPreset(unescaped_name,FALSE);
-		}
+		mParamList.erase(*iter);
 	}
-
 }
 
-bool LLWLParamManager::loadPresetXML(const std::string& name, std::istream& preset_stream, bool propagate /* = false */, bool check_if_real /* = false */)
+// returns all skies referenced by the day cycle, with their final names
+// side effect: applies changes to all internal structures!
+std::map<LLWLParamKey, LLWLParamSet> LLWLParamManager::finalizeFromDayCycle(LLWLParamKey::EScope scope)
 {
-	LLSD paramsData(LLSD::emptyMap());
-	
-	LLPointer<LLSDParser> parser = new LLSDXMLParser();
-	
-	if(parser->parse(preset_stream, paramsData, LLSDSerialize::SIZE_UNLIMITED) == LLSDParser::PARSE_FAILURE)
+	lldebugs << "mDay before finalizing:" << llendl;
 	{
-		return false;
-	}
-	
-	if(check_if_real)
-	{
-		static const char* expected_windlight_settings[] = {
-			"ambient",
-			"blue_density",
-			"blue_horizon",
-			"cloud_color",
-			"cloud_pos_density1",
-			"cloud_pos_density2",
-			"cloud_scale",
-			"cloud_scroll_rate",
-			"cloud_shadow",
-			"density_multiplier",
-			"distance_multiplier",
-			"east_angle",
-			"enable_cloud_scroll",
-			"gamma",
-			"glow",
-			"haze_density",
-			"haze_horizon",
-			"lightnorm",
-			"max_y",
-			"star_brightness",
-			"sun_angle",
-			"sunlight_color"
-		};
-		static S32 expected_count = LL_ARRAY_SIZE(expected_windlight_settings);
-		for(S32 i = 0; i < expected_count; ++i)
+		for (std::map<F32, LLWLParamKey>::iterator iter = mDay.mTimeMap.begin(); iter != mDay.mTimeMap.end(); ++iter)
 		{
-			if(!paramsData.has(expected_windlight_settings[i]))
+			LLWLParamKey& key = iter->second;
+			lldebugs << iter->first << "->" << key.name << llendl;
+		}
+	}
+
+	std::map<LLWLParamKey, LLWLParamSet> final_references;
+
+	// Move all referenced to desired scope, renaming if necessary
+	// First, save skies referenced
+	std::map<LLWLParamKey, LLWLParamSet> current_references; // all skies referenced by the day cycle, with their current names
+	// guard against skies with same name and different scopes
+	std::set<std::string> inserted_names;
+	std::map<std::string, unsigned int> conflicted_names; // integer later used as a count, for uniquely renaming conflicts
+
+	LLWLDayCycle& cycle = mDay;
+	for(std::map<F32, LLWLParamKey>::iterator iter = cycle.mTimeMap.begin();
+		iter != cycle.mTimeMap.end();
+		++iter)
+	{
+		LLWLParamKey& key = iter->second;
+		std::string desired_name = key.name;
+		replace_newlines_with_whitespace(desired_name); // already shouldn't have newlines, but just in case
+		if(inserted_names.find(desired_name) == inserted_names.end())
+		{
+			inserted_names.insert(desired_name);
+		}
+		else
+		{
+			// make exist in map
+			conflicted_names[desired_name] = 0;
+		}
+		current_references[key] = mParamList[key];
+	}
+
+	// forget all old skies in target scope, and rebuild, renaming as needed
+	clearParamSetsOfScope(scope);
+	for(std::map<LLWLParamKey, LLWLParamSet>::iterator iter = current_references.begin(); iter != current_references.end(); ++iter)
+	{
+		const LLWLParamKey& old_key = iter->first;
+
+		std::string desired_name(old_key.name);
+		replace_newlines_with_whitespace(desired_name);
+
+		LLWLParamKey new_key(desired_name, scope); // name will be replaced later if necessary
+
+		// if this sky is one with a non-unique name, rename via appending a number
+		// an existing preset of the target scope gets to keep its name
+		if (scope != old_key.scope && conflicted_names.find(desired_name) != conflicted_names.end())
+		{
+			std::string& new_name = new_key.name;
+
+			do
 			{
-				LL_WARNS("WindLight") << "Attempted to load WindLight param set without " << expected_windlight_settings[i] << LL_ENDL;
-				return false;
+				// if this executes more than once, this is an absurdly pathological case
+				// (e.g. "x" repeated twice, but "x 1" already exists, so need to use "x 2")
+				std::stringstream temp;
+				temp << desired_name << " " << (++conflicted_names[desired_name]);
+				new_name = temp.str();
+			} while (inserted_names.find(new_name) != inserted_names.end());
+
+			// yay, found one that works
+			inserted_names.insert(new_name); // track names we consume here; shouldn't be necessary due to ++int? but just in case
+
+			// *TODO factor out below into a rename()?
+
+			LL_INFOS("Windlight") << "Renamed " << old_key.name << " (scope" << old_key.scope << ") to "
+				<< new_key.name << " (scope " << new_key.scope << ")" << LL_ENDL;
+
+			// update name in sky
+			iter->second.mName = new_name;
+
+			// update keys in day cycle
+			for(std::map<F32, LLWLParamKey>::iterator frame = cycle.mTimeMap.begin(); frame != cycle.mTimeMap.end(); ++frame)
+			{
+				if (frame->second == old_key)
+				{
+					frame->second = new_key;
+				}
 			}
+
+			// add to master sky map
+			mParamList[new_key] = iter->second;
+		}
+
+		final_references[new_key] = iter->second;
+	}
+
+	lldebugs << "mDay after finalizing:" << llendl;
+	{
+		for (std::map<F32, LLWLParamKey>::iterator iter = mDay.mTimeMap.begin(); iter != mDay.mTimeMap.end(); ++iter)
+		{
+			LLWLParamKey& key = iter->second;
+			lldebugs << iter->first << "->" << key.name << llendl;
 		}
 	}
-	
-	std::map<std::string, LLWLParamSet>::iterator mIt = mParamList.find(name);
-	if(mIt == mParamList.end())
-	{
-		addParamSet(name, paramsData);
-	}
-	else 
-	{
-		setParamSet(name, paramsData);
-	}
 
-	if(propagate)
-	{
-		getParamSet(name, mCurParams);
-		propagateParameters();
-	}
-	return true;
-}
-void LLWLParamManager::loadPresetNotecard(const std::string& name, const LLUUID& asset_id, const LLUUID& inv_id)
-{
-	gAssetStorage->getInvItemAsset(LLHost::invalid,
-								   gAgent.getID(),
-								   gAgent.getSessionID(),
-								   gAgent.getID(),
-								   LLUUID::null,
-								   inv_id,
-								   asset_id,
-								   LLAssetType::AT_NOTECARD,
-								   &loadWindlightNotecard,
-								   (void*)&inv_id);
+	return final_references;
 }
 
-void LLWLParamManager::savePresets(const std::string & fileName)
+// static
+LLSD LLWLParamManager::createSkyMap(std::map<LLWLParamKey, LLWLParamSet> refs)
 {
-	//Nobody currently calls me, but if they did, then its reasonable to write the data out to the user's folder
-	//and not over the RO system wide version.
-
-	LLSD paramsData(LLSD::emptyMap());
-	
-	std::string pathName(gDirUtilp->getExpandedFilename( LL_PATH_USER_SETTINGS , "windlight", fileName));
-
-	for(std::map<std::string, LLWLParamSet>::iterator mIt = mParamList.begin();
-		mIt != mParamList.end();
-		++mIt) 
+	LLSD skies = LLSD::emptyMap();
+	for(std::map<LLWLParamKey, LLWLParamSet>::iterator iter = refs.begin(); iter != refs.end(); ++iter)
 	{
-		paramsData[mIt->first] = mIt->second.getAll();
+		skies.insert(iter->first.name, iter->second.getAll());
 	}
-
-	llofstream presetsXML(pathName);
-
-	LLPointer<LLSDFormatter> formatter = new LLSDXMLFormatter();
-
-	formatter->format(paramsData, presetsXML, LLSDFormatter::OPTIONS_PRETTY);
-
-	presetsXML.close();
-
-	propagateParameters();
+	return skies;
 }
 
-bool LLWLParamManager::savePresetToNotecard(const std::string & name)
+void LLWLParamManager::addAllSkies(const LLWLParamKey::EScope scope, const LLSD& sky_presets)
 {
-	// make an empty llsd
-	LLSD paramsData(LLSD::emptyMap());
-
-	// fill it with LLSD windlight params
-	paramsData = mParamList[name].getAll();
-
-	// get some XML
-	std::ostringstream presetsXML;
-	LLPointer<LLSDFormatter> formatter = new LLSDXMLFormatter();
-	formatter->format(paramsData, presetsXML, LLSDFormatter::OPTIONS_PRETTY);
-
-	// Write it to a notecard
-	LLNotecard notecard;
-	notecard.setText(presetsXML.str());
- 
-	LLInventoryItem *item = gInventory.getItem(mParamList[name].mInventoryID);
-	if(!item)
+	for(LLSD::map_const_iterator iter = sky_presets.beginMap(); iter != sky_presets.endMap(); ++iter)
 	{
-		mParamList[name].mInventoryID = LLUUID::null;
+		LLWLParamSet set;
+		set.setAll(iter->second);
+		mParamList[LLWLParamKey(iter->first, scope)] = set;
+	}
+}
+
+void LLWLParamManager::refreshRegionPresets()
+{
+	// Remove all region sky presets because they may belong to a previously visited region.
+	clearParamSetsOfScope(LLEnvKey::SCOPE_REGION);
+
+	// Add all sky presets belonging to the current region.
+	addAllSkies(LLEnvKey::SCOPE_REGION, LLEnvManagerNew::instance().getRegionSettings().getSkyMap());
+}
+
+void LLWLParamManager::loadAllPresets()
+{
+	// First, load system (coming out of the box) sky presets.
+	loadPresetsFromDir(getSysDir());
+
+	// Then load user presets. Note that user day presets will modify any system ones already loaded.
+	loadPresetsFromDir(getUserDir());
+}
+
+void LLWLParamManager::loadPresetsFromDir(const std::string& dir)
+{
+	LL_INFOS2("AppInit", "Shaders") << "Loading sky presets from " << dir << LL_ENDL;
+
+	LLDirIterator dir_iter(dir, "*.xml");
+	while (1)
+	{
+		std::string file;
+		if (!dir_iter.next(file))
+		{
+			break; // no more files
+		}
+
+		std::string path = dir + file;
+		if (!loadPreset(path))
+		{
+			llwarns << "Error loading sky preset from " << path << llendl;
+		}
+	}
+}
+
+bool LLWLParamManager::loadPreset(const std::string& path)
+{
+	llifstream xml_file;
+	std::string name(gDirUtilp->getBaseFileName(LLURI::unescape(path), /*strip_exten = */ true));
+
+	xml_file.open(path.c_str());
+	if (!xml_file)
+	{
 		return false;
 	}
-	std::string agent_url = gAgent.getRegion()->getCapability("UpdateNotecardAgentInventory");
-	if(!agent_url.empty())
+
+	LL_DEBUGS2("AppInit", "Shaders") << "Loading sky " << name << LL_ENDL;
+
+	LLSD params_data;
+	LLPointer<LLSDParser> parser = new LLSDXMLParser();
+	parser->parse(xml_file, params_data, LLSDSerialize::SIZE_UNLIMITED);
+	xml_file.close();
+
+	LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL);
+	if (hasParamSet(key))
 	{
-		LLTransactionID tid;
-		LLAssetID asset_id;
-		tid.generate();
-		asset_id = tid.makeAssetID(gAgent.getSecureSessionID());
-		
-		LLVFile file(gVFS, asset_id, LLAssetType::AT_NOTECARD, LLVFile::APPEND);
-		
-		std::ostringstream stream;
-		notecard.exportStream(stream);
-		std::string buffer = stream.str();
-		
-		S32 size = buffer.length() + 1;
-		file.setMaxSize(size);
-		file.write((U8*)buffer.c_str(), size);
-		LLSD body;
-		body["item_id"] = item->getUUID();
-		LLHTTPClient::post(agent_url, body, new LLUpdateAgentInventoryResponder(body, asset_id, LLAssetType::AT_NOTECARD));
+		setParamSet(key, params_data);
 	}
 	else
 	{
-		LL_WARNS("WindLight") << "Stuff the legacy system." << LL_ENDL;
-		return false;
+		addParamSet(key, params_data);
 	}
-	
-	propagateParameters();
+
 	return true;
 }
 
-void LLWLParamManager::loadPreset(const std::string & name,bool propagate)
+void LLWLParamManager::savePreset(LLWLParamKey key)
 {
-	// Check if we already have the preset before we try loading it again.
-	if(mParamList.find(name) != mParamList.end())
-	{
-		if(propagate)
-		{
-			//KC: save last
-			gSavedPerAccountSettings.setString("PhoenixLastWLsetting", name);
-			
-			getParamSet(name, mCurParams);
-			propagateParameters();
-		}
-		return;
-	}
-
-	// bugfix for SL-46920: preventing filenames that break stuff.
-	char * curl_str = curl_escape(name.c_str(), name.size());
-	std::string escaped_filename(curl_str);
-	curl_free(curl_str);
-	curl_str = NULL;
-
-	escaped_filename += ".xml";
-
-	std::string pathName(gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "windlight/skies", escaped_filename));
-	LL_DEBUGS2("AppInit", "Shaders") << "Loading WindLight sky setting from " << pathName << LL_ENDL; 
-
-	llifstream presetsXML;
-	presetsXML.open(pathName.c_str());
-
-	// That failed, try loading from the users area instead.
-	if(!presetsXML)
-	{
-		pathName=gDirUtilp->getExpandedFilename( LL_PATH_USER_SETTINGS , "windlight/skies", escaped_filename);
-		LL_DEBUGS2("AppInit", "Shaders")<< "Loading User WindLight sky setting from "  << LL_ENDL; 
-		presetsXML.open(pathName.c_str());
-	}
-
-	if (presetsXML)
-	{
-		loadPresetXML(name, presetsXML);
-		presetsXML.close();
-	} 
-	else 
-	{
-		llwarns << "Can't find " << name << llendl;
-		return;
-	}
-
-	
-	if(propagate)
-	{
-		//KC: save last
-		gSavedPerAccountSettings.setString("PhoenixLastWLsetting", name);
-		llinfos << "PhoenixLastWLsetting: " << name << llendl;
-		
-		getParamSet(name, mCurParams);
-		propagateParameters();
-	}
-
-	notifyObservers();
-}	
-
-void LLWLParamManager::savePreset(const std::string & name)
-{
-	// bugfix for SL-46920: preventing filenames that break stuff.
-	char * curl_str = curl_escape(name.c_str(), name.size());
-	std::string escaped_filename(curl_str);
-	curl_free(curl_str);
-	curl_str = NULL;
-
-	escaped_filename += ".xml";
+	llassert(key.scope == LLEnvKey::SCOPE_LOCAL && !key.name.empty());
 
 	// make an empty llsd
 	LLSD paramsData(LLSD::emptyMap());
-	std::string pathName(gDirUtilp->getExpandedFilename( LL_PATH_USER_SETTINGS , "windlight/skies", escaped_filename));
+	std::string pathName(getUserDir() + escapeString(key.name) + ".xml");
 
 	// fill it with LLSD windlight params
-	paramsData = mParamList[name].getAll();
+	paramsData = mParamList[key].getAll();
 
 	// write to file
 	llofstream presetsXML(pathName);
@@ -418,7 +360,6 @@ void LLWLParamManager::savePreset(const std::string & name)
 	presetsXML.close();
 
 	propagateParameters();
-	notifyObservers();
 }
 
 void LLWLParamManager::updateShaderUniforms(LLGLSLShader * shader)
@@ -522,7 +463,7 @@ void LLWLParamManager::update(LLViewerCamera * cam)
 	mCurParams.updateCloudScrolling();
 	
 	// update only if running
-	if(mAnimator.mIsRunning) 
+	if(mAnimator.getIsRunning()) 
 	{
 		mAnimator.update(mCurParams);
 	}
@@ -553,7 +494,7 @@ void LLWLParamManager::update(LLViewerCamera * cam)
 	{
 		F32 camYawDelta = mSunDeltaYaw * DEG_TO_RAD;
 		
-		LLVector3 lightNorm3(mLightDir);	
+		LLVector3 lightNorm3(mLightDir);
 		lightNorm3 *= LLQuaternion(-(camYaw + camYawDelta), LLVector3(0.f, 1.f, 0.f));
 		mRotatedLightDir = LLVector4(lightNorm3, 0.f);
 
@@ -571,6 +512,19 @@ void LLWLParamManager::update(LLViewerCamera * cam)
 	}
 }
 
+bool LLWLParamManager::applyDayCycleParams(const LLSD& params, LLEnvKey::EScope scope, F32 time)
+{
+	mDay.loadDayCycle(params, scope);
+	resetAnimator(time, true); // set to specified time and start animator
+	return true;
+}
+
+bool LLWLParamManager::applySkyParams(const LLSD& params)
+{
+	mAnimator.deactivate();
+	mCurParams.setAll(params);
+	return true;
+}
 // static
 void LLWLParamManager::initClass(void)
 {
@@ -591,112 +545,190 @@ void LLWLParamManager::resetAnimator(F32 curTime, bool run)
 
 	return;
 }
-bool LLWLParamManager::addParamSet(const std::string& name, LLWLParamSet& param)
+
+bool LLWLParamManager::addParamSet(const LLWLParamKey& key, LLWLParamSet& param)
 {
 	// add a new one if not one there already
-	std::map<std::string, LLWLParamSet>::iterator mIt = mParamList.find(name);
+	std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = mParamList.find(key);
 	if(mIt == mParamList.end()) 
 	{	
-		mParamList[name] = param;
+		llassert(!key.name.empty());
+		// *TODO: validate params
+		mParamList[key] = param;
+		mPresetListChangeSignal();
 		return true;
 	}
 
 	return false;
 }
 
-BOOL LLWLParamManager::addParamSet(const std::string& name, LLSD const & param)
+BOOL LLWLParamManager::addParamSet(const LLWLParamKey& key, LLSD const & param)
 {
-	// add a new one if not one there already
-	std::map<std::string, LLWLParamSet>::const_iterator finder = mParamList.find(name);
-	if(finder == mParamList.end())
-	{
-		mParamList[name].setAll(param);
-		return TRUE;
-	}
-	else
-	{
-		return FALSE;
-	}
+	LLWLParamSet param_set;
+	param_set.setAll(param);
+	return addParamSet(key, param_set);
 }
 
-bool LLWLParamManager::getParamSet(const std::string& name, LLWLParamSet& param)
+bool LLWLParamManager::getParamSet(const LLWLParamKey& key, LLWLParamSet& param)
 {
 	// find it and set it
-	std::map<std::string, LLWLParamSet>::iterator mIt = mParamList.find(name);
+	std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = mParamList.find(key);
 	if(mIt != mParamList.end()) 
 	{
-		param = mParamList[name];
-		param.mName = name;
+		param = mParamList[key];
+		param.mName = key.name;
 		return true;
 	}
 
 	return false;
+}
+
+bool LLWLParamManager::hasParamSet(const LLWLParamKey& key)
+{
+	LLWLParamSet dummy;
+	return getParamSet(key, dummy);
 }
 
 bool LLWLParamManager::setParamSet(const std::string& name, LLWLParamSet& param)
 {
-	mParamList[name] = param;
+	const LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL);
+	return setParamSet(key, param);
+}
+
+bool LLWLParamManager::setParamSet(const LLWLParamKey& key, LLWLParamSet& param)
+{
+	llassert(!key.name.empty());
+	// *TODO: validate params
+	mParamList[key] = param;
 
 	return true;
 }
 
 bool LLWLParamManager::setParamSet(const std::string& name, const LLSD & param)
 {
+	const LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL);
+	return setParamSet(key, param);
+}
+
+bool LLWLParamManager::setParamSet(const LLWLParamKey& key, const LLSD & param)
+{
+	llassert(!key.name.empty());
+	// *TODO: validate params
+
 	// quick, non robust (we won't be working with files, but assets) check
+	// this might not actually be true anymore....
 	if(!param.isMap()) 
 	{
 		return false;
 	}
 	
-	mParamList[name].setAll(param);
-
-	return true;
+	LLWLParamSet param_set;
+	param_set.setAll(param);
+	return setParamSet(key, param_set);
 }
 
 bool LLWLParamManager::removeParamSet(const std::string& name, bool delete_from_disk)
 {
+	const LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL);
+	return removeParamSet(key, delete_from_disk);
+}
+
+bool LLWLParamManager::removeParamSet(const LLWLParamKey& key, bool delete_from_disk)
+{
+	// *NOTE: Removing a sky preset invalidates day cycles that refer to it.
+
+	if (key.scope == LLEnvKey::SCOPE_REGION)
+	{
+		llwarns << "Removing region skies not supported" << llendl;
+		llassert(key.scope == LLEnvKey::SCOPE_LOCAL);
+		return false;
+	}
+
 	// remove from param list
-	std::map<std::string, LLWLParamSet>::iterator mIt = mParamList.find(name);
-	if(mIt != mParamList.end()) 
+	std::map<LLWLParamKey, LLWLParamSet>::iterator it = mParamList.find(key);
+	if (it == mParamList.end())
 	{
-		mParamList.erase(mIt);
+		LL_WARNS("WindLight") << "No sky preset named " << key.name << LL_ENDL;
+		return false;
 	}
 
-	F32 key;
+	mParamList.erase(it);
+	mDay.removeReferencesTo(key);
 
-	// remove all references
-	bool stat = true;
-	do 
+	// remove from file system if requested
+	if (delete_from_disk)
 	{
-		// get it
-		stat = mDay.getKey(name, key);
-		if(stat == false) 
+		std::string path_name(getUserDir());
+		std::string escaped_name = escapeString(key.name);
+
+		if(gDirUtilp->deleteFilesInDir(path_name, escaped_name + ".xml") < 1)
 		{
-			break;
+			LL_WARNS("WindLight") << "Error removing sky preset " << key.name << " from disk" << LL_ENDL;
 		}
-
-		// and remove
-		stat = mDay.removeKey(key);
-
-	} while(stat == true);
-	
-	if(delete_from_disk)
-	{
-		std::string path_name(gDirUtilp->getExpandedFilename( LL_PATH_USER_SETTINGS , "windlight/skies", ""));
-		
-		// use full curl escaped name
-		char * curl_str = curl_escape(name.c_str(), name.size());
-		std::string escaped_name(curl_str);
-		curl_free(curl_str);
-		curl_str = NULL;
-		
-		gDirUtilp->deleteFilesInDir(path_name, escaped_name + ".xml");
 	}
 
-	notifyObservers();
+	// signal interested parties
+	mPresetListChangeSignal();
 
 	return true;
 }
+
+bool LLWLParamManager::isSystemPreset(const std::string& preset_name) const
+{
+	// *TODO: file system access is excessive here.
+	return gDirUtilp->fileExists(getSysDir() + escapeString(preset_name) + ".xml");
+}
+
+void LLWLParamManager::getPresetNames(preset_name_list_t& region, preset_name_list_t& user, preset_name_list_t& sys) const
+{
+	region.clear();
+	user.clear();
+	sys.clear();
+
+	for (std::map<LLWLParamKey, LLWLParamSet>::const_iterator it = mParamList.begin(); it != mParamList.end(); it++)
+	{
+		const LLWLParamKey& key = it->first;
+		const std::string& name = key.name;
+
+		if (key.scope == LLEnvKey::SCOPE_REGION)
+		{
+			region.push_back(name);
+		}
+		else
+		{
+			if (isSystemPreset(name))
+			{
+				sys.push_back(name);
+			}
+			else
+			{
+				user.push_back(name);
+			}
+		}
+	}
+}
+
+void LLWLParamManager::getUserPresetNames(preset_name_list_t& user) const
+{
+	preset_name_list_t region, sys; // unused
+	getPresetNames(region, user, sys);
+}
+
+void LLWLParamManager::getPresetKeys(preset_key_list_t& keys) const
+{
+	keys.clear();
+
+	for (std::map<LLWLParamKey, LLWLParamSet>::const_iterator it = mParamList.begin(); it != mParamList.end(); it++)
+	{
+		keys.push_back(it->first);
+	}
+}
+
+boost::signals2::connection LLWLParamManager::setPresetListChangeCallback(const preset_list_signal_t::slot_type& cb)
+{
+	return mPresetListChangeSignal.connect(cb);
+}
+
 
 
 // static
@@ -704,24 +736,201 @@ LLWLParamManager * LLWLParamManager::instance()
 {
 	if(NULL == sInstance)
 	{
+		LL_DEBUGS("Windlight") << "Initializing sky" << LL_ENDL;
+
 		sInstance = new LLWLParamManager();
 
-		sInstance->loadPresets(LLStringUtil::null);
+		sInstance->loadAllPresets();
 
 		// load the day
-		sInstance->mDay.loadDayCycle(std::string("Default.xml"));
-
+		std::string preferred_day = LLEnvManagerNew::instance().getDayCycleName();
+		if (!LLDayCycleManager::instance().getPreset(preferred_day, sInstance->mDay))
+		{
+			// Fall back to default.
+			llwarns << "No day cycle named " << preferred_day << ", falling back to defaults" << llendl;
+			sInstance->mDay.loadDayCycleFromFile("Default.xml");
+	
+			// *TODO: Fix user preferences accordingly.
+		}
+	
 		// *HACK - sets cloud scrolling to what we want... fix this better in the future
-		sInstance->getParamSet("Default", sInstance->mCurParams);
-
+		std::string sky = LLEnvManagerNew::instance().getSkyPresetName();
+		if (!sInstance->getParamSet(LLWLParamKey(sky, LLWLParamKey::SCOPE_LOCAL), sInstance->mCurParams))
+		{
+			llwarns << "No sky preset named " << sky << ", falling back to defaults" << llendl;
+			sInstance->getParamSet(LLWLParamKey("Default", LLWLParamKey::SCOPE_LOCAL), sInstance->mCurParams);
+	
+			// *TODO: Fix user preferences accordingly.
+		}
+	
 		// set it to noon
-		sInstance->resetAnimator(0.5, true);
-
+		sInstance->resetAnimator(0.5, LLEnvManagerNew::instance().getUseDayCycle());
+	
 		// but use linden time sets it to what the estate is
-		sInstance->mAnimator.mUseLindenTime = true;
+		sInstance->mAnimator.setTimeType(LLWLAnimator::TIME_LINDEN);
+	
+		LLEnvManagerNew::instance().usePrefs();
 	}
 
 	return sInstance;
+}
+
+// static
+std::string LLWLParamManager::getSysDir()
+{
+	return gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "windlight/skies", "");
+}
+
+// static
+std::string LLWLParamManager::getUserDir()
+{
+	return gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS , "windlight/skies", "");
+}
+
+// static
+std::string LLWLParamManager::escapeString(const std::string& str)
+{
+	// Don't use LLURI::escape() because it doesn't encode '-' characters
+	// which may break handling of some system presets like "A-12AM".
+	char* curl_str = curl_escape(str.c_str(), str.size());
+	std::string escaped_str(curl_str);
+	curl_free(curl_str);
+	//std::string escaped_str(CurlHelper::escape(str));
+
+	return escaped_str;
+}
+
+
+bool LLWLParamManager::loadPresetXML(const std::string& name, std::istream& preset_stream, bool check_if_real /* = false */)
+{
+	LLSD params_data(LLSD::emptyMap());
+	
+	LLPointer<LLSDParser> parser = new LLSDXMLParser();
+	
+	if(parser->parse(preset_stream, params_data, LLSDSerialize::SIZE_UNLIMITED) == LLSDParser::PARSE_FAILURE)
+	{
+		return false;
+	}
+	
+	if(check_if_real)
+	{
+		static const char* expected_windlight_settings[] = {
+			"ambient",
+			"blue_density",
+			"blue_horizon",
+			"cloud_color",
+			"cloud_pos_density1",
+			"cloud_pos_density2",
+			"cloud_scale",
+			"cloud_scroll_rate",
+			"cloud_shadow",
+			"density_multiplier",
+			"distance_multiplier",
+			"east_angle",
+			"enable_cloud_scroll",
+			"gamma",
+			"glow",
+			"haze_density",
+			"haze_horizon",
+			"lightnorm",
+			"max_y",
+			"star_brightness",
+			"sun_angle",
+			"sunlight_color"
+		};
+		static S32 expected_count = LL_ARRAY_SIZE(expected_windlight_settings);
+		for(S32 i = 0; i < expected_count; ++i)
+		{
+			if(!params_data.has(expected_windlight_settings[i]))
+			{
+				LL_WARNS("WindLight") << "Attempted to load WindLight param set without " << expected_windlight_settings[i] << LL_ENDL;
+				return false;
+			}
+		}
+	}
+	
+
+	LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL);
+	if (hasParamSet(key))
+	{
+		setParamSet(key, params_data);
+	}
+	else
+	{
+		addParamSet(key, params_data);
+	}
+
+	return true;
+}
+
+void LLWLParamManager::loadPresetNotecard(const std::string& name, const LLUUID& asset_id, const LLUUID& inv_id)
+{
+	gAssetStorage->getInvItemAsset(LLHost::invalid,
+								   gAgent.getID(),
+								   gAgent.getSessionID(),
+								   gAgent.getID(),
+								   LLUUID::null,
+								   inv_id,
+								   asset_id,
+								   LLAssetType::AT_NOTECARD,
+								   &loadWindlightNotecard,
+								   (void*)&inv_id);
+}
+
+
+bool LLWLParamManager::savePresetToNotecard(const std::string & name)
+{
+	// make an empty llsd
+	LLSD paramsData(LLSD::emptyMap());
+
+	// fill it with LLSD windlight params
+	LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL);
+	paramsData = mParamList[key].getAll();
+
+	// get some XML
+	std::ostringstream presetsXML;
+	LLPointer<LLSDFormatter> formatter = new LLSDXMLFormatter();
+	formatter->format(paramsData, presetsXML, LLSDFormatter::OPTIONS_PRETTY);
+
+	// Write it to a notecard
+	LLNotecard notecard;
+	notecard.setText(presetsXML.str());
+ 
+	LLInventoryItem *item = gInventory.getItem(mParamList[key].mInventoryID);
+	if(!item)
+	{
+		mParamList[key].mInventoryID = LLUUID::null;
+		return false;
+	}
+	std::string agent_url = gAgent.getRegion()->getCapability("UpdateNotecardAgentInventory");
+	if(!agent_url.empty())
+	{
+		LLTransactionID tid;
+		LLAssetID asset_id;
+		tid.generate();
+		asset_id = tid.makeAssetID(gAgent.getSecureSessionID());
+		
+		LLVFile file(gVFS, asset_id, LLAssetType::AT_NOTECARD, LLVFile::APPEND);
+		
+		std::ostringstream stream;
+		notecard.exportStream(stream);
+		std::string buffer = stream.str();
+		
+		S32 size = buffer.length() + 1;
+		file.setMaxSize(size);
+		file.write((U8*)buffer.c_str(), size);
+		LLSD body;
+		body["item_id"] = item->getUUID();
+		LLHTTPClient::post(agent_url, body, new LLUpdateAgentInventoryResponder(body, asset_id, LLAssetType::AT_NOTECARD));
+	}
+	else
+	{
+		LL_WARNS("WindLight") << "Stuff the legacy system." << LL_ENDL;
+		return false;
+	}
+	
+	propagateParameters();
+	return true;
 }
 
 // static
@@ -747,57 +956,24 @@ void LLWLParamManager::loadWindlightNotecard(LLVFS *vfs, const LLUUID& asset_id,
 		notecard.importStream(str);
 		std::string settings = notecard.getText();
 		LLMemoryStream settings_str((U8*)settings.c_str(), settings.length());
-		bool is_animator_running = sInstance->mAnimator.mIsRunning;
-		bool animator_linden_time = sInstance->mAnimator.mUseLindenTime;
-		sInstance->mAnimator.mIsRunning = false;
-		sInstance->mAnimator.mUseLindenTime = false;
-		bool is_real_setting = sInstance->loadPresetXML(name, settings_str, true, true);
+		bool is_animator_running = sInstance->mAnimator.getIsRunning();
+		sInstance->mAnimator.deactivate();
+		bool is_real_setting = sInstance->loadPresetXML(name, settings_str, true);
 		if(!is_real_setting)
 		{
-			sInstance->mAnimator.mIsRunning = is_animator_running;
-			sInstance->mAnimator.mUseLindenTime = animator_linden_time;
+			if (is_animator_running)
+			{
+				sInstance->mAnimator.activate(LLWLAnimator::TIME_LINDEN);
+			}
 			LLSD subs;
 			subs["NAME"] = name;
 			LLNotifications::getInstance()->add("KittyInvalidWindlightNotecard", subs);
 		}
 		else
 		{
-			// We can do this because we know mCurParams 
-			sInstance->mParamList[name].mInventoryID = inventory_id;
+			// We can do this because we know mCurParams
+		LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL); 
+			sInstance->mParamList[key].mInventoryID = inventory_id;
 		}
-	}
-}
-
-// static
-void LLWLParamManager::addObserver(LLWLPresetsObserver* observer)
-{
-	sObservers.push_back(observer);
-}
-
-// static
-void LLWLParamManager::removeObserver(LLWLPresetsObserver* observer)
-{
-	std::vector<LLWLPresetsObserver*>::iterator it;
-	it = std::find(sObservers.begin(), sObservers.end(), observer);
-	if (it != sObservers.end())
-	{
-		sObservers.erase(it);
-	}
-}
-
-// Call this method when it's time to update everyone on a new state.
-// Copy the list because an observer could respond by removing itself
-// from the list. Static
-void LLWLParamManager::notifyObservers()
-{
-	lldebugs << "LLWLPresetsObserver::notifyObservers" << llendl;
-
-	std::vector<LLWLPresetsObserver*> observers = sObservers;
-
-	std::vector<LLWLPresetsObserver*>::iterator it;
-	for (it = observers.begin(); it != observers.end(); ++it)
-	{
-		LLWLPresetsObserver* observer = *it;
-		observer->changed();
 	}
 }
