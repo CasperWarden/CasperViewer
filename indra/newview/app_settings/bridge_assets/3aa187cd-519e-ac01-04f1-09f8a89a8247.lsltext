@@ -249,7 +249,8 @@ default
 		if(channel == receive_channel || channel == l2c)
 		{
 			// This is a viewer command. Deal with it.
-			receive(message);
+			if(id == llGetOwner())
+				receive(message);
 		}
 		else
 		{
