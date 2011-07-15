@@ -57,6 +57,7 @@ public:
 	~LLWLAnimator()
 	{
 		delete mInterpBeginWL;
+		delete mInterpEndWL;
 		delete mInterpBeginWater;
 		delete mInterpEndWater;
 	}
@@ -89,6 +90,7 @@ public:
 	}
 
 	void startInterpolation(const LLSD& targetWater);
+	void startInterpolationSky(const LLSD& targetSky);
 
 	bool getIsRunning()
 	{
@@ -128,9 +130,9 @@ public:
 
 private:
 	ETime mTimeType;
-	bool mIsRunning, mIsInterpolating;
+	bool mIsRunning, mIsInterpolating, mIsInterpolatingSky;
 private:
-	LLWLParamSet *mInterpBeginWL;
+	LLWLParamSet *mInterpBeginWL, *mInterpEndWL;
 	LLWaterParamSet *mInterpBeginWater, *mInterpEndWater;
 	clock_t mInterpStartTime, mInterpEndTime;
 

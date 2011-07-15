@@ -9056,24 +9056,24 @@ class LLWorldEnvSettings : public view_listener_t
 		
 		if (tod == "sunrise")
 		{
-			LLEnvManagerNew::instance().setUseSkyPreset("Sunrise");
+			LLEnvManagerNew::instance().setUseSkyPreset("Sunrise", true);
 		}
 		else if (tod == "noon")
 		{
-			LLEnvManagerNew::instance().setUseSkyPreset("Midday");
+			LLEnvManagerNew::instance().setUseSkyPreset("Midday", true);
 		}
 		else if (tod == "sunset")
 		{
-			LLEnvManagerNew::instance().setUseSkyPreset("Sunset");
+			LLEnvManagerNew::instance().setUseSkyPreset("Sunset", true);
 		}
 		else if (tod == "midnight")
 		{
-			LLEnvManagerNew::instance().setUseSkyPreset("Midnight");
+			LLEnvManagerNew::instance().setUseSkyPreset("Midnight", true);
 		}
 		else //default
 		{
 			//LLEnvManagerNew::instance().setUseDayCycle(LLEnvManagerNew::instance().getDayCycleName());
-			LLEnvManagerNew::instance().useRegionSettings();
+			LLEnvManagerNew::instance().setUseRegionSettings(true);
 		}
 		return true;
 	}

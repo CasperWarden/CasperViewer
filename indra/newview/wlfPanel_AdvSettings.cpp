@@ -209,12 +209,13 @@ void wlfPanel_AdvSettings::onChangeWWPresetName(LLUICtrl* ctrl, void * userData)
 	const std::string& wwset = combo_box->getSelectedValue().asString();
 	if (LLWaterParamManager::instance()->hasParamSet(wwset))
 	{
-		LLEnvManagerNew::instance().setUseWaterPreset(wwset);
+		LLEnvManagerNew::instance().setUseWaterPreset(wwset, true);
 	}
 	else
 	{
 		//if that failed, use region's
-		LLEnvManagerNew::instance().useRegionWater();
+		// LLEnvManagerNew::instance().useRegionWater();
+		LLEnvManagerNew::instance().setUseWaterPreset("Default", true);
 	}
 }
 
@@ -230,12 +231,13 @@ void wlfPanel_AdvSettings::onChangeWLPresetName(LLUICtrl* ctrl, void * userData)
 	const LLWLParamKey key(combo_box->getSelectedValue().asString(), LLEnvKey::SCOPE_LOCAL);
 	if (LLWLParamManager::instance()->hasParamSet(key))
 	{
-		LLEnvManagerNew::instance().setUseSkyPreset(key.name);
+		LLEnvManagerNew::instance().setUseSkyPreset(key.name, true);
 	}
 	else
 	{
 		//if that failed, use region's
-		LLEnvManagerNew::instance().useRegionSky();
+		LLEnvManagerNew::instance().setUseSkyPreset("Default", true);
+		// LLEnvManagerNew::instance().useRegionSky();
 	}
 }
 
@@ -261,7 +263,7 @@ void wlfPanel_AdvSettings::onClickWWNext(void* user_data)
 	}
 
 	//param_mgr->loadPreset(mIt->first, true);
-	LLEnvManagerNew::instance().setUseWaterPreset(mIt->first);
+	LLEnvManagerNew::instance().setUseWaterPreset(mIt->first, true);
 	LLComboBox* comboBox = self->getChild<LLComboBox>("WWPresetsCombo");
 	comboBox->setSimple(mIt->first);
 }
@@ -292,7 +294,7 @@ void wlfPanel_AdvSettings::onClickWWPrev(void* user_data)
 	}
 
 	//param_mgr->loadPreset(mIt->first, true);
-	LLEnvManagerNew::instance().setUseWaterPreset(mIt->first);
+	LLEnvManagerNew::instance().setUseWaterPreset(mIt->first, true);
 	LLComboBox* comboBox = self->getChild<LLComboBox>("WWPresetsCombo");
 	comboBox->setSimple(mIt->first);
 }
@@ -325,8 +327,8 @@ void wlfPanel_AdvSettings::onClickWLNext(void* user_data)
 	{
 		mIt++;
 	}
-	param_mgr->mAnimator.deactivate();
-	LLEnvManagerNew::instance().setUseSkyPreset(mIt->first.name);
+	// param_mgr->mAnimator.deactivate();
+	LLEnvManagerNew::instance().setUseSkyPreset(mIt->first.name, true);
 	LLComboBox* comboBox = self->getChild<LLComboBox>("WLPresetsCombo");
 	comboBox->setSimple(mIt->first.name);
 }
@@ -359,9 +361,9 @@ void wlfPanel_AdvSettings::onClickWLPrev(void* user_data)
 	{
 		mIt--;
 	}
-	param_mgr->mAnimator.deactivate();
+	// param_mgr->mAnimator.deactivate();
 	//LLWLParamManager::instance()->loadPreset(mIt->first.name, true);
-	LLEnvManagerNew::instance().setUseSkyPreset(mIt->first.name);
+	LLEnvManagerNew::instance().setUseSkyPreset(mIt->first.name, true);
 	LLComboBox* comboBox = self->getChild<LLComboBox>("WLPresetsCombo");
 	comboBox->setSimple(mIt->first.name);
 }
@@ -382,7 +384,7 @@ void wlfPanel_AdvSettings::onChangeDayTime(LLUICtrl* ctrl, void* userData)
 
 	if (sldr) {
 		// deactivate animator
-		LLWLParamManager::instance()->mAnimator.deactivate();
+		// LLWLParamManager::instance()->mAnimator.deactivate();
 
 		F32 val = sldr->getValueF32() + 0.25f;
 		if(val > 1.0) 

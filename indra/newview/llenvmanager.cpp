@@ -195,7 +195,7 @@ bool LLEnvManagerNew::useWaterParams(const LLSD& params)
 	return true;
 }
 
-bool LLEnvManagerNew::useSkyPreset(const std::string& name)
+bool LLEnvManagerNew::useSkyPreset(const std::string& name, bool interpolate /*= false*/)
 {
 	LLWLParamManager* sky_mgr = LLWLParamManager::instance();
 	LLWLParamSet param_set;
@@ -207,7 +207,7 @@ bool LLEnvManagerNew::useSkyPreset(const std::string& name)
 	}
 
 	LL_DEBUGS("Windlight") << "Displaying sky preset " << name << LL_ENDL;
-	sky_mgr->applySkyParams(param_set.getAll());
+	sky_mgr->applySkyParams(param_set.getAll(), interpolate);
 	return true;
 }
 
@@ -249,14 +249,14 @@ bool LLEnvManagerNew::useDayCycleParams(const LLSD& params, LLEnvKey::EScope sco
 	return LLWLParamManager::instance()->applyDayCycleParams(params, scope);
 }
 
-void LLEnvManagerNew::setUseRegionSettings(bool val)
+void LLEnvManagerNew::setUseRegionSettings(bool val, bool interpolate /*= false*/)
 {
 	mUserPrefs.setUseRegionSettings(val);
 	saveUserPrefs();
-	updateManagersFromPrefs(false);
+	updateManagersFromPrefs(interpolate);
 }
 
-void LLEnvManagerNew::setUseWaterPreset(const std::string& name)
+void LLEnvManagerNew::setUseWaterPreset(const std::string& name, bool interpolate /*= false*/)
 {
 	// *TODO: make sure the preset exists.
 	if (name.empty())
@@ -267,10 +267,10 @@ void LLEnvManagerNew::setUseWaterPreset(const std::string& name)
 
 	mUserPrefs.setUseWaterPreset(name);
 	saveUserPrefs();
-	updateManagersFromPrefs(false);
+	updateManagersFromPrefs(interpolate);
 }
 
-void LLEnvManagerNew::setUseSkyPreset(const std::string& name)
+void LLEnvManagerNew::setUseSkyPreset(const std::string& name, bool interpolate /*= false*/)
 {
 	// *TODO: make sure the preset exists.
 	if (name.empty())
@@ -281,10 +281,10 @@ void LLEnvManagerNew::setUseSkyPreset(const std::string& name)
 
 	mUserPrefs.setUseSkyPreset(name);
 	saveUserPrefs();
-	updateManagersFromPrefs(false);
+	updateManagersFromPrefs(interpolate);
 }
 
-void LLEnvManagerNew::setUseDayCycle(const std::string& name)
+void LLEnvManagerNew::setUseDayCycle(const std::string& name, bool interpolate /*= false*/)
 {
 	if (!LLDayCycleManager::instance().presetExists(name))
 	{
@@ -294,7 +294,7 @@ void LLEnvManagerNew::setUseDayCycle(const std::string& name)
 
 	mUserPrefs.setUseDayCycle(name);
 	saveUserPrefs();
-	updateManagersFromPrefs(false);
+	updateManagersFromPrefs(interpolate);
 }
 
 void LLEnvManagerNew::loadUserPrefs()
@@ -522,7 +522,7 @@ void LLEnvManagerNew::initSingleton()
 	loadUserPrefs();
 }
 
-void LLEnvManagerNew::updateSkyFromPrefs()
+void LLEnvManagerNew::updateSkyFromPrefs(bool interpolate /*= false*/)
 {
 	bool success = true;
 
@@ -539,7 +539,7 @@ void LLEnvManagerNew::updateSkyFromPrefs()
 		}
 		else
 		{
-			success = useSkyPreset(getSkyPresetName());
+			success = useSkyPreset(getSkyPresetName(), interpolate);
 		}
 	}
 
@@ -604,7 +604,7 @@ void LLEnvManagerNew::updateManagersFromPrefs(bool interpolate)
 	updateWaterFromPrefs(interpolate);
 
 	// Apply sky settings.
-	updateSkyFromPrefs();
+	updateSkyFromPrefs(interpolate);
 }
 
 bool LLEnvManagerNew::useRegionSky()

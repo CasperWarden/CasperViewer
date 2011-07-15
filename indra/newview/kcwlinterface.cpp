@@ -147,7 +147,7 @@ void KCWindlightInterface::ApplySettings(const LLSD& settings)
 		if (settings.has("water"))
 		{
 			// LLWaterParamManager::instance()->loadPreset(settings["water"].asString(), true);
-			LLEnvManagerNew::instance().useWaterPreset(settings["water"].asString());
+			LLEnvManagerNew::instance().setUseWaterPreset(settings["water"].asString(), true);
 			WLset = true;
 		}
 	}
@@ -205,14 +205,14 @@ void KCWindlightInterface::ApplyWindLightPreset(const std::string& preset)
 	LLWLParamKey key(preset, LLEnvKey::SCOPE_LOCAL);
 	if ( (preset != "Default") && (wlprammgr->hasParamSet(key)) )
 	{
-		LLEnvManagerNew::instance().useSkyPreset(preset);
+		LLEnvManagerNew::instance().setUseSkyPreset(preset, true);
 		WLset = true;
 		mWeChangedIt = true;
 	}
 	else
 	{
 		if (!LLEnvManagerNew::instance().getUseRegionSettings())
-			LLEnvManagerNew::instance().useRegionSettings();
+			LLEnvManagerNew::instance().setUseRegionSettings(true, true);
 		WLset = false;
 		mWeChangedIt = false;
 	}
