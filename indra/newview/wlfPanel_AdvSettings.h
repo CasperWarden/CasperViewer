@@ -34,6 +34,8 @@
 
 #include "llpanel.h"
 
+class LLComboBox;
+
 class wlfPanel_AdvSettings : public LLPanel
 {
 public:
@@ -59,6 +61,16 @@ protected:
 	static void onOpenAdvancedSky(void* userData);
 	static void onOpenAdvancedWater(void* userData);
 	static void onChangeDayTime(LLUICtrl* ctrl, void* userData);
+
+	void refreshLists(); /// update controls with user prefs
+
+	void populateWaterPresetsList();
+	void populateSkyPresetsList();
+	// void populateDayCyclePresetsList();
+
+	LLComboBox*		mWaterPresetCombo;
+	LLComboBox*		mSkyPresetCombo;
+	// LLComboBox*		mDayCyclePresetCombo;
 };
 
 #endif // LL_wlfPanel_AdvSettings_H

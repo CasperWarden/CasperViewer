@@ -41,12 +41,16 @@
 #include "lltextbox.h"
 #include "llcombobox.h"
 #include "llsliderctrl.h"
-#include "llwlparammanager.h"
-#include "llwaterparammanager.h"
 #include "llstartup.h"
 
 #include "llfloaterwindlight.h"
 #include "llfloaterwater.h"
+
+#include "lldaycyclemanager.h"
+#include "llenvmanager.h"
+#include "llwaterparammanager.h"
+#include "llwlparamset.h"
+#include "llwlparammanager.h"
 
 // [RLVa:KB]
 #include "rlvhandler.h"
@@ -95,6 +99,22 @@ void wlfPanel_AdvSettings::refresh()
 // [/RLVa:KB]
 }
 
+void wlfPanel_AdvSettings::refreshLists()
+{
+	LLEnvManagerNew& env_mgr = LLEnvManagerNew::instance();
+
+	// Populate the combo boxes with appropriate lists of available presets.
+	//actually, dont do this, its laggy and not needed to just refresh the selections
+	// populateWaterPresetsList();
+	// populateSkyPresetsList();
+	// populateDayCyclePresetsList();
+
+	// Select the current presets in combo boxes.
+	mWaterPresetCombo->selectByValue(env_mgr.getWaterPresetName());
+	mSkyPresetCombo->selectByValue(env_mgr.getSkyPresetName());
+	//mDayCyclePresetCombo->selectByValue(env_mgr.getDayCycleName());
+}
+
 void wlfPanel_AdvSettings::fixPanel()
 {
 	if(!firstBuildDone)
@@ -109,48 +129,24 @@ BOOL wlfPanel_AdvSettings::postBuild()
 {
 	childSetAction("expand", onClickExpandBtn, this);
 	
-	LLComboBox* WWcomboBox = getChild<LLComboBox>("WWPresetsCombo");
-	if(WWcomboBox != NULL) {
-		std::map<std::string, LLWaterParamSet>::iterator mIt =
-			LLWaterParamManager::instance()->mParamList.begin();
-		for(; mIt != LLWaterParamManager::instance()->mParamList.end(); mIt++) 
-		{
-			if (mIt->first.length() > 0)
-				WWcomboBox->add(mIt->first);
-		}
-
-		//RegionWL settings may not be on this list, add it
-		const std::string& wwset = LLEnvManagerNew::instance().getWaterPresetName();
-		if (!WWcomboBox->setSimple(wwset))
-		{
-			WWcomboBox->addSeparator();
-			WWcomboBox->add(wwset);
-			WWcomboBox->setSimple(wwset);
-		}
-		WWcomboBox->setCommitCallback(onChangeWWPresetName);
-	}
-
-	LLComboBox* WLcomboBox = getChild<LLComboBox>("WLPresetsCombo");
-	if(WLcomboBox != NULL) {
-		std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
-			LLWLParamManager::instance()->mParamList.begin();
-		for(; mIt != LLWLParamManager::instance()->mParamList.end(); mIt++) 
-		{
-			if (mIt->first.name.length() > 0)
-				WLcomboBox->add(mIt->first.name);
-		}
-
-		//RegionWL settings may not be on this list, add it
-		const std::string& wlset = LLEnvManagerNew::instance().getSkyPresetName();
-		if (!WLcomboBox->setSimple(wlset))
-		{
-			WLcomboBox->addSeparator();
-			WLcomboBox->add(wlset);
-			WLcomboBox->setSimple(wlset);
-		}
-		WLcomboBox->setCommitCallback(onChangeWLPresetName);
-	}
+	mWaterPresetCombo = getChild<LLComboBox>("WWPresetsCombo");
+	mWaterPresetCombo->setCommitCallback(onChangeWWPresetName);
+		
+	mSkyPresetCombo = getChild<LLComboBox>("WLPresetsCombo");
+	mSkyPresetCombo->setCommitCallback(onChangeWLPresetName);
 	
+	// mDayCyclePresetCombo = getChild<LLComboBox>("DCPresetsCombo");
+	// mDayCyclePresetCombo->setCommitCallback(onChangeDCPresetName);
+	
+	LLEnvManagerNew::instance().setPreferencesChangeCallback(boost::bind(&wlfPanel_AdvSettings::refreshLists, this));
+	LLWaterParamManager::instance()->setPresetListChangeCallback(boost::bind(&wlfPanel_AdvSettings::populateWaterPresetsList, this));
+	LLWLParamManager::instance()->setPresetListChangeCallback(boost::bind(&wlfPanel_AdvSettings::populateSkyPresetsList, this));
+	// LLDayCycleManager::instance().setModifyCallback(boost::bind(&wlfPanel_AdvSettings::populateDayCyclePresetsList, this));
+
+	populateWaterPresetsList();
+	populateSkyPresetsList();
+	//populateDayCyclePresetsList();
+
 	// next/prev buttons
 	childSetAction("WWnext", onClickWWNext, this);
 	childSetAction("WWprev", onClickWWPrev, this);
@@ -264,8 +260,7 @@ void wlfPanel_AdvSettings::onClickWWNext(void* user_data)
 
 	//param_mgr->loadPreset(mIt->first, true);
 	LLEnvManagerNew::instance().setUseWaterPreset(mIt->first, true);
-	LLComboBox* comboBox = self->getChild<LLComboBox>("WWPresetsCombo");
-	comboBox->setSimple(mIt->first);
+	self->mWaterPresetCombo->setSimple(mIt->first);
 }
 
 void wlfPanel_AdvSettings::onClickWWPrev(void* user_data)
@@ -295,8 +290,7 @@ void wlfPanel_AdvSettings::onClickWWPrev(void* user_data)
 
 	//param_mgr->loadPreset(mIt->first, true);
 	LLEnvManagerNew::instance().setUseWaterPreset(mIt->first, true);
-	LLComboBox* comboBox = self->getChild<LLComboBox>("WWPresetsCombo");
-	comboBox->setSimple(mIt->first);
+	self->mWaterPresetCombo->setSimple(mIt->first);
 }
 
 void wlfPanel_AdvSettings::onClickWLNext(void* user_data)
@@ -329,8 +323,7 @@ void wlfPanel_AdvSettings::onClickWLNext(void* user_data)
 	}
 	// param_mgr->mAnimator.deactivate();
 	LLEnvManagerNew::instance().setUseSkyPreset(mIt->first.name, true);
-	LLComboBox* comboBox = self->getChild<LLComboBox>("WLPresetsCombo");
-	comboBox->setSimple(mIt->first.name);
+	self->mSkyPresetCombo->setSimple(mIt->first.name);
 }
 
 void wlfPanel_AdvSettings::onClickWLPrev(void* user_data)
@@ -364,8 +357,7 @@ void wlfPanel_AdvSettings::onClickWLPrev(void* user_data)
 	// param_mgr->mAnimator.deactivate();
 	//LLWLParamManager::instance()->loadPreset(mIt->first.name, true);
 	LLEnvManagerNew::instance().setUseSkyPreset(mIt->first.name, true);
-	LLComboBox* comboBox = self->getChild<LLComboBox>("WLPresetsCombo");
-	comboBox->setSimple(mIt->first.name);
+	self->mSkyPresetCombo->setSimple(mIt->first.name);
 }
 
 void wlfPanel_AdvSettings::onOpenAdvancedSky(void* userData)
@@ -397,3 +389,85 @@ void wlfPanel_AdvSettings::onChangeDayTime(LLUICtrl* ctrl, void* userData)
 			LLWLParamManager::instance()->mCurParams);
 	}
 }
+
+void wlfPanel_AdvSettings::populateWaterPresetsList()
+{
+	mWaterPresetCombo->removeall();
+
+	std::list<std::string> user_presets, system_presets;
+	LLWaterParamManager::instance()->getPresetNames(user_presets, system_presets);
+
+	// Add user presets first.
+	for (std::list<std::string>::const_iterator it = user_presets.begin(); it != user_presets.end(); ++it)
+	{
+		mWaterPresetCombo->add(*it);
+	}
+
+	if (user_presets.size() > 0)
+	{
+		mWaterPresetCombo->addSeparator();
+	}
+
+	// Add system presets.
+	for (std::list<std::string>::const_iterator it = system_presets.begin(); it != system_presets.end(); ++it)
+	{
+		mWaterPresetCombo->add(*it);
+	}
+
+	mWaterPresetCombo->selectByValue(LLEnvManagerNew::instance().getWaterPresetName());
+}
+
+void wlfPanel_AdvSettings::populateSkyPresetsList()
+{
+	mSkyPresetCombo->removeall();
+
+	LLWLParamManager::preset_name_list_t region_presets; // unused as we don't list region presets here
+	LLWLParamManager::preset_name_list_t user_presets, sys_presets;
+	LLWLParamManager::instance()->getPresetNames(region_presets, user_presets, sys_presets);
+
+	// Add user presets.
+	for (LLWLParamManager::preset_name_list_t::const_iterator it = user_presets.begin(); it != user_presets.end(); ++it)
+	{
+		mSkyPresetCombo->add(*it);
+	}
+
+	if (!user_presets.empty())
+	{
+		mSkyPresetCombo->addSeparator();
+	}
+
+	// Add system presets.
+	for (LLWLParamManager::preset_name_list_t::const_iterator it = sys_presets.begin(); it != sys_presets.end(); ++it)
+	{
+		mSkyPresetCombo->add(*it);
+	}
+
+	mSkyPresetCombo->selectByValue(LLEnvManagerNew::instance().getSkyPresetName());
+}
+
+// void wlfPanel_AdvSettings::populateDayCyclePresetsList()
+// {
+	// mDayCyclePresetCombo->removeall();
+
+	// LLDayCycleManager::preset_name_list_t user_days, sys_days;
+	// LLDayCycleManager::instance().getPresetNames(user_days, sys_days);
+
+	// // Add user days.
+	// for (LLDayCycleManager::preset_name_list_t::const_iterator it = user_days.begin(); it != user_days.end(); ++it)
+	// {
+		// mDayCyclePresetCombo->add(*it);
+	// }
+
+	// if (user_days.size() > 0)
+	// {
+		// mDayCyclePresetCombo->addSeparator();
+	// }
+
+	// // Add system days.
+	// for (LLDayCycleManager::preset_name_list_t::const_iterator it = sys_days.begin(); it != sys_days.end(); ++it)
+	// {
+		// mDayCyclePresetCombo->add(*it);
+	// }
+
+	// mDayCyclePresetCombo->selectByValue(LLEnvManagerNew::instance().getDayCycleName());
+// }
