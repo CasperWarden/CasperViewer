@@ -3550,6 +3550,7 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
 					LLViewerPartSim::getInstance()->addPartSource(psc);
 				}
 // [/RLVa:KB]
+			case CHAT_TYPE_DIRECT: // llRegionSayTo()
 			case CHAT_TYPE_NORMAL:
 				verb = ": ";
 				break;
