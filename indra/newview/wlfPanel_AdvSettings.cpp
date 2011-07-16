@@ -232,132 +232,61 @@ void wlfPanel_AdvSettings::onChangeWLPresetName(LLUICtrl* ctrl, void * userData)
 	else
 	{
 		//if that failed, use region's
-		LLEnvManagerNew::instance().setUseSkyPreset("Default", true);
 		// LLEnvManagerNew::instance().useRegionSky();
+		LLEnvManagerNew::instance().setUseSkyPreset("Default", true);
 	}
 }
 
 void wlfPanel_AdvSettings::onClickWWNext(void* user_data)
 {
 	wlfPanel_AdvSettings* self = (wlfPanel_AdvSettings*) user_data;
-	
-	LLWaterParamManager * param_mgr = LLWaterParamManager::instance();
 
-	// find place of current param
-	std::map<std::string, LLWaterParamSet>::iterator mIt = 
-		param_mgr->mParamList.find(LLEnvManagerNew::instance().getWaterPresetName());
+	S32 index = self->mWaterPresetCombo->getCurrentIndex();
+	index++;
+	if (index == self->mWaterPresetCombo->getItemCount())
+		index = 0;
+	self->mWaterPresetCombo->setCurrentByIndex(index);
 
-	// if at the end, loop
-	std::map<std::string, LLWaterParamSet>::iterator last = param_mgr->mParamList.end(); --last;
-	if (mIt == param_mgr->mParamList.end() || mIt == last) 
-	{
-		mIt = param_mgr->mParamList.begin();
-	}
-	else
-	{
-		mIt++;
-	}
-
-	//param_mgr->loadPreset(mIt->first, true);
-	LLEnvManagerNew::instance().setUseWaterPreset(mIt->first, true);
-	self->mWaterPresetCombo->setSimple(mIt->first);
+	wlfPanel_AdvSettings::onChangeWWPresetName(self->mWaterPresetCombo, self);
 }
 
 void wlfPanel_AdvSettings::onClickWWPrev(void* user_data)
 {
 	wlfPanel_AdvSettings* self = (wlfPanel_AdvSettings*) user_data;
-	
-	LLWaterParamManager * param_mgr = LLWaterParamManager::instance();
 
-	// find place of current param
-	std::map<std::string, LLWaterParamSet>::iterator mIt = 
-		param_mgr->mParamList.find(LLEnvManagerNew::instance().getWaterPresetName());
+	S32 index = self->mWaterPresetCombo->getCurrentIndex();
+	if (index == 0)
+		index = self->mWaterPresetCombo->getItemCount();
+	index--;
+	self->mWaterPresetCombo->setCurrentByIndex(index);
 
-	if (mIt == param_mgr->mParamList.end())
-	{
-		mIt = param_mgr->mParamList.begin();
-	}
-	// if at the beginning, loop
-	else if(mIt == param_mgr->mParamList.begin()) 
-	{
-		std::map<std::string, LLWaterParamSet>::iterator last = param_mgr->mParamList.end(); --last;
-		mIt = last;
-	}
-	else
-	{
-		mIt--;
-	}
-
-	//param_mgr->loadPreset(mIt->first, true);
-	LLEnvManagerNew::instance().setUseWaterPreset(mIt->first, true);
-	self->mWaterPresetCombo->setSimple(mIt->first);
+	wlfPanel_AdvSettings::onChangeWWPresetName(self->mWaterPresetCombo, self);
 }
 
 void wlfPanel_AdvSettings::onClickWLNext(void* user_data)
 {
 	wlfPanel_AdvSettings* self = (wlfPanel_AdvSettings*) user_data;
 
-	LLWLParamManager* param_mgr = LLWLParamManager::instance();
+	S32 index = self->mSkyPresetCombo->getCurrentIndex();
+	index++;
+	if (index == self->mSkyPresetCombo->getItemCount())
+		index = 0;
+	self->mSkyPresetCombo->setCurrentByIndex(index);
 
-	// find place of current param
-	LLWLParamKey key(LLEnvManagerNew::instance().getSkyPresetName(), LLEnvKey::SCOPE_LOCAL);
-	std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
-		param_mgr->mParamList.find(key);
-
- 	// shouldn't happen unless you delete every preset but Default
-	if (mIt == param_mgr->mParamList.end())
-	{
-		llwarns << "No more presets left!" << llendl;
-		return;
-	}
-
-	// if at the end, loop
-	std::map<LLWLParamKey, LLWLParamSet>::iterator last = param_mgr->mParamList.end(); --last;
-	if(mIt == last) 
-	{
-		mIt = param_mgr->mParamList.begin();
-	}
-	else
-	{
-		mIt++;
-	}
-	// param_mgr->mAnimator.deactivate();
-	LLEnvManagerNew::instance().setUseSkyPreset(mIt->first.name, true);
-	self->mSkyPresetCombo->setSimple(mIt->first.name);
+	wlfPanel_AdvSettings::onChangeWLPresetName(self->mSkyPresetCombo, self);
 }
 
 void wlfPanel_AdvSettings::onClickWLPrev(void* user_data)
 {
 	wlfPanel_AdvSettings* self = (wlfPanel_AdvSettings*) user_data;
 
-	LLWLParamManager* param_mgr = LLWLParamManager::instance();
+	S32 index = self->mSkyPresetCombo->getCurrentIndex();
+	if (index == 0)
+		index = self->mSkyPresetCombo->getItemCount();
+	index--;
+	self->mSkyPresetCombo->setCurrentByIndex(index);
 
-	// find place of current param
-	LLWLParamKey key(LLEnvManagerNew::instance().getSkyPresetName(), LLEnvKey::SCOPE_LOCAL);
-	std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
-		param_mgr->mParamList.find(key);
-
- 	// shouldn't happen unless you delete every preset but Default
-	if (mIt == param_mgr->mParamList.end())
-	{
-		llwarns << "No more presets left!" << llendl;
-		return;
-	}
-
-	// if at the beginning, loop
-	if(mIt == param_mgr->mParamList.begin()) 
-	{
-		std::map<LLWLParamKey, LLWLParamSet>::iterator last = param_mgr->mParamList.end(); --last;
-		mIt = last;
-	}
-	else
-	{
-		mIt--;
-	}
-	// param_mgr->mAnimator.deactivate();
-	//LLWLParamManager::instance()->loadPreset(mIt->first.name, true);
-	LLEnvManagerNew::instance().setUseSkyPreset(mIt->first.name, true);
-	self->mSkyPresetCombo->setSimple(mIt->first.name);
+	wlfPanel_AdvSettings::onChangeWLPresetName(self->mSkyPresetCombo, self);
 }
 
 void wlfPanel_AdvSettings::onOpenAdvancedSky(void* userData)
@@ -394,22 +323,10 @@ void wlfPanel_AdvSettings::populateWaterPresetsList()
 {
 	mWaterPresetCombo->removeall();
 
-	std::list<std::string> user_presets, system_presets;
-	LLWaterParamManager::instance()->getPresetNames(user_presets, system_presets);
+	std::list<std::string> presets;
+	LLWaterParamManager::instance()->getPresetNames(presets);
 
-	// Add user presets first.
-	for (std::list<std::string>::const_iterator it = user_presets.begin(); it != user_presets.end(); ++it)
-	{
-		mWaterPresetCombo->add(*it);
-	}
-
-	if (user_presets.size() > 0)
-	{
-		mWaterPresetCombo->addSeparator();
-	}
-
-	// Add system presets.
-	for (std::list<std::string>::const_iterator it = system_presets.begin(); it != system_presets.end(); ++it)
+	for (std::list<std::string>::const_iterator it = presets.begin(); it != presets.end(); ++it)
 	{
 		mWaterPresetCombo->add(*it);
 	}
@@ -421,23 +338,10 @@ void wlfPanel_AdvSettings::populateSkyPresetsList()
 {
 	mSkyPresetCombo->removeall();
 
-	LLWLParamManager::preset_name_list_t region_presets; // unused as we don't list region presets here
-	LLWLParamManager::preset_name_list_t user_presets, sys_presets;
-	LLWLParamManager::instance()->getPresetNames(region_presets, user_presets, sys_presets);
+	LLWLParamManager::preset_name_list_t local_presets;
+	LLWLParamManager::instance()->getLocalPresetNames(local_presets);
 
-	// Add user presets.
-	for (LLWLParamManager::preset_name_list_t::const_iterator it = user_presets.begin(); it != user_presets.end(); ++it)
-	{
-		mSkyPresetCombo->add(*it);
-	}
-
-	if (!user_presets.empty())
-	{
-		mSkyPresetCombo->addSeparator();
-	}
-
-	// Add system presets.
-	for (LLWLParamManager::preset_name_list_t::const_iterator it = sys_presets.begin(); it != sys_presets.end(); ++it)
+	for (LLWLParamManager::preset_name_list_t::const_iterator it = local_presets.begin(); it != local_presets.end(); ++it)
 	{
 		mSkyPresetCombo->add(*it);
 	}

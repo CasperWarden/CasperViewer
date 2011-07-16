@@ -732,6 +732,22 @@ void LLWLParamManager::getUserPresetNames(preset_name_list_t& user) const
 	getPresetNames(region, user, sys);
 }
 
+void LLWLParamManager::getLocalPresetNames(preset_name_list_t& local) const
+{
+	local.clear();
+
+	for (std::map<LLWLParamKey, LLWLParamSet>::const_iterator it = mParamList.begin(); it != mParamList.end(); it++)
+	{
+		const LLWLParamKey& key = it->first;
+		const std::string& name = key.name;
+
+		if (key.scope != LLEnvKey::SCOPE_REGION)
+		{
+			local.push_back(name);
+		}
+	}
+}
+
 void LLWLParamManager::getPresetKeys(preset_key_list_t& keys) const
 {
 	keys.clear();
