@@ -215,7 +215,7 @@ void LLFloaterWindLight::initCallbacks(void) {
 	childSetCommitCallback("WLCloudScrollX", onCloudScrollXMoved, NULL);
 	childSetCommitCallback("WLCloudScrollY", onCloudScrollYMoved, NULL);
 	childSetCommitCallback("WLDistanceMult", onFloatControlMoved, &param_mgr->mDistanceMult);
-	childSetCommitCallback("DrawClassicClouds", LLSavedSettingsGlue::setBOOL, (void*)"SkyUseClassicClouds");
+	childSetCommitCallback("DrawClassicClouds", LLSavedSettingsGlue::setBOOL, (void*)"SkyUseClassicClouds2");
 
 	// WL Top
 	childSetAction("WLDayCycleMenuButton", onOpenDayCycle, NULL);
@@ -429,7 +429,7 @@ void LLFloaterWindLight::syncMenu()
 	bool lockY = !param_mgr->mCurParams.getEnableCloudScrollY();
 	childSetValue("WLCloudLockX", lockX);
 	childSetValue("WLCloudLockY", lockY);
-	childSetValue("DrawClassicClouds", gSavedSettings.getBOOL("SkyUseClassicClouds"));
+	childSetValue("DrawClassicClouds", gSavedSettings.getBOOL("SkyUseClassicClouds2"));
 	
 	// disable if locked, enable if not
 	if(lockX) 

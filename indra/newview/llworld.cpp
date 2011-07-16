@@ -95,7 +95,8 @@ LLWorld::LLWorld() :
 	mLastPacketsIn(0),
 	mLastPacketsOut(0),
 	mLastPacketsLost(0),
-	mSpaceTimeUSec(0)
+	mSpaceTimeUSec(0),
+	mClassicCloudsEnabled(TRUE)
 {
 	for (S32 i = 0; i < 8; i++)
 	{
@@ -667,12 +668,37 @@ void LLWorld::updateParticles()
 void LLWorld::updateClouds(const F32 dt)
 {
 	static BOOL* sFreezeTime = rebind_llcontrol<BOOL>("FreezeTime", &gSavedSettings, true);
-	if ((*sFreezeTime) ||
-		!gSavedSettings.getBOOL("SkyUseClassicClouds"))
+	if (*sFreezeTime)
 	{
 		// don't move clouds in snapshot mode
 		return;
 	}
+
+	static BOOL* sSkyUseClassicClouds = rebind_llcontrol<BOOL>("SkyUseClassicClouds2", &gSavedSettings, true);
+	if (mClassicCloudsEnabled != (*sSkyUseClassicClouds))
+	{
+		// The classic cloud toggle has been flipped
+		// gotta update all of the cloud layers
+		mClassicCloudsEnabled = (*sSkyUseClassicClouds);
+
+		if (!mClassicCloudsEnabled && mActiveRegionList.size())
+		{
+			// We've transitioned to having classic clouds disabled
+			// reset all cloud layers.
+			for (
+				region_list_t::iterator iter = mActiveRegionList.begin();
+				iter != mActiveRegionList.end();
+				++iter)
+			{
+				LLViewerRegion* regionp = *iter;
+				regionp->mCloudLayer.reset();
+			}
+
+			return;
+		}
+	}
+	else if ( !mClassicCloudsEnabled ) return;
+
 	if (mActiveRegionList.size())
 	{
 		// Update all the cloud puff positions, and timer based stuff
