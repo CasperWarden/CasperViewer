@@ -494,6 +494,11 @@ void LLEnvManagerNew::onRegionSettingsResponse(const LLSD& content)
 	{
 		updateManagersFromPrefs(mInterpNextChangeMessage);
 	}
+	//bit of a  hacky override since I've repurposed many of the settings and methods here
+	else if (gSavedSettings.getBOOL("UseEnvironmentFromRegionAlways"))
+	{
+		setUseRegionSettings(true, mInterpNextChangeMessage);
+	}
 
 	// Let interested parties know about the region settings update.
 	mRegionSettingsChangeSignal();

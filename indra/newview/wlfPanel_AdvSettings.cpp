@@ -41,6 +41,7 @@
 #include "lltextbox.h"
 #include "llcombobox.h"
 #include "llsliderctrl.h"
+#include "llcheckboxctrl.h"
 #include "llstartup.h"
 
 #include "llfloaterwindlight.h"
@@ -128,7 +129,9 @@ void wlfPanel_AdvSettings::fixPanel()
 BOOL wlfPanel_AdvSettings::postBuild()
 {
 	childSetAction("expand", onClickExpandBtn, this);
-	
+
+	getChild<LLCheckBoxCtrl>("use_estate_wl")->setCommitCallback(onUseRegionSettings);
+
 	mWaterPresetCombo = getChild<LLComboBox>("WWPresetsCombo");
 	mWaterPresetCombo->setCommitCallback(onChangeWWPresetName);
 		
@@ -193,6 +196,11 @@ void wlfPanel_AdvSettings::onClickExpandBtn(void* user_data)
 	gOverlayBar->layoutButtons();
 }
 
+void wlfPanel_AdvSettings::onUseRegionSettings(LLUICtrl* ctrl, void* userdata)
+{
+	LLEnvManagerNew::instance().setUseRegionSettings(gSavedSettings.getBOOL("UseEnvironmentFromRegion"), gSavedSettings.getBOOL("PhoenixInterpolateSky"));
+}
+
 void wlfPanel_AdvSettings::onChangeWWPresetName(LLUICtrl* ctrl, void * userData)
 {
 	LLComboBox * combo_box = static_cast<LLComboBox*>(ctrl);
@@ -205,13 +213,13 @@ void wlfPanel_AdvSettings::onChangeWWPresetName(LLUICtrl* ctrl, void * userData)
 	const std::string& wwset = combo_box->getSelectedValue().asString();
 	if (LLWaterParamManager::instance()->hasParamSet(wwset))
 	{
-		LLEnvManagerNew::instance().setUseWaterPreset(wwset, true);
+		LLEnvManagerNew::instance().setUseWaterPreset(wwset, gSavedSettings.getBOOL("PhoenixInterpolateWater"));
 	}
 	else
 	{
 		//if that failed, use region's
 		// LLEnvManagerNew::instance().useRegionWater();
-		LLEnvManagerNew::instance().setUseWaterPreset("Default", true);
+		LLEnvManagerNew::instance().setUseWaterPreset("Default", gSavedSettings.getBOOL("PhoenixInterpolateWater"));
 	}
 }
 
@@ -227,13 +235,13 @@ void wlfPanel_AdvSettings::onChangeWLPresetName(LLUICtrl* ctrl, void * userData)
 	const LLWLParamKey key(combo_box->getSelectedValue().asString(), LLEnvKey::SCOPE_LOCAL);
 	if (LLWLParamManager::instance()->hasParamSet(key))
 	{
-		LLEnvManagerNew::instance().setUseSkyPreset(key.name, true);
+		LLEnvManagerNew::instance().setUseSkyPreset(key.name, gSavedSettings.getBOOL("PhoenixInterpolateSky"));
 	}
 	else
 	{
 		//if that failed, use region's
 		// LLEnvManagerNew::instance().useRegionSky();
-		LLEnvManagerNew::instance().setUseSkyPreset("Default", true);
+		LLEnvManagerNew::instance().setUseSkyPreset("Default", gSavedSettings.getBOOL("PhoenixInterpolateSky"));
 	}
 }
 
@@ -305,7 +313,7 @@ void wlfPanel_AdvSettings::onChangeDayTime(LLUICtrl* ctrl, void* userData)
 
 	if (sldr) {
 		// deactivate animator
-		// LLWLParamManager::instance()->mAnimator.deactivate();
+		LLWLParamManager::instance()->mAnimator.deactivate();
 
 		F32 val = sldr->getValueF32() + 0.25f;
 		if(val > 1.0) 

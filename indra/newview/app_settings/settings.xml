@@ -15889,5 +15889,49 @@
       <key>Value</key>
       <string>Default</string>
     </map>
+		<key>UseEnvironmentFromRegionAlways</key>
+		<map>
+			<key>Comment</key>
+			<string>Choose whether to always use the region's environment settings when they are availabe or to allow the manual selections to remain unchanging.</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>Boolean</string>
+			<key>Value</key>
+			<integer>1</integer>
+		</map>
+		<key>PhoenixInterpolateSky</key>
+		<map>
+			<key>Comment</key>
+			<string>PhoenixInterpolateSky</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>Boolean</string>
+			<key>Value</key>
+			<integer>1</integer>
+		</map>
+		<key>PhoenixInterpolateWater</key>
+		<map>
+			<key>Comment</key>
+			<string>PhoenixInterpolateWater</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>Boolean</string>
+			<key>Value</key>
+			<integer>1</integer>
+		</map>
+		<key>PhoenixInterpolateParcelWL</key>
+		<map>
+			<key>Comment</key>
+			<string>PhoenixInterpolateParcelWL</string>
+			<key>Persist</key>
+			<integer>1</integer>
+			<key>Type</key>
+			<string>Boolean</string>
+			<key>Value</key>
+			<integer>1</integer>
+		</map>
 	</map>
 </llsd>

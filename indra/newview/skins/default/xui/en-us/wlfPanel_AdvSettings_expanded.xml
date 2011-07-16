@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <panel bg_visible="false" border="false" border_visible="false" bottom="1"
-     follows="left|bottom" height="220" left="0" name="Adv_Settings"
+     follows="left|bottom" height="245" left="0" name="Adv_Settings"
      use_bounding_rect="true" width="200" >
-<panel bottom="0" filename="panel_bg_tab.xml" height="220" left="0" width="205" />
-<slider bottom="195" left="5" control_name="RenderFarClip"
+<panel bottom="0" filename="panel_bg_tab.xml" height="245" left="0" width="205" />
+<slider bottom="215" left="5" control_name="RenderFarClip"
 	     decimal_digits="0" enabled="true" follows="left|bottom" height="20"
 	     increment="8" label="Draw Dist.:" can_edit_text="true"
 	     label_width="66" max_val="1024" min_val="24" mouse_opaque="true"
@@ -37,6 +37,8 @@
        decimal_digits="0" enabled="true" left_delta="-0" bottom_delta="-20" label="DD Step Time:"
 	   follows="left|bottom" label_width="66" height="20" increment="1" initial_val="20" max_val="30" can_edit_text="true"
 	   min_val="5" mouse_opaque="true" show_text="true" width="195" auto_resize="false" tool_tip="Interval in seconds between each draw distance increment"/>
+
+<check_box bottom_delta="-20" left_delta="-0" label="Use Estate WL" control_name="UseEnvironmentFromRegion" enabled="true" follows="left|top" font="SansSerifSmall" height="16" mouse_opaque="true" name="use_estate_wl" width="195" />
 
 <button bottom_delta="-22" left="2" enabled="true" follows="left|bottom" height="14" width="14"
 	     image_overlay="Inv_WindLight.png" label="" mouse_opaque="true"

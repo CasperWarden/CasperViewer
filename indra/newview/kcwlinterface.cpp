@@ -146,8 +146,7 @@ void KCWindlightInterface::ApplySettings(const LLSD& settings)
 
 		if (settings.has("water"))
 		{
-			// LLWaterParamManager::instance()->loadPreset(settings["water"].asString(), true);
-			LLEnvManagerNew::instance().setUseWaterPreset(settings["water"].asString(), true);
+			LLEnvManagerNew::instance().setUseWaterPreset(settings["water"].asString(), gSavedSettings.getBOOL("PhoenixInterpolateParcelWL"));
 			WLset = true;
 		}
 	}
@@ -205,14 +204,14 @@ void KCWindlightInterface::ApplyWindLightPreset(const std::string& preset)
 	LLWLParamKey key(preset, LLEnvKey::SCOPE_LOCAL);
 	if ( (preset != "Default") && (wlprammgr->hasParamSet(key)) )
 	{
-		LLEnvManagerNew::instance().setUseSkyPreset(preset, true);
+		LLEnvManagerNew::instance().setUseSkyPreset(preset, gSavedSettings.getBOOL("PhoenixInterpolateParcelWL"));
 		WLset = true;
 		mWeChangedIt = true;
 	}
 	else
 	{
 		if (!LLEnvManagerNew::instance().getUseRegionSettings())
-			LLEnvManagerNew::instance().setUseRegionSettings(true, true);
+			LLEnvManagerNew::instance().setUseRegionSettings(true, gSavedSettings.getBOOL("PhoenixInterpolateParcelWL"));
 		WLset = false;
 		mWeChangedIt = false;
 	}

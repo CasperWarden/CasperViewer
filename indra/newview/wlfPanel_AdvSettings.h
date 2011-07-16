@@ -54,6 +54,7 @@ public:
 protected:
 	void build();
 
+	static void onUseRegionSettings(LLUICtrl* ctrl, void* userdata);
 	static void onClickWWNext(void* user_data);
 	static void onClickWWPrev(void* user_data);
 	static void onClickWLNext(void* user_data);
