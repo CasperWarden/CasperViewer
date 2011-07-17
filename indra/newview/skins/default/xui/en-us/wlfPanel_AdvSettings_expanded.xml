@@ -38,7 +38,7 @@
 	   follows="left|bottom" label_width="66" height="20" increment="1" initial_val="20" max_val="30" can_edit_text="true"
 	   min_val="5" mouse_opaque="true" show_text="true" width="195" auto_resize="false" tool_tip="Interval in seconds between each draw distance increment"/>
 
-<check_box bottom_delta="-20" left_delta="-0" label="Use Estate WL" control_name="UseEnvironmentFromRegion" enabled="true" follows="left|top" font="SansSerifSmall" height="16" mouse_opaque="true" name="use_estate_wl" width="195" />
+<check_box bottom_delta="-20" left_delta="-0" label="Use Region Environment Settings" control_name="UseEnvironmentFromRegion" enabled="true" follows="left|top" font="SansSerifSmall" height="16" mouse_opaque="true" name="use_estate_wl" width="195" />
 
 <button bottom_delta="-22" left="2" enabled="true" follows="left|bottom" height="14" width="14"
 	     image_overlay="Inv_WindLight.png" label="" mouse_opaque="true"

@@ -404,7 +404,7 @@
 			<menu_item_call bottom="-86" enabled="true" height="19" label="Midnight" left="0" mouse_opaque="true" name="Midnight" width="169">
 				<on_click function="World.EnvSettings" userdata="midnight" />
 			</menu_item_call>
-			<menu_item_call bottom="-105" enabled="false" height="19" label="Revert to Region Default" left="0" mouse_opaque="true" name="Use Region Settings" width="169">
+			<menu_item_call bottom="-105" enabled="false" height="19" label="Use Region Environment Settings" left="0" mouse_opaque="true" name="Use Region Environment Settings" width="169">
 				<on_click function="World.EnvSettings" userdata="default" />
 			</menu_item_call>
 			<menu_item_separator bottom="-113" enabled="true" height="8" label="-----------" left="0" mouse_opaque="true" name="separator" width="169" />

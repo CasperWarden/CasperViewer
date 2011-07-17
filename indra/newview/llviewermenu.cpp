@@ -9070,10 +9070,9 @@ class LLWorldEnvSettings : public view_listener_t
 		{
 			LLEnvManagerNew::instance().setUseSkyPreset("Midnight", true);
 		}
-		else //default
+		else // Use Region Environment Settings
 		{
-			//LLEnvManagerNew::instance().setUseDayCycle(LLEnvManagerNew::instance().getDayCycleName());
-			LLEnvManagerNew::instance().setUseRegionSettings(true);
+			LLEnvManagerNew::instance().setUseRegionSettings(true, true);
 		}
 		return true;
 	}
