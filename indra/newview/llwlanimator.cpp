@@ -127,10 +127,10 @@ void LLWLAnimator::update(LLWLParamSet& curParams)
 			return;
 		}
 
-		weight = (current - mInterpStartTime) / (INTERP_TOTAL_SECONDS * CLOCKS_PER_SEC);
-
+		
 		if (mIsInterpolatingSky)
 		{
+			weight = (current - mInterpStartTime) / (INTERP_TOTAL_SECONDS * CLOCKS_PER_SEC);
 			curParams.mix(*mInterpBeginWL, *mInterpEndWL, weight);
 		}
 		else
@@ -143,6 +143,7 @@ void LLWLAnimator::update(LLWLParamSet& curParams)
 			buf.mix(LLWLParamManager::instance()->mParamList[mFirstIt->second], LLWLParamManager::instance()->mParamList[mSecondIt->second], weight);	// mix to determine moving target for interpolation finish (as below)
 
 			// mix from previous value to moving target
+			weight = (current - mInterpStartTime) / (INTERP_TOTAL_SECONDS * CLOCKS_PER_SEC);
 			curParams.mix(*mInterpBeginWL, buf, weight);
 		}
 
