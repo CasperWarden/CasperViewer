@@ -75,20 +75,15 @@ LLFloaterWater::LLFloaterWater() : LLFloater(std::string("water floater"))
 	LLUICtrlFactory::getInstance()->buildFloater(this, "floater_water.xml");
 	
 	// add the combo boxes
-	LLComboBox* comboBox = getChild<LLComboBox>("WaterPresetsCombo");
+	mWaterPresetCombo = getChild<LLComboBox>("WaterPresetsCombo");
 
-	if(comboBox != NULL) {
-		
-		std::map<std::string, LLWaterParamSet>::iterator mIt = 
-			LLWaterParamManager::instance()->mParamList.begin();
-		for(; mIt != LLWaterParamManager::instance()->mParamList.end(); mIt++) 
-		{
-			comboBox->add(mIt->first);
-		}
-
-		// set defaults on combo boxes
-		comboBox->selectByValue(LLSD("Default"));
+	if (mWaterPresetCombo != NULL)
+	{
+		populateWaterPresetsList();
+		//mWaterPresetCombo->selectByValue(LLSD("Default"));
+		mWaterPresetCombo->setCommitCallback(onChangePresetName);
 	}
+
 
 	std::string def_water = getString("WLDefaultWaterNames");
 
@@ -156,11 +151,9 @@ void LLFloaterWater::initCallbacks(void) {
 	childSetCommitCallback("WaterBlurMult", onFloatControlMoved, &param_mgr->mBlurMultiplier);
 
 	// Load/save
-	LLComboBox* comboBox = getChild<LLComboBox>("WaterPresetsCombo");
-
-	//childSetAction("WaterLoadPreset", onLoadPreset, comboBox);
-	childSetAction("WaterNewPreset", onNewPreset, comboBox);
-	childSetAction("WaterDeletePreset", onDeletePreset, comboBox);
+	//childSetAction("WaterLoadPreset", onLoadPreset, mWaterPresetCombo);
+	childSetAction("WaterNewPreset", onNewPreset, mWaterPresetCombo);
+	childSetAction("WaterDeletePreset", onDeletePreset, mWaterPresetCombo);
 	childSetCommitCallback("WaterSavePreset", onSavePreset, this);
 
 	// wave direction
@@ -168,8 +161,6 @@ void LLFloaterWater::initCallbacks(void) {
 	childSetCommitCallback("WaterWave1DirY", onVector2ControlYMoved, &param_mgr->mWave1Dir);
 	childSetCommitCallback("WaterWave2DirX", onVector2ControlXMoved, &param_mgr->mWave2Dir);
 	childSetCommitCallback("WaterWave2DirY", onVector2ControlYMoved, &param_mgr->mWave2Dir);
-
-	comboBox->setCommitCallback(onChangePresetName);
 
 	LLTextureCtrl* textCtrl = getChild<LLTextureCtrl>("WaterNormalMap");
 	textCtrl->setDefaultImageAssetID(DEFAULT_WATER_NORMAL);
@@ -204,29 +195,22 @@ bool LLFloaterWater::newPromptCallback(const LLSD& notification, const LLSD& res
 	}
 
 	if(option == 0) {
-		LLComboBox* comboBox = sWaterMenu->getChild<LLComboBox>( "WaterPresetsCombo");
-
 		LLWaterParamManager * param_mgr = LLWaterParamManager::instance();
 
 		// add the current parameters to the list
 		// see if it's there first
-		std::map<std::string, LLWaterParamSet>::iterator mIt = 
-			param_mgr->mParamList.find(text);
-
 		// if not there, add a new one
-		if(mIt == param_mgr->mParamList.end()) 
+		if(!LLWaterParamManager::instance()->hasParamSet(text)) 
 		{
 			param_mgr->addParamSet(text, param_mgr->mCurParams);
-			comboBox->add(text);
-			comboBox->sortByName();
+			sWaterMenu->mWaterPresetCombo->add(text);
+			sWaterMenu->mWaterPresetCombo->sortByName();
 
-			comboBox->setSimple(text);
+			sWaterMenu->mWaterPresetCombo->selectByValue(text);
 
 			param_mgr->savePreset(text);
-			
-			//KC: workaround for not selecting the new preset in the combo box
-			//param_mgr->loadPreset(text, true);
-			LLEnvManagerNew::instance().useWaterPreset(text);
+
+			LLEnvManagerNew::instance().setUseWaterPreset(text);
 
 		// otherwise, send a message to the user
 		} 
@@ -246,10 +230,9 @@ void LLFloaterWater::syncMenu()
 
 	LLWaterParamSet & current_params = param_mgr->mCurParams;
 
-	LLComboBox* comboBox = getChild<LLComboBox>("WaterPresetsCombo");
-	if (comboBox->getSelectedItemLabel() != current_params.mName)
+	if (mWaterPresetCombo->getSelectedItemLabel() != LLEnvManagerNew::instance().getWaterPresetName())
 	{
-		comboBox->setSimple(current_params.mName);
+		mWaterPresetCombo->selectByValue(LLEnvManagerNew::instance().getWaterPresetName());
 	}
 
 	// blue horizon
@@ -635,20 +618,17 @@ public:
 void KVFloaterWaterNotecardCreatedCallback::fire(const LLUUID& inv_item)
 {
 	LLWaterParamManager * param_mgr = LLWaterParamManager::instance();
-	param_mgr->setParamSet(param_mgr->mCurParams.mName, param_mgr->mCurParams);
-	param_mgr->mParamList[param_mgr->mCurParams.mName].mInventoryID = inv_item;
 	param_mgr->mCurParams.mInventoryID = inv_item;
+	param_mgr->setParamSet(param_mgr->mCurParams.mName, param_mgr->mCurParams);
+	//param_mgr->mParamList[param_mgr->mCurParams.mName].mInventoryID = inv_item;
 	LL_INFOS("WindLight") << "Created inventory item " << inv_item << LL_ENDL;
 	param_mgr->savePresetToNotecard(param_mgr->mCurParams.mName);
 }
 
 void LLFloaterWater::onSavePreset(LLUICtrl* ctrl, void* userData)
 {
-	// get the name
-	LLComboBox* comboBox = sWaterMenu->getChild<LLComboBox>("WaterPresetsCombo");
-
 	// don't save the empty name
-	if(comboBox->getSelectedItemLabel() == "")
+	if(sWaterMenu->mWaterPresetCombo->getSelectedItemLabel() == "")
 	{
 		return;
 	}
@@ -668,7 +648,7 @@ void LLFloaterWater::onSavePreset(LLUICtrl* ctrl, void* userData)
 		else
 		{
 			// Make sure we have a ".ww" extension.
-			std::string name = comboBox->getSelectedItemLabel();
+			std::string name = sWaterMenu->mWaterPresetCombo->getSelectedItemLabel();
 			if(name.length() > 2 && name.compare(name.length() - 3, 3, ".ww") != 0)
 			{
 				name += ".ww";
@@ -692,11 +672,11 @@ void LLFloaterWater::onSavePreset(LLUICtrl* ctrl, void* userData)
 	else
 	{
 		LLWaterParamManager::instance()->mCurParams.mName = 
-			comboBox->getSelectedItemLabel();
+			sWaterMenu->mWaterPresetCombo->getSelectedItemLabel();
 
 		// check to see if it's a default and shouldn't be overwritten
 		std::set<std::string>::iterator sIt = sDefaultPresets.find(
-			comboBox->getSelectedItemLabel());
+			sWaterMenu->mWaterPresetCombo->getSelectedItemLabel());
 		if(sIt != sDefaultPresets.end() && !gSavedSettings.getBOOL("WaterEditPresets")) 
 		{
 			LLNotifications::instance().add("WLNoEditDefault");
@@ -740,15 +720,13 @@ bool LLFloaterWater::saveAlertCallback(const LLSD& notification, const LLSD& res
 
 void LLFloaterWater::onDeletePreset(void* userData)
 {
-	LLComboBox* combo_box = sWaterMenu->getChild<LLComboBox>("WaterPresetsCombo");
-
-	if(combo_box->getSelectedValue().asString() == "")
+	if(sWaterMenu->mWaterPresetCombo->getSelectedValue().asString() == "")
 	{
 		return;
 	}
 
 	LLSD args;
-	args["SKY"] = combo_box->getSelectedValue().asString();
+	args["SKY"] = sWaterMenu->mWaterPresetCombo->getSelectedValue().asString();
 	LLNotifications::instance().add("WLDeletePresetAlert", args, LLSD(), deleteAlertCallback);
 }
 
@@ -758,7 +736,6 @@ bool LLFloaterWater::deleteAlertCallback(const LLSD& notification, const LLSD& r
 	// if they choose delete, do it.  Otherwise, don't do anything
 	if(option == 0) 
 	{
-		LLComboBox* combo_box = sWaterMenu->getChild<LLComboBox>("WaterPresetsCombo");
 		LLFloaterDayCycle* day_cycle = NULL;
 		LLComboBox* key_combo = NULL;
 		LLMultiSliderCtrl* mult_sldr = NULL;
@@ -770,7 +747,7 @@ bool LLFloaterWater::deleteAlertCallback(const LLSD& notification, const LLSD& r
 			mult_sldr = day_cycle->getChild<LLMultiSliderCtrl>("WaterDayCycleKeys");
 		}
 
-		std::string name = combo_box->getSelectedValue().asString();
+		std::string name = sWaterMenu->mWaterPresetCombo->getSelectedValue().asString();
 
 		// check to see if it's a default and shouldn't be deleted
 		std::set<std::string>::iterator sIt = sDefaultPresets.find(name);
@@ -783,9 +760,9 @@ bool LLFloaterWater::deleteAlertCallback(const LLSD& notification, const LLSD& r
 		LLWaterParamManager::instance()->removeParamSet(name, true);
 		
 		// remove and choose another
-		S32 new_index = combo_box->getCurrentIndex();
+		S32 new_index = sWaterMenu->mWaterPresetCombo->getCurrentIndex();
 
-		combo_box->remove(name);
+		sWaterMenu->mWaterPresetCombo->remove(name);
 
 		if(key_combo != NULL) 
 		{
@@ -801,9 +778,9 @@ bool LLFloaterWater::deleteAlertCallback(const LLSD& notification, const LLSD& r
 			new_index--;
 		}
 		
-		if(combo_box->getItemCount() > 0) 
+		if(sWaterMenu->mWaterPresetCombo->getItemCount() > 0) 
 		{
-			combo_box->setCurrentByIndex(new_index);
+			sWaterMenu->mWaterPresetCombo->setCurrentByIndex(new_index);
 		}
 	}
 	return false;
@@ -818,55 +795,54 @@ void LLFloaterWater::onChangePresetName(LLUICtrl* ctrl, void * userData)
 	{
 		return;
 	}
-	
-	//LLWaterParamManager::instance()->loadPreset(
-	//	combo_box->getSelectedValue().asString(), true);
-	LLEnvManagerNew::instance().useWaterPreset(combo_box->getSelectedValue().asString());
+
+	const std::string& wwset = combo_box->getSelectedValue().asString();
+	if (LLWaterParamManager::instance()->hasParamSet(wwset))
+	{
+		LLEnvManagerNew::instance().setUseWaterPreset(wwset);
+	}
+	else
+	{
+		//if that failed, use region's
+		// LLEnvManagerNew::instance().useRegionWater();
+		LLEnvManagerNew::instance().setUseWaterPreset("Default");
+	}
 	sWaterMenu->syncMenu();
 }
 
 void LLFloaterWater::onClickNext(void* user_data)
 {
-	LLWaterParamManager * param_mgr = LLWaterParamManager::instance();
-	LLWaterParamSet& currentParams = param_mgr->mCurParams;
+	S32 index = sWaterMenu->mWaterPresetCombo->getCurrentIndex();
+	index++;
+	if (index == sWaterMenu->mWaterPresetCombo->getItemCount())
+		index = 0;
+	sWaterMenu->mWaterPresetCombo->setCurrentByIndex(index);
 
-	// find place of current param
-	std::map<std::string, LLWaterParamSet>::iterator mIt = 
-		param_mgr->mParamList.find(currentParams.mName);
-
-	// if at the end, loop
-	std::map<std::string, LLWaterParamSet>::iterator last = param_mgr->mParamList.end(); --last;
-	if(mIt == last) 
-	{
-		mIt = param_mgr->mParamList.begin();
-	}
-	else
-	{
-		mIt++;
-	}
-	LLEnvManagerNew::instance().useWaterPreset(mIt->first);
-	// param_mgr->loadPreset(mIt->first, true);
+	LLFloaterWater::onChangePresetName(sWaterMenu->mWaterPresetCombo, sWaterMenu);
 }
 
 void LLFloaterWater::onClickPrev(void* user_data)
 {
-	LLWaterParamManager * param_mgr = LLWaterParamManager::instance();
-	LLWaterParamSet & currentParams = param_mgr->mCurParams;
+	S32 index = sWaterMenu->mWaterPresetCombo->getCurrentIndex();
+	if (index == 0)
+		index = sWaterMenu->mWaterPresetCombo->getItemCount();
+	index--;
+	sWaterMenu->mWaterPresetCombo->setCurrentByIndex(index);
 
-	// find place of current param
-	std::map<std::string, LLWaterParamSet>::iterator mIt = 
-		param_mgr->mParamList.find(currentParams.mName);
+	LLFloaterWater::onChangePresetName(sWaterMenu->mWaterPresetCombo, sWaterMenu);
+}
 
-	// if at the beginning, loop
-	if(mIt == param_mgr->mParamList.begin()) 
+void LLFloaterWater::populateWaterPresetsList()
+{
+	mWaterPresetCombo->removeall();
+
+	std::list<std::string> presets;
+	LLWaterParamManager::instance()->getPresetNames(presets);
+
+	for (std::list<std::string>::const_iterator it = presets.begin(); it != presets.end(); ++it)
 	{
-		std::map<std::string, LLWaterParamSet>::iterator last = param_mgr->mParamList.end(); --last;
-		mIt = last;
+		mWaterPresetCombo->add(*it);
 	}
-	else
-	{
-		mIt--;
-	}
-	LLEnvManagerNew::instance().useWaterPreset(mIt->first);
-	// param_mgr->loadPreset(mIt->first, true);
+
+	mWaterPresetCombo->selectByValue(LLEnvManagerNew::instance().getWaterPresetName());
 }

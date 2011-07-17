@@ -46,6 +46,8 @@
 struct WaterColorControl;
 struct WaterloatControl;
 
+class LLComboBox;
+
 
 /// Menuing system for all of windlight's functionality
 class LLFloaterWater : public LLFloater
@@ -135,6 +137,10 @@ private:
 
 	static void onClickNext(void* user_data);
 	static void onClickPrev(void* user_data);
+
+	void populateWaterPresetsList();
+
+	LLComboBox*		mWaterPresetCombo;
 };
 
 

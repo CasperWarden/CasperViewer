@@ -355,18 +355,14 @@ private:
 
 	void loadAllPresets();
 	void loadPresetsFromDir(const std::string& dir);
+	bool loadPreset(const std::string& path);
 
-public:
-	bool loadPreset(const std::string& path, bool propagate=true);
-
-private:
 	static std::string getSysDir();
 	static std::string getUserDir();
 
 	LLVector4 mWaterPlane;
 	F32 mWaterFogKS;
 
-public:
 	// list of all the parameters, listed by name
 	preset_map_t mParamList;
 

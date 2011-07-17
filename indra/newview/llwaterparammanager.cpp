@@ -122,14 +122,14 @@ void LLWaterParamManager::loadPresetsFromDir(const std::string& dir)
 		}
 
 		std::string path = dir + file;
-		if (!loadPreset(path, false))
+		if (!loadPreset(path))
 		{
 			llwarns << "Error loading water preset from " << path << llendl;
 		}
 	}
 }
 
-bool LLWaterParamManager::loadPreset(const std::string& path, bool propagate)
+bool LLWaterParamManager::loadPreset(const std::string& path)
 {
 	llifstream xml_file;
 	std::string name(gDirUtilp->getBaseFileName(LLURI::unescape(path), /*strip_exten = */ true));
@@ -154,15 +154,6 @@ bool LLWaterParamManager::loadPreset(const std::string& path, bool propagate)
 	else
 	{
 		addParamSet(name, params_data);
-	}
-
-	if(propagate)
-	{
-		//KC: save last
-		gSavedPerAccountSettings.setString("PhoenixLastWWsetting", name);
-		
-		getParamSet(name, mCurParams);
-		propagateParameters();
 	}
 
 	return true;
