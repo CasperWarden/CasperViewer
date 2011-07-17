@@ -316,7 +316,7 @@ void LLFloaterDayCycle::onUseLindenTime(void* userData)
 
 void LLFloaterDayCycle::onLoadDayCycle(void* userData)
 {
-	LLWLParamManager::instance()->mDay.loadDayCycle("Default.xml");
+	LLWLParamManager::instance()->mDay.loadDayCycleFromFile("Default.xml");
 	
 	// sync it all up
 	syncSliderTrack();

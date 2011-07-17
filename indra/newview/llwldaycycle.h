@@ -57,7 +57,6 @@ public:
 	~LLWLDayCycle();
 
 	/// load a day cycle
-	void loadDayCycle(const std::string & fileName);
 	void loadDayCycle(const LLSD& llsd, LLEnvKey::EScope scope);
 
 	/// load a day cycle

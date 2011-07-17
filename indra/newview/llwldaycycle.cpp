@@ -90,11 +90,6 @@ void LLWLDayCycle::loadDayCycle(const LLSD& day_data, LLWLParamKey::EScope scope
 	}
 }
 
-void LLWLDayCycle::loadDayCycle(const std::string & fileName)
-{
-	loadDayCycle(loadCycleDataFromFile(fileName), LLWLParamKey::SCOPE_LOCAL);
-}
-
 void LLWLDayCycle::loadDayCycleFromFile(const std::string & fileName)
 {
 	loadDayCycle(loadCycleDataFromFile(fileName), LLWLParamKey::SCOPE_LOCAL);
