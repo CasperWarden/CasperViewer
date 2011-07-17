@@ -80,7 +80,6 @@ LLFloaterWater::LLFloaterWater() : LLFloater(std::string("water floater"))
 	if (mWaterPresetCombo != NULL)
 	{
 		populateWaterPresetsList();
-		//mWaterPresetCombo->selectByValue(LLSD("Default"));
 		mWaterPresetCombo->setCommitCallback(onChangePresetName);
 	}
 

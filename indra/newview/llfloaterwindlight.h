@@ -45,6 +45,7 @@
 struct WLColorControl;
 struct WLFloatControl;
 
+class LLComboBox;
 
 /// Menuing system for all of windlight's functionality
 class LLFloaterWindLight : public LLFloater
@@ -145,6 +146,10 @@ private:
 
 	static void onClickNext(void* user_data);
 	static void onClickPrev(void* user_data);
+	
+	void populateSkyPresetsList();
+	
+	LLComboBox*		mSkyPresetCombo;
 };
 
 

@@ -429,7 +429,6 @@ private:
 	static std::string getSysDir();
 	static std::string getUserDir();
 
-public:
 	// list of all the parameters, listed by name
 	std::map<LLWLParamKey, LLWLParamSet> mParamList;
 

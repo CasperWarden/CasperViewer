@@ -72,11 +72,12 @@ LLFloaterDayCycle::LLFloaterDayCycle() : LLFloater(std::string("Day Cycle Floate
 
 	if(keyCombo != NULL) 
 	{
-		std::map<LLWLParamKey, LLWLParamSet>::iterator mIt = 
-			LLWLParamManager::instance()->mParamList.begin();
-		for(; mIt != LLWLParamManager::instance()->mParamList.end(); mIt++) 
+		LLWLParamManager::preset_name_list_t local_presets;
+		LLWLParamManager::instance()->getLocalPresetNames(local_presets);
+
+		for (LLWLParamManager::preset_name_list_t::const_iterator it = local_presets.begin(); it != local_presets.end(); ++it)
 		{
-			keyCombo->add(std::string(mIt->first.name));
+			keyCombo->add(*it);
 		}
 
 		// set defaults on combo boxes
