@@ -114,6 +114,8 @@ void wlfPanel_AdvSettings::refreshLists()
 	mWaterPresetCombo->selectByValue(env_mgr.getWaterPresetName());
 	mSkyPresetCombo->selectByValue(env_mgr.getSkyPresetName());
 	//mDayCyclePresetCombo->selectByValue(env_mgr.getDayCycleName());
+	
+	updateTimeSlider();
 }
 
 void wlfPanel_AdvSettings::fixPanel()
@@ -159,7 +161,9 @@ BOOL wlfPanel_AdvSettings::postBuild()
 	childSetAction("EnvAdvancedSkyButton", onOpenAdvancedSky, NULL);
 	childSetAction("EnvAdvancedWaterButton", onOpenAdvancedWater, NULL);
 	
-	childSetCommitCallback("EnvTimeSlider", onChangeDayTime, NULL);
+	mTimeSlider = getChild<LLSliderCtrl>("EnvTimeSlider");
+	mTimeSlider->setCommitCallback(onChangeDayTime);
+	updateTimeSlider();
 	
 	fixPointer = this;
 	return TRUE;
@@ -309,7 +313,7 @@ void wlfPanel_AdvSettings::onOpenAdvancedWater(void* userData)
 
 void wlfPanel_AdvSettings::onChangeDayTime(LLUICtrl* ctrl, void* userData)
 {
-	LLSliderCtrl* sldr = (LLSliderCtrl*) ctrl;
+	LLSliderCtrl* sldr = static_cast<LLSliderCtrl*>(ctrl);
 
 	if (sldr) {
 		// deactivate animator
@@ -383,3 +387,14 @@ void wlfPanel_AdvSettings::populateSkyPresetsList()
 
 	// mDayCyclePresetCombo->selectByValue(LLEnvManagerNew::instance().getDayCycleName());
 // }
+
+void wlfPanel_AdvSettings::updateTimeSlider()
+{
+	
+	F32 val = LLWLParamManager::instance()->mAnimator.getDayTime() - 0.25f;
+	if(val < 0.0)
+	{
+		val++;
+	}
+	mTimeSlider->setValue(val);
+}

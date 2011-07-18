@@ -35,6 +35,7 @@
 #include "llpanel.h"
 
 class LLComboBox;
+class LLSliderCtrl;
 
 class wlfPanel_AdvSettings : public LLPanel
 {
@@ -68,10 +69,12 @@ protected:
 	void populateWaterPresetsList();
 	void populateSkyPresetsList();
 	// void populateDayCyclePresetsList();
+	void updateTimeSlider();
 
 	LLComboBox*		mWaterPresetCombo;
 	LLComboBox*		mSkyPresetCombo;
 	// LLComboBox*		mDayCyclePresetCombo;
+	LLSliderCtrl*		mTimeSlider;
 };
 
 #endif // LL_wlfPanel_AdvSettings_H
