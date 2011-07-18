@@ -34,6 +34,7 @@
 #include "llviewerparcelmgr.h"
 #include "llwlparammanager.h"
 #include "llwaterparammanager.h"
+#include "lldaycyclemanager.h"
 
 #include <boost/regex.hpp>
 
@@ -47,7 +48,10 @@ KCWindlightInterface::KCWindlightInterface() :
 	WLset(FALSE),
 	mWeChangedIt(false),
 	mCurrentSpace(-2.f),
-	mLastParcelID(-1)
+	mLastParcelID(-1),
+	mLastRegion(NULL),
+	mRegionOverride(false),
+	mHaveRegionSettings(false)
 {
 
 }
@@ -61,9 +65,18 @@ void KCWindlightInterface::ParcelChange()
 	LLParcel *parcel = NULL;
 	S32 this_parcel_id = 0;
 	std::string desc;
- 
+
  	parcel = LLViewerParcelMgr::getInstance()->getAgentParcel();
- 
+
+	// Since we cannot depend on the order in which the EnvironmentSettings cap and parcel info
+	// will come in, we must check if the other has set something before this one for the current region.
+	if (gAgent.getRegion() != mLastRegion)
+	{
+		mRegionOverride = false;
+		mHaveRegionSettings = false;
+		mLastRegion = gAgent.getRegion();
+	}
+
 	if (parcel)
 	{
 		this_parcel_id = parcel->getLocalID();
@@ -141,10 +154,12 @@ void KCWindlightInterface::ApplySettings(const LLSD& settings)
 	if (!settings.has("local_id") || (settings["local_id"].asInteger() == parcel->getLocalID()) )
 	{
 		mCurrentSettings = settings;
+		
+		mRegionOverride = settings.has("region_override");
 
 		ApplySkySettings(settings);
 
-		if (settings.has("water"))
+		if (settings.has("water") && (!mHaveRegionSettings || mRegionOverride))
 		{
 			LLEnvManagerNew::instance().setUseWaterPreset(settings["water"].asString(), gSavedSettings.getBOOL("PhoenixInterpolateParcelWL"));
 			WLset = true;
@@ -182,7 +197,8 @@ void KCWindlightInterface::ApplySkySettings(const LLSD& settings)
 	if (mCurrentSpace != -1.f)
 	{
 		mCurrentSpace = -1.f;
-		if (settings.has("sky_default"))
+		// set notes on KCWindlightInterface::haveParcelOverride
+		if (settings.has("sky_default") && (!mHaveRegionSettings || mRegionOverride))
 		{
 			//llinfos << "WL set : " << settings["sky_default"] << llendl;
 			ApplyWindLightPreset(settings["sky_default"].asString());
@@ -352,7 +368,7 @@ bool KCWindlightInterface::ParsePacelForWLSettings(const std::string& desc, LLSD
 			std::string::const_iterator start = mat_block[1].first;
 			std::string::const_iterator end = mat_block[1].second;
 			//Sky: "preset" Water: "preset"
-			const boost::regex key("(?i)(?:(?:(Sky)(?:\\s?@\\s?([\\d]+)m?\\s?(?:to|-)\\s?([\\d]+)m?)?)|(Water))\\s?:\\s?\"([^\"\\r\\n]+)\"");
+			const boost::regex key("(?i)(?:(?:(Sky)(?:\\s?@\\s?([\\d]+)m?\\s?(?:to|-)\\s?([\\d]+)m?)?)|(Water))\\s?:\\s?\"([^\"\\r\\n]+)\"|(RegionOverride)");
 			while (boost::regex_search(start, end, match, key, boost::match_default))
 			{
 				if (match[1].matched)
@@ -395,6 +411,12 @@ bool KCWindlightInterface::ParsePacelForWLSettings(const std::string& desc, LLSD
 						settings["water"] = preset;
 						found_settings = true;
 					}
+				}
+				else if (match[6].matched)
+				{
+					std::string preset(match[5]);
+					llinfos << "got region override flag" << llendl;
+					settings["region_override"] = true;
 				}
 				
 				// update search position 
@@ -525,3 +547,23 @@ default
     }
 }
 */
+
+// Region settings are prefered for default parcel ones
+// But parcel height mapped skies always override region's
+// And parcels can use the "RegionOverride" in their config line
+bool KCWindlightInterface::haveParcelOverride(const LLEnvironmentSettings& new_settings)
+{
+	// Since we cannot depend on the order in which the EnvironmentSettings cap and parcel info
+	// will come in, we must check if the other has set something before this one for the current region.
+	if (gAgent.getRegion() != mLastRegion)
+	{
+		mRegionOverride = false;
+		mCurrentSettings.clear();
+		mLastRegion = gAgent.getRegion();
+	}
+	
+	//*ASSUMPTION: if region day cycle is empty, its set to default
+	mHaveRegionSettings = new_settings.getWLDayCycle().size() > 0;
+	
+	return  mRegionOverride || mCurrentSpace != -1.f;
+}

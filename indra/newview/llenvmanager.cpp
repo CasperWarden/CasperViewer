@@ -41,6 +41,7 @@
 #include "llwaterparammanager.h"
 #include "llwlhandlers.h"
 #include "llwlparammanager.h"
+#include "kcwlinterface.h"
 
 std::string LLEnvPrefs::getWaterPresetName() const
 {
@@ -489,15 +490,19 @@ void LLEnvManagerNew::onRegionSettingsResponse(const LLSD& content)
 	// Load region sky presets.
 	LLWLParamManager::instance()->refreshRegionPresets();
 
-	// If using server settings, update managers.
-	if (getUseRegionSettings())
+	// Use the region settings if parcel settings didnt override it already -KC
+	if (KCWindlightInterface::instance().haveParcelOverride(new_settings))
 	{
-		updateManagersFromPrefs(mInterpNextChangeMessage);
-	}
-	//bit of a  hacky override since I've repurposed many of the settings and methods here
-	else if (gSavedSettings.getBOOL("UseEnvironmentFromRegionAlways"))
-	{
-		setUseRegionSettings(true, mInterpNextChangeMessage);
+		// If using server settings, update managers.
+		if (getUseRegionSettings())
+		{
+			updateManagersFromPrefs(mInterpNextChangeMessage);
+		}
+		//bit of a hacky override since I've repurposed many of the settings and methods here -KC
+		else if (gSavedSettings.getBOOL("UseEnvironmentFromRegionAlways"))
+		{
+			setUseRegionSettings(true, mInterpNextChangeMessage);
+		}
 	}
 
 	// Let interested parties know about the region settings update.
