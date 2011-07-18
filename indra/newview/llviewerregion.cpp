@@ -175,7 +175,8 @@ LLViewerRegion::LLViewerRegion(const U64 &handle,
 	mCacheEntriesCount(0),
 	mCacheID(),
 	mEventPoll(NULL),
-	mReleaseNotesRequested(FALSE)
+	mReleaseNotesRequested(FALSE),
+	mCapabilitiesReceived(false)
 {
 	mWidth = region_width_meters;
 	mOriginGlobal = from_region_handle(handle); 
