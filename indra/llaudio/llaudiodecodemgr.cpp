@@ -221,37 +221,75 @@ BOOL LLVorbisDecodeState::initDecode()
 	S32 sample_count = ov_pcm_total(&mVF, -1);
 	size_t size_guess = (size_t)sample_count;
 	vorbis_info* vi = ov_info(&mVF, -1);
-	size_guess *= vi->channels;
+	size_guess *= (vi? vi->channels : 1);
 	size_guess *= 2;
 	size_guess += 2048;
 	
+	bool abort_decode = false;
+
+	if (vi)
+	{
+		if( vi->channels < 1 || vi->channels > LLVORBIS_CLIP_MAX_CHANNELS )
+		{
+			abort_decode = true;
+			llwarns << "Bad channel count: " << vi->channels << llendl;
+		}
+	}
+	else // !vi
+	{
+		abort_decode = true;
+		llwarns << "No default bitstream found" << llendl;	
+	}
 	if(size_guess >= 157286400)
 	{
 		llwarns << "Bad sound caught by zmagic" << llendl;
-		delete mInFilep;
-		mInFilep = NULL;
-		return FALSE;
+		abort_decode = true;
 	}
-	
-	bool abort_decode = false;
-	
-	if( vi->channels < 1 || vi->channels > LLVORBIS_CLIP_MAX_CHANNELS )
+	else
+	{
+	if( (size_t)sample_count > LLVORBIS_CLIP_REJECT_SAMPLES ||
+	    (size_t)sample_count <= 0)
 	{
 		abort_decode = true;
-		llwarns << "Bad channel count: " << vi->channels << llendl;
+		llwarns << "Illegal sample count: " << sample_count << llendl;
+	}
+
+	if( size_guess > LLVORBIS_CLIP_REJECT_SIZE ||
+	    size_guess < 0)
+	{
+		abort_decode = true;
+		llwarns << "Illegal sample size: " << size_guess << llendl;
+	}
 	}
 	
 	if( abort_decode )
 	{
-		llwarns << "Canceling initDecode." << llendl;
-		llwarns << "Bad asset encoded by: " << ov_comment(&mVF,-1)->vendor << llendl;
+		llwarns << "Canceling initDecode. Bad asset: " << mUUID << llendl;
+		vorbis_comment* comment = ov_comment(&mVF,-1);
+		if (comment && comment->vendor)
+		{
+			llwarns << "Bad asset encoded by: " << comment->vendor << llendl;
+		}
 		delete mInFilep;
 		mInFilep = NULL;
 		return FALSE;
 	}
 
-	mWAVBuffer.reserve(size_guess);
-	mWAVBuffer.resize(WAV_HEADER_SIZE);
+	try
+	{
+		mWAVBuffer.reserve(size_guess);
+		mWAVBuffer.resize(WAV_HEADER_SIZE);
+	}
+	catch(std::bad_alloc)
+	{
+		llwarns << "bad_alloc" << llendl;
+		if(mInFilep)
+		{
+			delete mInFilep;
+			mInFilep = NULL;
+		}
+		return FALSE;
+	};
 
 	{
 		// write the .wav format header
@@ -424,7 +462,7 @@ BOOL LLVorbisDecodeState::finishDecode()
 			char pcmout[4096];		/*Flawfinder: ignore*/ 	
 
 			fade_length = llmin((S32)128,(S32)(data_length-36)/8);			
-			if((S32)mWAVBuffer.size() >= (WAV_HEADER_SIZE + 2* fade_length))
+			if((S32)mWAVBuffer.size() > (WAV_HEADER_SIZE + 2* fade_length))
 			{
 				memcpy(pcmout, &mWAVBuffer[WAV_HEADER_SIZE], (2 * fade_length));	/*Flawfinder: ignore*/
 			}
@@ -443,7 +481,7 @@ BOOL LLVorbisDecodeState::finishDecode()
 				memcpy(&mWAVBuffer[WAV_HEADER_SIZE], pcmout, (2 * fade_length));	/*Flawfinder: ignore*/
 			}
 			S32 near_end = mWAVBuffer.size() - (2 * fade_length);
-			if ((S32)mWAVBuffer.size() >= ( near_end + 2* fade_length))
+			if ((S32)mWAVBuffer.size() > ( near_end + 2* fade_length))
 			{
 				memcpy(pcmout, &mWAVBuffer[near_end], (2 * fade_length));	/*Flawfinder: ignore*/
 			}
@@ -542,12 +580,19 @@ void LLAudioDecodeMgr::Impl::processQueue(const F32 num_secs)
 	{
 		if (mCurrentDecodep)
 		{
-			BOOL res;
+			BOOL res = false;
 
 			// Decode in a loop until we're done or have run out of time.
+			try
+			{
 			while(!(res = mCurrentDecodep->decodeSection()) && (decode_timer.getElapsedTimeF32() < num_secs))
 			{
 				// decodeSection does all of the work above
+			}
+			}
+			catch(std::bad_alloc)
+			{
+				llerrs<<"bad_alloc whilst decoding"<<llendl;
 			}
 
 			if (mCurrentDecodep->isDone() && !mCurrentDecodep->isValid())
