@@ -6779,7 +6779,6 @@ An error has occurred while trying to connect to voice chat for [VOICE_CHANNEL_N
    duration="15"
    icon="notifytip.tga" 
    name="ServerVersionChanged"
-   priority="high"
    type="notifytip">
 The region you have entered is running a different simulator version.
 Current simulator : [NEWVERSION]
