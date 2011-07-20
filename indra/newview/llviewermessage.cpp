@@ -4187,7 +4187,7 @@ void process_agent_movement_complete(LLMessageSystem* msg, void**)
 		return;
 	}
 
-	if (!gLastVersionChannel.empty())
+	if (!gLastVersionChannel.empty() && gSavedSettings.getBOOL("PhoenixShowServerVersionChangeNotice"))
 	{
 		LLSD args;
 		args["OLDVERSION"] = gLastVersionChannel;
