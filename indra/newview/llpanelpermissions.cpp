@@ -499,7 +499,8 @@ void LLPanelPermissions::refresh()
 		}
 		// The edit fields are only enabled if you can sell this object
 		// and the sale price is not mixed.
-		bool enable_edit = (num_for_sale && can_transfer) ? !is_for_sale_mixed : false;
+		// bool enable_edit = (num_for_sale && can_transfer) ? !is_for_sale_mixed : false;
+		bool enable_edit = can_transfer ? !is_for_sale_mixed : false;
 		childSetEnabled("Cost",enable_edit);
 		childSetEnabled("Edit Cost",enable_edit);
 	}
@@ -1148,10 +1149,10 @@ void LLPanelPermissions::setAllSaleInfo()
 		sale_type = LLSaleInfo::FS_NOT;
 
 	// Force the sale price of not-for-sale items to DEFAULT_PRICE.
-	if (sale_type == LLSaleInfo::FS_NOT)
-	{
-		price = DEFAULT_PRICE;
-	}
+//	if (sale_type == LLSaleInfo::FS_NOT)
+//	{
+//		price = DEFAULT_PRICE;
+//	}
 	// Pack up the sale info and send the update.
 	LLSaleInfo sale_info(sale_type, price);
 	LLSelectMgr::getInstance()->selectionSetObjectSaleInfo(sale_info);
