@@ -7,6 +7,8 @@
 #include "llerror.h"
 
 #include "llviewercontrol.h"		// gSavedSettings
+#include "llagent.h"
+#include "llviewerregion.h"
 
 HippoLimits *gHippoLimits = 0;
 
@@ -55,14 +57,49 @@ void HippoLimits::setSecondLifeLimits()
 		mMaxAgentGroups = DEFAULT_MAX_AGENT_GROUPS;
 	}
 	
-	if(gSavedSettings.getBOOL("Phoenix64mPrimSupport")) {
-		mMaxPrimScale = 64.0f;
-	} else {
-		mMaxPrimScale = 10.0f;
-	}
-	
 	mMaxHeight = 4096.0f;
 	mMinHoleSize = 0.05f;
 	mMaxHollow = 0.95f;
+
+	// Check if we have caps yet for the new region, defer till we do if needed
+	LLViewerRegion* cur_region = gAgent.getRegion();
+	if (cur_region)
+	{
+		if (!cur_region->capabilitiesReceived())
+		{
+			// set limit back to 10m till get caps
+			mMaxPrimScale = 10.0f;
+			gSavedSettings.setBOOL("Phoenix64mPrimSupport", FALSE);
+			cur_region->setCapabilitiesReceivedCallback(boost::bind(&HippoLimits::onRegionCapsReceived, _1));
+		}
+		else
+		{
+			doSecondLifeMeshCheck();
+		}
+	}
+}
+
+//static
+void HippoLimits::onRegionCapsReceived(const LLUUID& region_id)
+{
+	if (region_id == gAgent.getRegion()->getRegionID())
+	{
+		gHippoLimits->doSecondLifeMeshCheck();
+	}
+}
+
+void HippoLimits::doSecondLifeMeshCheck()
+{
+	// check if the region has mesh for 64m prim support
+	if (!gAgent.getRegion()->getCapability("GetMesh").empty())
+	{
+		mMaxPrimScale = 64.0f;
+		gSavedSettings.setBOOL("Phoenix64mPrimSupport", TRUE);
+	}
+	else
+	{
+		mMaxPrimScale = 10.0f;
+		gSavedSettings.setBOOL("Phoenix64mPrimSupport", FALSE);
+	}
 }
 

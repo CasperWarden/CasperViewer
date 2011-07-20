@@ -139,6 +139,7 @@
 #include "llfloaterteleporthistory.h"
 #include "jc_lslviewerbridge.h"
 #include "llenvmanager.h"
+#include "hippolimits.h"
 
 #include "llfloaterstats.h"
 #include "floaterao.h"
@@ -1009,6 +1010,8 @@ void LLAgent::setRegion(LLViewerRegion *regionp)
 	{
 		LLEnvManagerNew::instance().onRegionCrossing();
 	}
+
+	gHippoLimits->setLimits();
 }
 
 

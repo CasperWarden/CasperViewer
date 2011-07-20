@@ -15713,6 +15713,7 @@
 			<key>Value</key>
 			<integer>0</integer>
 		</map>
+<!-- this is automatic now and only used for display -->
 		<key>Phoenix64mPrimSupport</key>
 		<map>
 			<key>Comment</key>

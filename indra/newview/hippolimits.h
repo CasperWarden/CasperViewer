@@ -25,6 +25,8 @@ private:
 
 	void setOpenSimLimits();
 	void setSecondLifeLimits();
+	static void  onRegionCapsReceived(const LLUUID& region_id);
+	void  doSecondLifeMeshCheck();
 };
 
 
