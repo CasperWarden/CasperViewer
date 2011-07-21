@@ -1380,3 +1380,6 @@ char* _PREHASH_FaceIndex = LLMessageStringTable::getInstance()->getString("FaceI
 char* _PREHASH_StatusData = LLMessageStringTable::getInstance()->getString("StatusData");
 char* _PREHASH_ProductSKU = LLMessageStringTable::getInstance()->getString("ProductSKU");
 char* _PREHASH_Language = LLMessageStringTable::getInstance()->getString("Language");
+char* _PREHASH_SeeAVs = LLMessageStringTable::getInstance()->getString("SeeAVs");
+char* _PREHASH_AnyAVSounds = LLMessageStringTable::getInstance()->getString("AnyAVSounds");
+char* _PREHASH_GroupAVSounds = LLMessageStringTable::getInstance()->getString("GroupAVSounds");

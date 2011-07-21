@@ -1547,9 +1547,9 @@ integer llGetParcelMaxPrims(vector pos, integer sim_wide)
 Returns the maximum number of prims allowed on the parcel at pos
   </string>
   <string name="LSLTipText_llGetParcelDetails">
-list llGetParcelDetails(vector pos, list params)
-Returns the parcel details specified in params for the parcel at pos.
-Params is one or more of: PARCEL_DETAILS_NAME, _DESC, _OWNER, _GROUP, _AREA, _ID
+    list llGetParcelDetails(vector pos, list params)
+    Returns the parcel details specified in params for the parcel at pos.
+    Params is one or more of: PARCEL_DETAILS_NAME, _DESC, _OWNER, _GROUP, _AREA, _ID, _SEE_AVATARS
   </string>
   <string name="LSLTipText_llSetLinkPrimitiveParams">
 llSetLinkPrimitiveParams(integer linknumber, list rules)

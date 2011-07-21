@@ -100,6 +100,12 @@ BOOL LLPanelLandAudio::postBuild()
 	mMusicURLEdit = getChild<LLLineEditor>("music_url");
 	childSetCommitCallback("music_url", onCommitAny, this);
 
+	mCheckAVSoundAny = getChild<LLCheckBoxCtrl>("all av sound check");
+	childSetCommitCallback("all av sound check", onCommitAny, this);
+
+	mCheckAVSoundGroup = getChild<LLCheckBoxCtrl>("group av sound check");
+	childSetCommitCallback("group av sound check", onCommitAny, this);
+
 	mMusicUrlCheck = getChild<LLCheckBoxCtrl>("hide_music_url");
 	childSetCommitCallback("hide_music_url", onCommitAny, this);
 
@@ -128,6 +134,13 @@ void LLPanelLandAudio::refresh()
 
 		mMusicUrlCheck->set( parcel->getObscureMusic() );
 		mMusicUrlCheck->setEnabled( can_change_media );
+
+		BOOL can_change_av_sounds = LLViewerParcelMgr::isParcelModifiableByAgent(parcel, GP_LAND_OPTIONS) && parcel->getHaveNewParcelLimitData();
+		mCheckAVSoundAny->set(parcel->getAllowAnyAVSounds());
+		mCheckAVSoundAny->setEnabled(can_change_av_sounds);
+
+		mCheckAVSoundGroup->set(parcel->getAllowGroupAVSounds() || parcel->getAllowAnyAVSounds());	// On if "Everyone" is on
+		mCheckAVSoundGroup->setEnabled(can_change_av_sounds && !parcel->getAllowAnyAVSounds());		// Enabled if "Everyone" is off
 
 		bool obscure_music = ! can_change_media && parcel->getObscureMusic();
 		mMusicURLEdit->setDrawAsterixes( obscure_music );
@@ -189,6 +202,13 @@ void LLPanelLandAudio::onCommitAny(LLUICtrl*, void *userdata)
 		break;
 	}
 
+	BOOL any_av_sound		= self->mCheckAVSoundAny->get();
+	BOOL group_av_sound		= TRUE;		// If set to "Everyone" then group is checked as well
+	if (!any_av_sound)
+	{	// If "Everyone" is off, use the value from the checkbox
+		group_av_sound = self->mCheckAVSoundGroup->get();
+	}
+
 	// Remove leading/trailing whitespace (common when copying/pasting)
 	LLStringUtil::trim(music_url);
 
@@ -198,6 +218,8 @@ void LLPanelLandAudio::onCommitAny(LLUICtrl*, void *userdata)
 	parcel->setParcelFlag(PF_SOUND_LOCAL, sound_local);
 	parcel->setMusicURL(music_url);
 	parcel->setObscureMusic(obscure_music);
+	parcel->setAllowAnyAVSounds(any_av_sound);
+	parcel->setAllowGroupAVSounds(group_av_sound);
 
 	// Send current parcel data upstream to server
 	LLViewerParcelMgr::getInstance()->sendParcelPropertiesUpdate( parcel );

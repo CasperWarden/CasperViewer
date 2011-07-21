@@ -1380,4 +1380,7 @@ extern char * _PREHASH_FaceIndex;
 extern char * _PREHASH_StatusData;
 extern char * _PREHASH_ProductSKU;
 extern char * _PREHASH_Language;
+extern char * _PREHASH_SeeAVs;
+extern char * _PREHASH_AnyAVSounds;
+extern char * _PREHASH_GroupAVSounds;
 #endif

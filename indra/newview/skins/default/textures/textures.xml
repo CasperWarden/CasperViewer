@@ -335,7 +335,10 @@
   <texture name="UIImgGrabUUID"	file_name="c63f124c-6340-4fbf-b59e-0869a44adb64.tga"/>
   <texture name="UIImgGrabSelectedUUID"	file_name="c1e21504-f136-451d-b8e9-929037812f1d.tga"/>
 
-  <!--<texture name="UIImgScaleUUID" 			file_name="88a90fef-b448-4883-9344-ecf378a60433.tga"/>-->
+  <texture name="Parcel_SeeAVsOff_Dark" file_name="Parcel_SeeAVsOff_Dark.png" />
+  <texture name="Parcel_SeeAVsOn_Dark" file_name="Parcel_SeeAVsOn_Dark.png" />
+  <texture name="Parcel_SeeAVsOff_Light" file_name="Parcel_SeeAVsOff_Light.png" />
+  <texture name="Parcel_SeeAVsOn_Light" file_name="Parcel_SeeAVsOn_Light.png" />
 
   <texture name="UIImgFaceUUID"	file_name="ce15fd63-b0b6-463c-a37d-ea6393208b3e.tga"/>
   <texture name="UIImgFaceSelectedUUID"	file_name="b4870163-6208-42a9-9801-93133bf9a6cd.tga"/>

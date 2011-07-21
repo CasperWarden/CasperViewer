@@ -353,6 +353,7 @@ private:
 	LLCheckBoxCtrl		*mMatureCtrl;
 	LLCheckBoxCtrl		*mPushRestrictionCtrl;
 	LLButton			*mPublishHelpButton;
+	LLCheckBoxCtrl		*mSeeAvatarsCtrl;
 
 	LLSafeHandle<LLParcelSelection>&	mParcel;
 };
