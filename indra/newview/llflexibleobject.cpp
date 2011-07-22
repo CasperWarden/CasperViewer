@@ -373,7 +373,6 @@ void LLVolumeImplFlexible::doFlexibleUpdate()
 		}
 	}
 
-	llassert_always(mInitialized);
 	if(!mInitialized) 
 	{
 		//the object is not visible
@@ -697,8 +696,10 @@ BOOL LLVolumeImplFlexible::doUpdateGeometry(LLDrawable *drawable)
 	}
 
 	volume->updateRelativeXform();
-	doFlexibleUpdate();
-	
+	if (mRenderRes > -1)
+	{
+		doFlexibleUpdate();
+	}
 	// Object may have been rotated, which means it needs a rebuild.  See SL-47220
 	BOOL	rotated = FALSE;
 	LLQuaternion cur_rotation = getFrameRotation();
