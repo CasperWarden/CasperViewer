@@ -9175,14 +9175,6 @@ void LLVOAvatar::processAvatarAppearance( LLMessageSystem* mesgsys )
 			param = getNextVisualParam();
 		}
 
-		if (param)
-		{
-		        if (param->getName() == "breast_physics_mass")
-		        {
-		                llinfos << getFullname() << " does not have avatar physics." << llendl;
-                        }
-                }
-
 		if (params_changed)
 		{
 			if (interp_params)
