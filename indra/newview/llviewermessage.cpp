@@ -3256,6 +3256,8 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
 		from_name,
 		LLMute::flagTextChat)
 		|| LLMuteList::getInstance()->isMuted(owner_id, LLMute::flagTextChat);
+	if(gSavedSettings.getBOOL("PhoenixOnlyMyErrors") && (chat.mChatType == CHAT_TYPE_DEBUG_MSG) && (owner_id != gAgent.getID()))
+		return;
 	is_linden = chat.mSourceType != CHAT_SOURCE_OBJECT &&
 		LLMuteList::getInstance()->isLinden(from_name);
 
