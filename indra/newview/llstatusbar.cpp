@@ -461,6 +461,17 @@ void LLStatusBar::refresh()
 		x += buttonRect.getWidth();
 	}
 
+	BOOL no_see_avs = parcel && !parcel->getSeeAVs();
+	childSetVisible("status_SeeAV", no_see_avs);
+	if (no_see_avs)
+	{
+		childGetRect( "status_SeeAV", buttonRect );
+		r.setOriginAndSize( x, y, buttonRect.getWidth(), buttonRect.getHeight());
+		childSetRect( "status_SeeAV", r );
+		x += buttonRect.getWidth();
+	}
+	
+
 	BOOL canBuyLand = parcel
 		&& !parcel->isPublic()
 		&& LLViewerParcelMgr::getInstance()->canAgentBuyParcel(parcel, false);
@@ -474,7 +485,6 @@ void LLStatusBar::refresh()
 		childSetRect( "buyland", r );
 		x += buttonRect.getWidth();
 	}
-
 	//KC: icon to show that WL settings are being overridden locally
 	BOOL status_wl = KCWindlightInterface::instance().WLset;
 	childSetVisible("status_wl", status_wl);
@@ -484,7 +494,7 @@ void LLStatusBar::refresh()
 		childGetRect( "status_wl", buttonRect );
 		r.setOriginAndSize( x, y, buttonRect.getWidth(), buttonRect.getHeight());
 		childSetRect( "status_wl", r );
-		x += buttonRect.getWidth();
+		x += buttonRect.getWidth() - 6;
 	}
 
 	std::string location_name;
