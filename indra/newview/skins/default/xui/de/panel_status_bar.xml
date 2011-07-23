@@ -29,8 +29,10 @@
 	<button name="no_scripts" tool_tip="Skripte sind unzulässig"/>
 	<button label="" label_selected="" name="restrictpush" tool_tip="Kein Stoßen"/>
 	<button name="status_voice" tool_tip="Voice aktiviert"/>
+	<button name="status_SeeAV" tool_tip="Avatar-Privatsphäre aktiviert"/>
 	<button name="status_no_voice" tool_tip="Voice hier nicht möglich"/>
 	<button label="" label_selected="" name="buyland" tool_tip="Diese Parzelle kaufen"/>
+	<button name="status_wl" tool_tip="Windlight-Einstellungen aktiviert"/>
 	<text name="packet_loss_tooltip">
 		Paketverlust
 	</text>

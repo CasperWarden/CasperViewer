@@ -396,6 +396,10 @@ Nur große Parzellen können in der Suche aufgeführt werden.
 			<string name="mature_check_adult_tooltip">
 				Die Informationen oder Inhalte Ihrer Parzelle sind „Adult“.
 			</string>
+			<text name="allow_label5">
+				Einwohner auf anderem Land erlauben:
+			</text>
+			<check_box label="Avatare sehen" name="SeeAvatarsCheck" tool_tip="Erlaubt Einwohnern auf anderem Land mit Einwohnern auf diesem Land zu sprechen und diese zu sehen, sowie Ihnen diese zu sehen und mit ihnen zu sprechen."/>
 			<text name="Snapshot:">
 				Foto:
 			</text>
@@ -427,6 +431,9 @@ Nur große Parzellen können in der Suche aufgeführt werden.
 			</string>
 			<string name="push_restrict_region_text">
 				Kein Stoßen (regional)
+			</string>
+			<string name="see_avs_text">
+				Einwohner auf diesem Land zu sehen und mit ihnen zu sprechen
 			</string>
 		</panel>
 		<panel label="Medien" name="land_media_panel">

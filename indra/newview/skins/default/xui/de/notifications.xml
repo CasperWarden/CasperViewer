@@ -2566,6 +2566,9 @@ Sie können keine anderen Personen stoßen, außer Ihnen gehört das Land.
 		Auf diesem Land ist Bauen deaktiviert („Bauen aus“).
 Sie können hier keine Objekte erstellen.
 	</notification>
+	<notification name="SeeAvatars">
+		Dieses Land versteckt Sichtbarkeit von Avataren und Chat von einem anderen Land aus. Sie können keine Einwohner außerhalb von diesem Land sehen und Einwohner außerhalb können Sie nicht sehen. Normaler Text auf Kanal 0 wird ebenfalls geblockt.
+	</notification>
 	<notification name="ScriptsStopped">
 		Ein Administrator hat die Skriptausführung in dieser Region vorübergehend deaktiviert.
 	</notification>
