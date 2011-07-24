@@ -456,8 +456,6 @@ Mediów:
 			</text>
 			<check_box label="Automatyczna Skala" name="media_auto_scale" tool_tip="Wybranie tej opcji dobierze odpowiedni rozmiar zawartości mediów dla tej posiadłości automatycznie. Może to mieć znaczący wpływ na jakość odtwarzanego materialu - może zwolnić i zmniejszyć jakość materiału."/>
 			<check_box label="Powtórka Odtwarzania" name="media_loop" tool_tip="Odtwarzaj media z powtórką. Po wyświetleniu materialu, rozpocznie się odtwarzanie od początku."/>
-			<check_box label="Ukryj URL Mediów" name="hide_media_url" tool_tip="Wybranie tej opcji, zablokuje widok adresu do medów wszystkim nieautoryzowanym użytkownikom. Nie dotyczy to jednak typów HTML."/>
-			<check_box label="Ukryj URL Muzyki" name="hide_music_url" tool_tip="Wybranie tej opcji, zablokuje widok adresu do medów muzycznych w posiadłości wszystkim nieautoryzowanym użytkownikom"/>
 			<text length="1" name="media_size" tool_tip="Rozmiar dla ładowania mediów internetowych. Zostaw 0 dla ustawień domyślnych." type="string">
 				Rozmiar:
 			</text>

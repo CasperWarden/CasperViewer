@@ -454,8 +454,6 @@ beállítások:
 			</text>
 			<check_box label="Automatikus méretezés" name="media_auto_scale" tool_tip="Ennek beállításával a tartalmak automatikus méretezésre kerülnek. Ami lehet, hogy kissé lassabb és gyengébb minőséget eredményez vizuálisan, azonban egyéb méretezési és igazítási."/>
 			<check_box label="Média ismétlése" name="media_loop" tool_tip="Média folyamatos ismétlése. A média befejeztével az egész lejátszási folyamat újraindul az elejétől."/>
-			<check_box label="Média URL elrejtése" name="hide_media_url" tool_tip="Evvel a beállítással a telken lévő média hivatkozások elrejthetők a nem engedélyezett lakók számára. Megjegyzés: Nem alkalmazható HTML típusú médiák esetén."/>
-			<check_box label="Zene URL elrejtése" name="hide_music_url" tool_tip="Evvel a beállítással a telken lévő zene hivatkozások elrejthetők a nem engedélyezett lakók számára."/>
 			<text length="1" name="media_size" tool_tip="A renderelni kívánt web média mérete, 0 az alapértelmezett." type="string" width="105">
 				Média mérete:
 			</text>

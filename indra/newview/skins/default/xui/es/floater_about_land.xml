@@ -454,8 +454,6 @@ los media:
 			</text>
 			<check_box left="97" label="Escala automática" name="media_auto_scale" tool_tip="Marcando esta opción, se ajustará el tamaño del contenido automáticamente. Puede ser ligeramente más lento y con menor calidad visual, pero no tendrá que ajustar ni alinear ninguna textura."/>
 			<check_box label="Media en bucle" name="media_loop" tool_tip="Ejecuta el media en bucle: cuando acaba su ejecución, vuelve a empezar."/>
-			<check_box left="97" label="Ocultar la URL del media" name="hide_media_url" tool_tip="Marcando esta opción esconderá en la información de esta parcela -a quien no esté autorizado a verla- la URL del media. Note que esto no está disponible para HTML."/>
-			<check_box label="Ocultar la URL de la música" name="hide_music_url" tool_tip="Marcando esta opción esconderá en la información de esta parcela -a quien no esté autorizado a verla- la URL de la música"/>
 			<text name="media_size" tool_tip="Tamaño en el que mostrar las web (marque 0 para por defecto)." left="102" width="120">
 				Tamaño del media:
 			</text>

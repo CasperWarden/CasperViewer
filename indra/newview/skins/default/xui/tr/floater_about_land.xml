@@ -453,8 +453,6 @@ seçenekleri:
 			</text>
 			<check_box label="Otomatik ölçek" name="media_auto_scale" tool_tip="Bu seçeneği işaretlemek içeriği bu parsel için otomatik olarak ölçeklendirecektir.Biraz yavaş ve düşük kalitede görsellik olabilir fakat başka bir desen ölçeklemesi veya hizalaması gerekmez."/>
 			<check_box label="Medyayı tekrarla" name="media_loop" tool_tip="Medyayı tekrar oynatma.Medya oynamayı durdurduğunda onu baştan başlatacaktır."/>
-			<check_box label="Medya adresini sakla" name="hide_media_url" tool_tip="Bu seçeneği işaretlemek herhangi bir izinsiz görüntüleyiciden bu parsel bilgisindeki medya adresini gizleyecektir.HTML türleri için geçerli değildir."/>
-			<check_box label="Müzik adresini sakla" name="hide_music_url" tool_tip="Bu seçeneği işaretlemek herhangi bir izinsiz görüntüleyiciden bu parsel bilgisindeki müzik adresini gizleyecektir."/>
 			<text length="1" name="media_size" tool_tip="Web medyasını yorumlama boyutu, varsayılan için 0 bırakınız." type="string">
 				Medya 
 boyutu:

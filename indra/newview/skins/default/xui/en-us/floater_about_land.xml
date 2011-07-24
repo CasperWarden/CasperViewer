@@ -614,7 +614,7 @@ Go to World menu > About Land or select another parcel to show its details.
 			     mouse_opaque="true" name="check group scripts" radio_style="false"
 			     width="70" />
 			<text type="string" length="1" bg_visible="false" border_drop_shadow_visible="false" border_visible="false"
-			     bottom="-100" drop_shadow_visible="true" enabled="true" follows="left|top"
+			     bottom="-103" drop_shadow_visible="true" enabled="true" follows="left|top"
 			     font="SansSerifSmall" h_pad="0" halign="left" height="16" left="4"
 			     mouse_opaque="true" name="land_options_label" v_pad="0" width="278">
 				Land Options:
@@ -752,12 +752,12 @@ Only large parcels can be listed in search.
 				Your parcel information or content is considered adult.
 			</string>
       <text type="string" length="1" follows="left|top" text_color="white" height="16"
-       layout="topleft" left="4" top="174" name="allow_label5" width="278">
+       layout="topleft" left="4" top="167" name="allow_label5" width="278">
         Allow Residents on other parcels to:
       </text>
       <check_box height="16" label="See Avatars" follows="top" layout="topleft" left="14" name="SeeAvatarsCheck"
        tool_tip="Allows residents on other parcels to see and chat with residents on this parcel, and you to see and chat with them."
-       bottom="-195" width="120" />
+       bottom="-200" width="120" />
 			<text type="string" length="1" bg_visible="false" border_drop_shadow_visible="false" border_visible="false"
 			     bottom="-230" drop_shadow_visible="true" enabled="true" follows="left|top"
 			     font="SansSerifSmall" h_pad="0" halign="left" height="16" left="4"
@@ -884,7 +884,7 @@ Only large parcels can be listed in search.
 				 right="-90"
 				 select_all_on_focus_received="true"
 				 select_on_focus="true"
-				 text_readonly_color="0.576471 0.662745 0.835294 1" />
+				 text_readonly_color="0.25 0.25 0.25 1" />
 			<button
 				 bottom_delta="0"
 				 follows="right|top"
@@ -933,22 +933,8 @@ Only large parcels can be listed in search.
 				 right="-12"
 				 scale_image="true"
 				 width="70" />
-			<check_box
-				 bottom_delta="-22"
-				 enabled="true"
-				 follows="left|top"
-				 font="SansSerifSmall"
-				 height="16"
-				 initial_value="false"
-				 label="Hide URL"
-				 left="80"
-				 mouse_opaque="true"
-				 name="hide_media_url"
-				 radio_style="false"
-				 tool_tip="Checking this option will hide the media URL from any non-authorized viewers of this parcel information. Note this is not available for HTML types."
-				 width="150" />
 			<text
-				 bottom_delta="0"
+				 bottom_delta="-22"
 				 follows="right|top"
 				 font="SansSerifSmall"
 				 halign="right"
@@ -1333,7 +1319,8 @@ Select the thumbnail to choose a different texture.
 				 max_length="255"
 				 name="music_url"
 				 right="-15"
-				 select_on_focus="true" />
+				 select_on_focus="true"
+				 text_readonly_color="0.25 0.25 0.25 1" />
 			<text
 				 bottom_delta="-65"
 				 follows="left|top"

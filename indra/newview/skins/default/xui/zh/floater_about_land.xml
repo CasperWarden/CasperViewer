@@ -451,8 +451,6 @@
 			</text>
 			<check_box label="自动调整内容大小 " name="media_auto_scale" tool_tip="打开此项将自动缩放该地块上的内容。其速度和质量可能会稍稍降低，但不会需要任何其他的材质缩放或对齐。"/>
 			<check_box label="循环播放" name="media_loop" tool_tip="循环播放媒体。当媒体播放完毕时，它将从开始处重新播放。"/>
-			<check_box label="隐藏媒体 URL" name="hide_media_url" tool_tip="打开该选项将对未经允许的土地信息察看者隐藏媒体 URL。请注意该选项不适用于 HTML 类型。"/>
-			<check_box label="隐藏音乐 URL" name="hide_music_url" tool_tip="打开该选项将对未经允许的土地信息察看者隐藏音乐 URL。"/>
 			<text name="media_size" tool_tip="渲染媒体的尺寸，设为 0 使用默认值">
 				媒体尺寸:
 			</text>

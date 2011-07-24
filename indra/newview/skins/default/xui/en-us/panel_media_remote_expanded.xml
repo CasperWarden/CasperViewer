@@ -18,9 +18,6 @@
 	<string name="default_tooltip_label">
 		No Media Specified
 	</string>
-	<string name="media_hidden_label">
-		(URL hidden by parcel owner)
-	</string>
 	<string name="media_icon_tooltip_web">
 		This location displays content from the World Wide Web. Click the Play button to display Web content.
 	</string>

@@ -459,8 +459,6 @@ Media:
 			</text>
 			<check_box left="94" label="Auto ridimensiona" name="media_auto_scale" tool_tip="Spuntando questa opzione, nell&apos;appezzamento il contenuto media si ridimensionerà automaticamente. Potrebbe darsi che appaia un po&apos; più lento e che diminuisca la qualità visiva ma nessun altro riadattamento o allineamento della texture sarà necessario."/>
 			<check_box left="265" label="Fai ripetere il video" name="media_loop" tool_tip="Fai ripetere il video continuamente. Quando il video è finito, reinizierà dal principio."/>
-			<check_box left="94" label="Nascondi indirizzo URL Media" name="hide_media_url" tool_tip="Abilitando questa opzione nasconderai l&apos;indirizzo url dei media a tutte le persone non autorizzate a vedere le informazioni del terreno. Nota che questo non è disponibile per contenuto di tipo HTML."/>
-			<check_box left="265" label="Nascondi indirizzo URL Musica" name="hide_music_url" tool_tip="Abilitando questa opzione nasconderai l&apos;indirizzo url della musica a tutte le persone non autorizzate a vedere le informazioni del terreno."/>
 			<text left="99" width="120" name="media_size" tool_tip="Aumenta grandezza per far vedere meglio i media web, lascia a 0 per impostare il default.">
 				Grandezza Media:
 			</text>

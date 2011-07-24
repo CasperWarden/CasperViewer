@@ -106,9 +106,6 @@ BOOL LLPanelLandAudio::postBuild()
 	mCheckAVSoundGroup = getChild<LLCheckBoxCtrl>("group av sound check");
 	childSetCommitCallback("group av sound check", onCommitAny, this);
 
-	mMusicUrlCheck = getChild<LLCheckBoxCtrl>("hide_music_url");
-	childSetCommitCallback("hide_music_url", onCommitAny, this);
-
 	return TRUE;
 }
 
@@ -132,18 +129,12 @@ void LLPanelLandAudio::refresh()
 		mMusicURLEdit->setText(parcel->getMusicURL());
 		mMusicURLEdit->setEnabled( can_change_media );
 
-		mMusicUrlCheck->set( parcel->getObscureMusic() );
-		mMusicUrlCheck->setEnabled( can_change_media );
-
 		BOOL can_change_av_sounds = LLViewerParcelMgr::isParcelModifiableByAgent(parcel, GP_LAND_OPTIONS) && parcel->getHaveNewParcelLimitData();
 		mCheckAVSoundAny->set(parcel->getAllowAnyAVSounds());
 		mCheckAVSoundAny->setEnabled(can_change_av_sounds);
 
 		mCheckAVSoundGroup->set(parcel->getAllowGroupAVSounds() || parcel->getAllowAnyAVSounds());	// On if "Everyone" is on
 		mCheckAVSoundGroup->setEnabled(can_change_av_sounds && !parcel->getAllowAnyAVSounds());		// Enabled if "Everyone" is off
-
-		bool obscure_music = ! can_change_media && parcel->getObscureMusic();
-		mMusicURLEdit->setDrawAsterixes( obscure_music );
 
 		mCheckSoundLocal->set( parcel->getSoundLocal() );
 		mCheckSoundLocal->setEnabled( can_change_media );
@@ -179,8 +170,6 @@ void LLPanelLandAudio::onCommitAny(LLUICtrl*, void *userdata)
 	BOOL sound_local		= self->mCheckSoundLocal->get();
 	int voice_setting		= self->mRadioVoiceChat->getSelectedIndex();
 	std::string music_url	= self->mMusicURLEdit->getText();
-	U8 obscure_music		= self->mMusicUrlCheck->get();
-
 
 	BOOL voice_enabled;
 	BOOL voice_estate_chan;
@@ -217,7 +206,6 @@ void LLPanelLandAudio::onCommitAny(LLUICtrl*, void *userdata)
 	parcel->setParcelFlag(PF_USE_ESTATE_VOICE_CHAN, voice_estate_chan);
 	parcel->setParcelFlag(PF_SOUND_LOCAL, sound_local);
 	parcel->setMusicURL(music_url);
-	parcel->setObscureMusic(obscure_music);
 	parcel->setAllowAnyAVSounds(any_av_sound);
 	parcel->setAllowGroupAVSounds(group_av_sound);
 

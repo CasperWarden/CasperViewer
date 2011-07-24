@@ -450,8 +450,6 @@ web-siden, efter du klikker på play knappen.)
 			</text>
 			<check_box label="Auto skalér" name="media_auto_scale" tool_tip="Vælg denne mulighed for at skalere indholdet for dette parcel automatisk. Det kan være lidt langsommere og have lavere kvalitet, men ingen anden tekstur skalering eller tilpasning vil være nødvendigt."/>
 			<check_box label="Gentag afspil" name="media_loop" tool_tip="Gentager automatisk medie, når det er færdigt med at spille starter det automatisk forfra."/>
-			<check_box label="Skjul medie URL" name="hide_media_url" tool_tip="Klik her for at skjule medie adressen så det kun er dig og evt. parcel gruppens ejer/administratorer der kan se den."/>
-			<check_box label="Skjul musik URL" name="hide_music_url" tool_tip="Klik her for at skjule musik adressen så det kun er dig og evt. parcel gruppens ejer/administratorer der kan se den."/>
 			<text length="1" name="media_size" tool_tip="Størrelse for rendering af Web medie, benyt 0 for standard." type="string" width="105">
 				Medie Størrelse:
 			</text>
