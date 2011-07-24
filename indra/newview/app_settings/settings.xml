@@ -599,7 +599,7 @@
 		<key>PhoenixBeamColorFile</key>
 		<map>
 			<key>Comment</key>
-			<string>Beam file for the shape of your beam</string>
+			<string>Beam file for the color of your beam</string>
 			<key>Persist</key>
 			<integer>1</integer>
 			<key>Type</key>
