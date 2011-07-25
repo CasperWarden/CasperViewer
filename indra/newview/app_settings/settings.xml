@@ -13,6 +13,17 @@
       <key>Value</key>
       <string />
     </map>
+    <key>PhoenixSupportGroupchatPrefix</key>
+    <map>
+      <key>Comment</key>
+      <string>Prefixes "PH" to your chat in the Phoenix-Firestorm Viewer Support group, to insure you receive answers specific to Phoenix.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
     <key>PhoenixShowChatChannel</key>
     <map>
       <key>Comment</key>

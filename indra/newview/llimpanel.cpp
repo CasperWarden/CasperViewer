@@ -58,6 +58,7 @@
 #include "llfloateractivespeakers.h"
 #include "llfloateravatarinfo.h"
 #include "llfloaterchat.h"
+#include "llcheckboxctrl.h"
 #include "llkeyboard.h"
 #include "lllineeditor.h"
 #include "llnotify.h"
@@ -1424,6 +1425,15 @@ BOOL LLFloaterIMPanel::postBuild()
 		if ( IM_SESSION_GROUP_START == mDialog )
 		{
 			childSetEnabled("profile_btn", FALSE);
+			// AO: Hack for prefixing viewer type to Phoenix support chat
+			if (mSessionUUID == LLUUID("3a1be8d4-01f3-bc1a-2703-442f0cc8f2dd")) // hardset to phoenix/firestorm viewer support
+			{
+				LLCheckBoxCtrl* prefixViewer = getChild<LLCheckBoxCtrl>("prefixViewerToggle");
+				childSetCommitCallback("prefixViewerToggle", onClickToggleViewerPrefix, this);
+				childSetVisible("prefixViewerToggle",TRUE);
+				childSetVisible("prefixViewerExtraText",TRUE);
+				prefixViewer->setValue(gSavedSettings.getBOOL("PhoenixSupportGroupchatPrefix"));
+			}
 		}
 		if(IM_SESSION_IRC_START == mDialog || IM_PRIVATE_IRC == mDialog)
 		{
@@ -2063,6 +2073,14 @@ void LLFloaterIMPanel::onClickToggleActiveSpeakers(void* userdata)
 	LLFloaterIMPanel* self = (LLFloaterIMPanel*)userdata;
 
 	self->childSetVisible("active_speakers_panel", !self->childIsVisible("active_speakers_panel"));
+}
+
+//static
+void LLFloaterIMPanel::onClickToggleViewerPrefix(LLUICtrl* caller, void *data)  // AO: For PVFS
+{
+	LLFloaterIMPanel* self = (LLFloaterIMPanel*)data;
+	BOOL prefixViewer = self->getChild<LLCheckBoxCtrl>("prefixViewerToggle")->getValue();
+	gSavedSettings.setBOOL("PhoenixSupportGroupchatPrefix",prefixViewer);
 }
 
 // static
@@ -3054,6 +3072,12 @@ void LLFloaterIMPanel::sendMsg()
 				{
 					utf8_text.replace(0, 1, "/me ");
 				}
+			}
+			
+			// AO: PVFS Viewer Prefix Hack
+			if ((mSessionUUID == LLUUID("3a1be8d4-01f3-bc1a-2703-442f0cc8f2dd")) && gSavedSettings.getBOOL("PhoenixSupportGroupchatPrefix"))
+			{
+				utf8_text.insert(0,"(PH) ");
 			}
 
 // [RLVa:KB] - Alternate: Snowglobe-1.2.4 | Checked: 2009-07-10 (RLVa-1.0.0g) | Modified: RLVa-1.0.0g

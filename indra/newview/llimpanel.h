@@ -267,6 +267,7 @@ public:
 	static void		onClickEndCall( void* userdata );
 	static void		onClickSend( void* userdata );
 	static void		onClickToggleActiveSpeakers( void* userdata );
+	static void		onClickToggleViewerPrefix(LLUICtrl* caller,void *data); // AO: PFVS Hack
 	static void*	createSpeakersPanel(void* data);
 	static void		onKickSpeaker(void* user_data);
 

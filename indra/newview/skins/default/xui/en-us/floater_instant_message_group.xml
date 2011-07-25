@@ -55,8 +55,13 @@
 			<button bottom_delta="0" follows="left|top" halign="right" height="20"
 			     image_overlay="icn_voice-call-end.tga" image_overlay_alignment="left"
 			     label="End Call" left_delta="0" name="end_call_btn" pad_right="12"
-			     visible="false" width="80" />
-			<button bottom_delta="0" follows="right|top" height="20" label="&lt; &lt;"
+			     visible="false" width="65" />
+			<check_box visible="false" bottom_delta="6" enabled="true" follows="left|top" font="SansSerifSmall"
+                             height="20" initial_value="true" label="Specify Viewer Type" left_delta="79"
+                             name="prefixViewerToggle" radio_style="false" width="80" />
+                        <text visible="false" bottom_delta="-15" enabled="true" follows="left|top" font="SansSerifSmall"
+                             height="20" left_delta="20" name="prefixViewerExtraText" width="120">For Accurate Answers</text>
+			<button bottom_delta="10" follows="right|top" height="20" label="&lt; &lt;"
 			     label_selected="&gt; &gt;" left="143" name="toggle_active_speakers_btn"
 			     right="176"
 			     tool_tip="Click here to toggle a list of active participants in this IM session."
