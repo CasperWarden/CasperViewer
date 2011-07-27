@@ -912,8 +912,10 @@ bool LLWLParamManager::savePresetToNotecard(const std::string & name)
 	// make an empty llsd
 	LLSD paramsData(LLSD::emptyMap());
 
+	LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL);
+	if(!hasParamSet(key)) return false;
+
 	// fill it with LLSD windlight params
-	LLWLParamKey key((" Norecard: " + name), LLEnvKey::SCOPE_LOCAL);
 	paramsData = mParamList[key].getAll();
 
 	// get some XML

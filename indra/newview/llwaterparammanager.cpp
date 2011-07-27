@@ -192,9 +192,8 @@ bool LLWaterParamManager::loadPresetXML(const std::string& name, std::istream& p
 			return false;
 		}
 	}
-	
-	std::map<std::string, LLWaterParamSet>::iterator mIt = mParamList.find(name);
-	if(mIt == mParamList.end())
+
+	if(!hasParamSet(name))
 	{
 		addParamSet(name, paramsData);
 	}
@@ -253,13 +252,13 @@ void LLWaterParamManager::savePreset(const std::string & name)
 // Damned if I'm going to be the one to do it, though.
 bool LLWaterParamManager::savePresetToNotecard(const std::string & name)
 {
-	std::string key(" Notecard: " + name);
+	if(!hasParamSet(name)) return false;
 
 	// make an empty llsd
 	LLSD paramsData(LLSD::emptyMap());
 	
 	// fill it with LLSD windlight params
-	paramsData = mParamList[key].getAll();
+	paramsData = mParamList[name].getAll();
 	
 	// get some XML
 	std::ostringstream presetsXML;
@@ -273,7 +272,7 @@ bool LLWaterParamManager::savePresetToNotecard(const std::string & name)
 	LLInventoryItem *item = gInventory.getItem(mParamList[name].mInventoryID);
 	if(!item)
 	{
-		mParamList[key].mInventoryID = LLUUID::null;
+		mParamList[name].mInventoryID = LLUUID::null;
 		return false;
 	}
 	std::string agent_url = gAgent.getRegion()->getCapability("UpdateNotecardAgentInventory");
