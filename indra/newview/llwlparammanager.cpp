@@ -835,7 +835,7 @@ std::string LLWLParamManager::escapeString(const std::string& str)
 }
 
 
-bool LLWLParamManager::loadPresetXML(const std::string& name, std::istream& preset_stream, bool check_if_real /* = false */)
+bool LLWLParamManager::loadPresetXML(const LLWLParamKey& key, std::istream& preset_stream)
 {
 	LLSD params_data(LLSD::emptyMap());
 	
@@ -846,45 +846,40 @@ bool LLWLParamManager::loadPresetXML(const std::string& name, std::istream& pres
 		return false;
 	}
 	
-	if(check_if_real)
+	static const char* expected_windlight_settings[] = {
+		"ambient",
+		"blue_density",
+		"blue_horizon",
+		"cloud_color",
+		"cloud_pos_density1",
+		"cloud_pos_density2",
+		"cloud_scale",
+		"cloud_scroll_rate",
+		"cloud_shadow",
+		"density_multiplier",
+		"distance_multiplier",
+		"east_angle",
+		"enable_cloud_scroll",
+		"gamma",
+		"glow",
+		"haze_density",
+		"haze_horizon",
+		"lightnorm",
+		"max_y",
+		"star_brightness",
+		"sun_angle",
+		"sunlight_color"
+	};
+	static S32 expected_count = LL_ARRAY_SIZE(expected_windlight_settings);
+	for(S32 i = 0; i < expected_count; ++i)
 	{
-		static const char* expected_windlight_settings[] = {
-			"ambient",
-			"blue_density",
-			"blue_horizon",
-			"cloud_color",
-			"cloud_pos_density1",
-			"cloud_pos_density2",
-			"cloud_scale",
-			"cloud_scroll_rate",
-			"cloud_shadow",
-			"density_multiplier",
-			"distance_multiplier",
-			"east_angle",
-			"enable_cloud_scroll",
-			"gamma",
-			"glow",
-			"haze_density",
-			"haze_horizon",
-			"lightnorm",
-			"max_y",
-			"star_brightness",
-			"sun_angle",
-			"sunlight_color"
-		};
-		static S32 expected_count = LL_ARRAY_SIZE(expected_windlight_settings);
-		for(S32 i = 0; i < expected_count; ++i)
+		if(!params_data.has(expected_windlight_settings[i]))
 		{
-			if(!params_data.has(expected_windlight_settings[i]))
-			{
-				LL_WARNS("WindLight") << "Attempted to load WindLight param set without " << expected_windlight_settings[i] << LL_ENDL;
-				return false;
-			}
+			LL_WARNS("WindLight") << "Attempted to load WindLight param set without " << expected_windlight_settings[i] << LL_ENDL;
+			return false;
 		}
 	}
-	
 
-	LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL);
 	if (hasParamSet(key))
 	{
 		setParamSet(key, params_data);
@@ -918,7 +913,7 @@ bool LLWLParamManager::savePresetToNotecard(const std::string & name)
 	LLSD paramsData(LLSD::emptyMap());
 
 	// fill it with LLSD windlight params
-	LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL);
+	LLWLParamKey key((" Norecard: " + name), LLEnvKey::SCOPE_LOCAL);
 	paramsData = mParamList[key].getAll();
 
 	// get some XML
@@ -959,11 +954,10 @@ bool LLWLParamManager::savePresetToNotecard(const std::string & name)
 	}
 	else
 	{
-		LL_WARNS("WindLight") << "Stuff the legacy system." << LL_ENDL;
+		LL_WARNS("WindLight") << "Failed to save notecard." << LL_ENDL;
 		return false;
 	}
 	
-	propagateParameters();
 	return true;
 }
 
@@ -990,15 +984,11 @@ void LLWLParamManager::loadWindlightNotecard(LLVFS *vfs, const LLUUID& asset_id,
 		notecard.importStream(str);
 		std::string settings = notecard.getText();
 		LLMemoryStream settings_str((U8*)settings.c_str(), settings.length());
-		bool is_animator_running = sInstance->mAnimator.getIsRunning();
-		sInstance->mAnimator.deactivate();
-		bool is_real_setting = sInstance->loadPresetXML(name, settings_str, true);
+		
+		LLWLParamKey key((" Norecard: " + name), LLEnvKey::SCOPE_LOCAL); 
+		bool is_real_setting = sInstance->loadPresetXML(key, settings_str);
 		if(!is_real_setting)
 		{
-			if (is_animator_running)
-			{
-				sInstance->mAnimator.activate(LLWLAnimator::TIME_LINDEN);
-			}
 			LLSD subs;
 			subs["NAME"] = name;
 			LLNotifications::getInstance()->add("KittyInvalidWindlightNotecard", subs);
@@ -1006,8 +996,8 @@ void LLWLParamManager::loadWindlightNotecard(LLVFS *vfs, const LLUUID& asset_id,
 		else
 		{
 			// We can do this because we know mCurParams
-		LLWLParamKey key(name, LLEnvKey::SCOPE_LOCAL); 
 			sInstance->mParamList[key].mInventoryID = inventory_id;
+			LLEnvManagerNew::instance().setUseSkyPreset(key.name);
 		}
 	}
 }
