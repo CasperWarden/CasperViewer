@@ -462,8 +462,8 @@ des Abspielen-Pfeils den Film oder die Webseite an.)
 				Medien-
 Optionen:
 			</text>
-			<check_box label="Automatisch skalieren" name="media_auto_scale" tool_tip="Aktivieren Sie diese Option, um den Inhalt für diese Parzelle automatisch zu skalieren. Dies ist eventuell langsamer und die Qualität ist schlechter, aber Sie müssen keine weitere Texturskalierung oder -anpassung vornehmen."/>
-			<check_box label="Als Schleife wiedergeben" name="media_loop" tool_tip="Spielt das Medium in einer Schleife ab.  Der Abspielvorgang wird immer wieder von vorne fortgesetzt."/>
+      <check_box label="Als Schleife wiedergeben" name="media_loop" tool_tip="Spielt das Medium in einer Schleife ab.  Der Abspielvorgang wird immer wieder von vorne fortgesetzt." bottom_delta="-7"/>
+      <check_box label="Automatisch skalieren" name="media_auto_scale" tool_tip="Aktivieren Sie diese Option, um den Inhalt für diese Parzelle automatisch zu skalieren. Dies ist eventuell langsamer und die Qualität ist schlechter, aber Sie müssen keine weitere Texturskalierung oder -anpassung vornehmen." left_delta="155" />
 			<text name="media_size" tool_tip="Darstellungsgröße von Webmedien, für Standard bei 0 belassen.">
 				Größe:
 			</text>

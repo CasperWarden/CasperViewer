@@ -1002,7 +1002,8 @@ Only large parcels can be listed in search.
 				 right="-90"
 				 select_all_on_focus_received="true"
 				 select_on_focus="true"
-				 tool_tip="Text displayed next to play/load button" />
+				 tool_tip="Text displayed next to play/load button"
+				 text_readonly_color="0.25 0.25 0.25 1" />
 			<text
 				 bottom_delta="-28"
 				 follows="left|top"
