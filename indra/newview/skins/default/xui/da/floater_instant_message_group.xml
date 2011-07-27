@@ -43,6 +43,9 @@ Hvis ikke du kan finde svaret der, så indtast venligst dit spørgsmål og vent 
 			<button label="Afslut" name="end_call_btn"  width="126" halign="center"/>
 			<button label="&lt; &lt;" label_selected="&gt; &gt;" name="toggle_active_speakers_btn"
 			     tool_tip="Tryk her for at se/skjule liste med aktive deltagere i denne samtale." />
+			<check_box 
+                             label="Specify Viewer Type" left="275"
+                             name="prefixViewerToggle" width="80" />
 			<button label="Send" name="send_btn" />
 		</layout_panel>
 	</layout_stack>
