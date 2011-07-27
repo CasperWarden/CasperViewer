@@ -162,6 +162,7 @@ class LLMediaCtrl :
 		bool mStretchToFill;
 		bool mMaintainAspectRatio;
 		bool mHideLoading;
+		bool mHidingInitialLoad;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

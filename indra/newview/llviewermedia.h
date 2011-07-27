@@ -39,6 +39,7 @@
 #include "llpluginclassmediaowner.h"
 
 #include "llviewermediaobserver.h"
+#include "v4color.h"
 
 class LLViewerMediaImpl;
 class LLUUID;
@@ -220,6 +221,8 @@ public:
 
 	/*virtual*/ void	paste();
 	/*virtual*/ BOOL	canPaste() const;
+	 
+	void setBackgroundColor(LLColor4 color);
 	
 	typedef enum 
 	{
@@ -260,6 +263,8 @@ public:
 	bool mMediaAutoScale;
 	bool mMediaLoop;
 	bool mNeedsNewTexture;
+	S32 mTextureUsedWidth;
+	S32 mTextureUsedHeight;
 	bool mSuspendUpdates;
 	bool mVisible;
 	
@@ -269,6 +274,7 @@ public:
 	F64 mPreviousMediaTime;
 	bool mMediaSourceFailed;
 	bool mClearCache;
+	LLColor4 mBackgroundColor;
 	bool mTrustedBrowser;
 
 

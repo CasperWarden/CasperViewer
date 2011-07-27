@@ -621,8 +621,11 @@ LLViewerMediaImpl::LLViewerMediaImpl(const std::string& media_url,
 	mMediaURL(media_url),
 	mMimeType(mime_type),
 	mNeedsNewTexture(true),
+	mTextureUsedWidth(0),
+	mTextureUsedHeight(0),
 	mSuspendUpdates(false),
-	mVisible(true)
+	mVisible(true),
+	mBackgroundColor(LLColor4::black) // Do not set to white or may get "white flash" bug.
 { 
 	createMediaSource();
 }
@@ -794,6 +797,7 @@ bool LLViewerMediaImpl::initializePlugin(const std::string& media_type)
 		media_source->setLoop(mMediaLoop);
 		media_source->setAutoScale(mMediaAutoScale);
 		media_source->setBrowserUserAgent(LLViewerMedia::getCurrentUserAgent());
+		media_source->setBackgroundColor(mBackgroundColor);
 
 		if(gSavedSettings.getBOOL("BrowserIgnoreSSLCertErrors"))
 		{
@@ -1294,8 +1298,11 @@ LLViewerImage* LLViewerMediaImpl::updatePlaceholderImage()
 	if (mNeedsNewTexture 
 		|| placeholder_image->getUseMipMaps()
 		|| ! placeholder_image->mIsMediaTexture
-		|| placeholder_image->getWidth() != mMediaSource->getTextureWidth()
-		|| placeholder_image->getHeight() != mMediaSource->getTextureHeight())
+		|| (placeholder_image->getWidth() != mMediaSource->getTextureWidth())
+		|| (placeholder_image->getHeight() != mMediaSource->getTextureHeight())
+		|| (mTextureUsedWidth != mMediaSource->getWidth())
+		|| (mTextureUsedHeight != mMediaSource->getHeight())
+		)
 	{
 		llinfos << "initializing media placeholder" << llendl;
 		llinfos << "movie image id " << mTextureId << llendl;
@@ -1312,7 +1319,10 @@ LLViewerImage* LLViewerMediaImpl::updatePlaceholderImage()
 		// MEDIAOPT: seems insane that we actually have to make an imageraw then
 		// immediately discard it
 		LLPointer<LLImageRaw> raw = new LLImageRaw(texture_width, texture_height, texture_depth);
-		raw->clear(0x0f, 0x0f, 0x0f, 0xff);
+		// Clear the texture to the background color, ignoring alpha.
+		// convert background color channels from [0.0, 1.0] to [0, 255];
+		raw->clear(int(mBackgroundColor.mV[VX] * 255.0f), int(mBackgroundColor.mV[VY] * 255.0f), int(mBackgroundColor.mV[VZ] * 255.0f), 0xff);
+
 		int discard_level = 0;
 
 		// ask media source for correct GL image format constants
@@ -1329,6 +1339,11 @@ LLViewerImage* LLViewerMediaImpl::updatePlaceholderImage()
 		// MEDIAOPT: set this dynamically on play/stop
 		placeholder_image->mIsMediaTexture = true;
 		mNeedsNewTexture = false;
+
+		// If the amount of the texture being drawn by the media goes down in either width or height, 
+		// recreate the texture to avoid leaving parts of the old image behind.
+		mTextureUsedWidth = mMediaSource->getWidth();
+		mTextureUsedHeight = mMediaSource->getHeight();
 	}
 	
 	return placeholder_image;
@@ -1737,6 +1752,16 @@ LLViewerMediaImpl::canPaste() const
 	else
 		return FALSE;
 }
+
+void LLViewerMediaImpl::setBackgroundColor(LLColor4 color)
+{
+	mBackgroundColor = color; 
+
+	if(mMediaSource)
+	{
+		mMediaSource->setBackgroundColor(mBackgroundColor);
+	}
+};
 
 void LLViewerMediaImpl::setNavState(EMediaNavState state)
 {
