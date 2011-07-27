@@ -240,12 +240,9 @@ public:
 	LLWLParamManager();
 	~LLWLParamManager();
 
-	/// save the preset file
-	void savePresets(const std::string & fileName);
-
 	/// load an individual preset into the sky from an LLSD stream
 	/// Returns whether the stream was actually reasonable XML to load from.
-	bool loadPresetXML(const std::string& name, std::istream& preset_stream, bool check_if_real=false);
+	bool loadPresetXML(const LLWLParamKey& key, std::istream& preset_stream);
 	
 	/// Load an individual preset from a notecard.
 	void loadPresetNotecard(const std::string& name, const LLUUID& asset_id, const LLUUID& inv_id);

@@ -159,7 +159,7 @@ bool LLWaterParamManager::loadPreset(const std::string& path)
 	return true;
 }
 
-bool LLWaterParamManager::loadPresetXML(const std::string& name, std::istream& preset_stream, bool propagate /* = false */, bool check_if_real /* = false */)
+bool LLWaterParamManager::loadPresetXML(const std::string& name, std::istream& preset_stream)
 {
 	LLSD paramsData(LLSD::emptyMap());
 	
@@ -169,30 +169,27 @@ bool LLWaterParamManager::loadPresetXML(const std::string& name, std::istream& p
 	{
 		return false;
 	}
-	
-	if(check_if_real)
+
+	static const char* expected_windlight_settings[] = {
+		"blurMultiplier",
+		"fresnelOffset",
+		"fresnelScale",
+		"normScale",
+		"normalMap",
+		"scaleAbove",
+		"scaleBelow",
+		"waterFogColor",
+		"waterFogDensity",
+		"wave1Dir",
+		"wave2Dir"
+	};
+	static S32 expected_count = LL_ARRAY_SIZE(expected_windlight_settings);
+	for(S32 i = 0; i < expected_count; ++i)
 	{
-		static const char* expected_windlight_settings[] = {
-			"blurMultiplier",
-			"fresnelOffset",
-			"fresnelScale",
-			"normScale",
-			"normalMap",
-			"scaleAbove",
-			"scaleBelow",
-			"waterFogColor",
-			"waterFogDensity",
-			"wave1Dir",
-			"wave2Dir"
-		};
-		static S32 expected_count = LL_ARRAY_SIZE(expected_windlight_settings);
-		for(S32 i = 0; i < expected_count; ++i)
+		if(!paramsData.has(expected_windlight_settings[i]))
 		{
-			if(!paramsData.has(expected_windlight_settings[i]))
-			{
-				LL_WARNS("WindLight") << "Attempted to load WindLight water param set without " << expected_windlight_settings[i] << LL_ENDL;
-				return false;
-			}
+			LL_WARNS("WindLight") << "Attempted to load WindLight water param set without " << expected_windlight_settings[i] << LL_ENDL;
+			return false;
 		}
 	}
 	
@@ -205,12 +202,7 @@ bool LLWaterParamManager::loadPresetXML(const std::string& name, std::istream& p
 	{
 		setParamSet(name, paramsData);
 	}
-	
-	if(propagate)
-	{
-		getParamSet(name, mCurParams);
-		propagateParameters();
-	}
+
 	return true;
 }
 
@@ -261,11 +253,13 @@ void LLWaterParamManager::savePreset(const std::string & name)
 // Damned if I'm going to be the one to do it, though.
 bool LLWaterParamManager::savePresetToNotecard(const std::string & name)
 {
+	std::string key(" Notecard: " + name);
+
 	// make an empty llsd
 	LLSD paramsData(LLSD::emptyMap());
 	
 	// fill it with LLSD windlight params
-	paramsData = mParamList[name].getAll();
+	paramsData = mParamList[key].getAll();
 	
 	// get some XML
 	std::ostringstream presetsXML;
@@ -279,7 +273,7 @@ bool LLWaterParamManager::savePresetToNotecard(const std::string & name)
 	LLInventoryItem *item = gInventory.getItem(mParamList[name].mInventoryID);
 	if(!item)
 	{
-		mParamList[name].mInventoryID = LLUUID::null;
+		mParamList[key].mInventoryID = LLUUID::null;
 		return false;
 	}
 	std::string agent_url = gAgent.getRegion()->getCapability("UpdateNotecardAgentInventory");
@@ -308,8 +302,7 @@ bool LLWaterParamManager::savePresetToNotecard(const std::string & name)
 		LL_WARNS("WindLight") << "Stuff the legacy system." << LL_ENDL;
 		return false;
 	}
-	
-	propagateParameters();
+
 	return true;
 }
 
@@ -640,6 +633,8 @@ void LLWaterParamManager::loadWaterNotecard(LLVFS *vfs, const LLUUID& asset_id, 
 	}
 	if(LL_ERR_NOERR == status)
 	{
+		std::string key(" Notecard: " + name);
+
 		LLVFile file(vfs, asset_id, asset_type, LLVFile::READ);
 		S32 file_length = file.getSize();
 		std::vector<char> buffer(file_length + 1);
@@ -650,7 +645,8 @@ void LLWaterParamManager::loadWaterNotecard(LLVFS *vfs, const LLUUID& asset_id, 
 		notecard.importStream(str);
 		std::string settings = notecard.getText();
 		LLMemoryStream settings_str((U8*)settings.c_str(), settings.length());
-		bool is_real_setting = sInstance->loadPresetXML(name, settings_str, true, true);
+
+		bool is_real_setting = sInstance->loadPresetXML(key, settings_str);
 		if(!is_real_setting)
 		{
 			LLSD subs;
@@ -660,7 +656,8 @@ void LLWaterParamManager::loadWaterNotecard(LLVFS *vfs, const LLUUID& asset_id, 
 		else
 		{
 			// We can do this because we know mCurParams 
-			sInstance->mParamList[name].mInventoryID = inventory_id;
+			sInstance->mParamList[key].mInventoryID = inventory_id;
+			LLEnvManagerNew::instance().setUseWaterPreset(key);
 		}
 	}
 }
