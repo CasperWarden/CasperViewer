@@ -70,7 +70,7 @@ public:
 
 	/*virtual*/ void			draw();
 
-	const std::string&				getName() const;
+	std::string				getName() const;
 	const LLColor4&				getMarkerColor() const;
 
 	LLVector3d getPositionGlobal() const;

@@ -625,6 +625,7 @@ LLViewerMediaImpl::LLViewerMediaImpl(const std::string& media_url,
 	mTextureUsedHeight(0),
 	mSuspendUpdates(false),
 	mVisible(true),
+	mHasFocus(false),
 	mBackgroundColor(LLColor4::black) // Do not set to white or may get "white flash" bug.
 { 
 	createMediaSource();
@@ -797,6 +798,7 @@ bool LLViewerMediaImpl::initializePlugin(const std::string& media_type)
 		media_source->setLoop(mMediaLoop);
 		media_source->setAutoScale(mMediaAutoScale);
 		media_source->setBrowserUserAgent(LLViewerMedia::getCurrentUserAgent());
+		media_source->focus(mHasFocus);
 		media_source->setBackgroundColor(mBackgroundColor);
 
 		if(gSavedSettings.getBOOL("BrowserIgnoreSSLCertErrors"))
@@ -918,6 +920,9 @@ void LLViewerMediaImpl::setVolume(F32 volume)
 //////////////////////////////////////////////////////////////////////////////////////////
 void LLViewerMediaImpl::focus(bool focus)
 {
+
+	mHasFocus = focus;
+
 	if (mMediaSource)
 	{
 		// call focus just for the hell of it, even though this apopears to be a nop
@@ -930,6 +935,13 @@ void LLViewerMediaImpl::focus(bool focus)
 //			mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_UP, 1, 1, 0);
 		}
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+bool LLViewerMediaImpl::hasFocus() const
+{
+	// FIXME: This might be able to be a bit smarter by hooking into LLViewerMediaFocus, etc.
+	return mHasFocus;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -946,50 +958,120 @@ void LLViewerMediaImpl::clearCache()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
-void LLViewerMediaImpl::mouseDown(S32 x, S32 y)
+void LLViewerMediaImpl::mouseDown(S32 x, S32 y, MASK mask, S32 button)
 {
 	scaleMouse(&x, &y);
 	mLastMouseX = x;
 	mLastMouseY = y;
 	if (mMediaSource)
 	{
-		mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_DOWN, LEFT_BUTTON, x, y, 0);
+		mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_DOWN, button, x, y, mask);
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
-void LLViewerMediaImpl::mouseUp(S32 x, S32 y)
+void LLViewerMediaImpl::mouseUp(S32 x, S32 y, MASK mask, S32 button)
 {
 	scaleMouse(&x, &y);
 	mLastMouseX = x;
 	mLastMouseY = y;
 	if (mMediaSource)
 	{
-		mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_UP, LEFT_BUTTON, x, y, 0);
+		mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_UP, button, x, y, mask);
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
-void LLViewerMediaImpl::mouseMove(S32 x, S32 y)
+void LLViewerMediaImpl::mouseMove(S32 x, S32 y, MASK mask)
 {
 	scaleMouse(&x, &y);
 	mLastMouseX = x;
 	mLastMouseY = y;
 	if (mMediaSource)
 	{
-		mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_MOVE, LEFT_BUTTON, x, y, 0);
+		mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_MOVE, 0, x, y, mask);
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
-void LLViewerMediaImpl::mouseLeftDoubleClick(S32 x, S32 y)
+//static 
+void LLViewerMediaImpl::scaleTextureCoords(const LLVector2& texture_coords, S32 *x, S32 *y)
+{
+	F32 texture_x = texture_coords.mV[VX];
+	F32 texture_y = texture_coords.mV[VY];
+	
+	// Deal with repeating textures by wrapping the coordinates into the range [0, 1.0)
+	texture_x = fmodf(texture_x, 1.0f);
+	if(texture_x < 0.0f)
+		texture_x = 1.0 + texture_x;
+		
+	texture_y = fmodf(texture_y, 1.0f);
+	if(texture_y < 0.0f)
+		texture_y = 1.0 + texture_y;
+
+	// scale x and y to texel units.
+	*x = llround(texture_x * mMediaSource->getTextureWidth());
+	*y = llround((1.0f - texture_y) * mMediaSource->getTextureHeight());
+
+	// Adjust for the difference between the actual texture height and the amount of the texture in use.
+	*y -= (mMediaSource->getTextureHeight() - mMediaSource->getHeight());
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+void LLViewerMediaImpl::mouseDown(const LLVector2& texture_coords, MASK mask, S32 button)
+{
+	if(mMediaSource)
+	{
+		S32 x, y;
+		scaleTextureCoords(texture_coords, &x, &y);
+
+		mouseDown(x, y, mask, button);
+	}
+}
+
+void LLViewerMediaImpl::mouseUp(const LLVector2& texture_coords, MASK mask, S32 button)
+{
+	if(mMediaSource)
+	{		
+		S32 x, y;
+		scaleTextureCoords(texture_coords, &x, &y);
+
+		mouseUp(x, y, mask, button);
+	}
+}
+
+void LLViewerMediaImpl::mouseMove(const LLVector2& texture_coords, MASK mask)
+{
+	if(mMediaSource)
+	{		
+		S32 x, y;
+		scaleTextureCoords(texture_coords, &x, &y);
+
+		mouseMove(x, y, mask);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+void LLViewerMediaImpl::mouseDoubleClick(S32 x, S32 y, MASK mask, S32 button)
 {
 	scaleMouse(&x, &y);
 	mLastMouseX = x;
 	mLastMouseY = y;
 	if (mMediaSource)
 	{
-		mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_DOUBLE_CLICK, LEFT_BUTTON, x, y, 0);
+		mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_DOUBLE_CLICK, button, x, y, mask);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+void LLViewerMediaImpl::scrollWheel(S32 x, S32 y, MASK mask)
+{
+	scaleMouse(&x, &y);
+	mLastMouseX = x;
+	mLastMouseY = y;
+	if (mMediaSource)
+	{
+		mMediaSource->scrollEvent(x, y, mask);
 	}
 }
 
@@ -998,7 +1080,7 @@ void LLViewerMediaImpl::onMouseCaptureLost()
 {
 	if (mMediaSource)
 	{
-		mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_UP, LEFT_BUTTON, mLastMouseX, mLastMouseY, 0);
+		mMediaSource->mouseEvent(LLPluginClassMedia::MOUSE_EVENT_UP, 0, mLastMouseX, mLastMouseY, 0);
 	}
 }
 
@@ -1016,6 +1098,18 @@ BOOL LLViewerMediaImpl::handleMouseUp(S32 x, S32 y, MASK mask)
 
 	return TRUE; 
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+std::string LLViewerMediaImpl::getName() const 
+{ 
+	if (mMediaSource)
+	{
+		return mMediaSource->getMediaName();
+	}
+	
+	return LLStringUtil::null; 
+};
+
 //////////////////////////////////////////////////////////////////////////////////////////
 void LLViewerMediaImpl::navigateHome()
 {

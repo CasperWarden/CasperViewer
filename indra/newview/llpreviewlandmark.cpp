@@ -147,7 +147,7 @@ void LLPreviewLandmark::getDegreesAndDist( F32* degrees, F64* horiz_dist, F64* v
 	}
 }
 
-const std::string& LLPreviewLandmark::getName() const
+std::string LLPreviewLandmark::getName() const
 {
 	const LLInventoryItem *item = getItem();
 	if (item)

@@ -141,10 +141,16 @@ public:
 	void seek(F32 time);
 	void setVolume(F32 volume);
 	void focus(bool focus);
-	void mouseDown(S32 x, S32 y);
-	void mouseUp(S32 x, S32 y);
-	void mouseMove(S32 x, S32 y);
-	void mouseLeftDoubleClick(S32 x,S32 y );
+	// True if the impl has user focus.
+	bool hasFocus() const;
+	void mouseDown(S32 x, S32 y, MASK mask, S32 button = 0);
+	void mouseUp(S32 x, S32 y, MASK mask, S32 button = 0);
+	void mouseMove(S32 x, S32 y, MASK mask);
+	void mouseDown(const LLVector2& texture_coords, MASK mask, S32 button = 0);
+	void mouseUp(const LLVector2& texture_coords, MASK mask, S32 button = 0);
+	void mouseMove(const LLVector2& texture_coords, MASK mask);
+	void mouseDoubleClick(S32 x,S32 y, MASK mask, S32 button = 0);
+	void scrollWheel(S32 x, S32 y, MASK mask);
 	void mouseCapture();
 
 	void navigateHome();
@@ -160,6 +166,7 @@ public:
 	void getTextureSize(S32 *texture_width, S32 *texture_height);
 	void clearCache();
 	void scaleMouse(S32 *mouse_x, S32 *mouse_y);
+	void scaleTextureCoords(const LLVector2& texture_coords, S32 *x, S32 *y);
 
 	void update();
 	void updateMovieImage(const LLUUID& image_id, BOOL active);
@@ -202,7 +209,8 @@ public:
 	/*virtual*/ BOOL	handleToolTip(S32 x, S32 y, std::string& msg, LLRect* sticky_rect_screen) { return FALSE; };
 	/*virtual*/ BOOL	handleMiddleMouseDown(S32 x, S32 y, MASK mask) { return FALSE; };
 	/*virtual*/ BOOL	handleMiddleMouseUp(S32 x, S32 y, MASK mask) {return FALSE; };
-	/*virtual*/ const std::string& getName() const { return LLStringUtil::null; };
+	/*virtual*/ std::string getName() const;
+
 	/*virtual*/ BOOL isView() const { return FALSE; };
 	/*virtual*/ void	screenPointToLocal(S32 screen_x, S32 screen_y, S32* local_x, S32* local_y) const {};
 	/*virtual*/ void	localPointToScreen(S32 local_x, S32 local_y, S32* screen_x, S32* screen_y) const {};
@@ -270,6 +278,7 @@ public:
 	
 	ECursorType mLastSetCursor;
 	EMediaNavState mMediaNavState;
+	bool mHasFocus;
 	int mPreviousMediaState;
 	F64 mPreviousMediaTime;
 	bool mMediaSourceFailed;

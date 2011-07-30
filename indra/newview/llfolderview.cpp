@@ -710,7 +710,7 @@ const std::string& LLFolderViewItem::getSearchableLabel() const
 	}
 }
 
-const std::string& LLFolderViewItem::getName( void ) const
+std::string LLFolderViewItem::getName( void ) const
 {
 	if(mListener)
 	{
