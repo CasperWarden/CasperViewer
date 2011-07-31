@@ -87,6 +87,7 @@ void wlfPanel_AdvSettings::refresh()
 // [RLVa:KB] - Checked: 2009-09-19
 	if ( (rlv_handler_t::isEnabled()) && (gSavedSettings.getBOOL("wlfAdvSettingsPopup")) )
 	{
+		childSetEnabled("use_estate_wl", !gRlvHandler.hasBehaviour(RLV_BHVR_SETENV));
 		childSetEnabled("EnvAdvancedWaterButton", !gRlvHandler.hasBehaviour(RLV_BHVR_SETENV));
 		childSetEnabled("WWPresetsCombo", !gRlvHandler.hasBehaviour(RLV_BHVR_SETENV));
 		childSetEnabled("WWprev", !gRlvHandler.hasBehaviour(RLV_BHVR_SETENV));
@@ -110,10 +111,20 @@ void wlfPanel_AdvSettings::refreshLists()
 	// populateSkyPresetsList();
 	// populateDayCyclePresetsList();
 
-	// Select the current presets in combo boxes.
-	mWaterPresetCombo->selectByValue(env_mgr.getWaterPresetName());
-	mSkyPresetCombo->selectByValue(env_mgr.getSkyPresetName());
-	//mDayCyclePresetCombo->selectByValue(env_mgr.getDayCycleName());
+	//populate the combos with "Default" if using region settings
+	if (gSavedSettings.getBOOL("UseEnvironmentFromRegion"))
+	{
+		mWaterPresetCombo->selectByValue("Default");
+		mSkyPresetCombo->selectByValue("Default");
+		//mDayCyclePresetCombo->selectByValue("Default");
+	}
+	else
+	{
+		// Select the current presets in combo boxes.
+		mWaterPresetCombo->selectByValue(env_mgr.getWaterPresetName());
+		mSkyPresetCombo->selectByValue(env_mgr.getSkyPresetName());
+		//mDayCyclePresetCombo->selectByValue(env_mgr.getDayCycleName());
+	}
 	
 	updateTimeSlider();
 }
@@ -343,7 +354,16 @@ void wlfPanel_AdvSettings::populateWaterPresetsList()
 		mWaterPresetCombo->add(*it);
 	}
 
-	mWaterPresetCombo->selectByValue(LLEnvManagerNew::instance().getWaterPresetName());
+	//populate the combos with "Default" if using region settings
+	if (gSavedSettings.getBOOL("UseEnvironmentFromRegion"))
+	{
+		mWaterPresetCombo->selectByValue("Default");
+	}
+	else
+	{
+		// Select the current presets in combo boxes.
+		mWaterPresetCombo->selectByValue(LLEnvManagerNew::instance().getWaterPresetName());
+	}
 }
 
 void wlfPanel_AdvSettings::populateSkyPresetsList()
@@ -358,7 +378,16 @@ void wlfPanel_AdvSettings::populateSkyPresetsList()
 		mSkyPresetCombo->add(*it);
 	}
 
-	mSkyPresetCombo->selectByValue(LLEnvManagerNew::instance().getSkyPresetName());
+	//populate the combos with "Default" if using region settings
+	if (gSavedSettings.getBOOL("UseEnvironmentFromRegion"))
+	{
+		mSkyPresetCombo->selectByValue("Default");
+	}
+	else
+	{
+		// Select the current presets in combo boxes.
+		mSkyPresetCombo->selectByValue(LLEnvManagerNew::instance().getSkyPresetName());
+	}
 }
 
 // void wlfPanel_AdvSettings::populateDayCyclePresetsList()
@@ -385,7 +414,16 @@ void wlfPanel_AdvSettings::populateSkyPresetsList()
 		// mDayCyclePresetCombo->add(*it);
 	// }
 
-	// mDayCyclePresetCombo->selectByValue(LLEnvManagerNew::instance().getDayCycleName());
+	//populate the combos with "Default" if using region settings
+	// if (gSavedSettings.getBOOL("UseEnvironmentFromRegion"))
+	// {
+		// mDayCyclePresetCombo->selectByValue("Default");
+	// }
+	// else
+	// {
+		// Select the current presets in combo boxes.
+		// mDayCyclePresetCombo->selectByValue(LLEnvManagerNew::instance().getDayCycleName());
+	// }
 // }
 
 void wlfPanel_AdvSettings::updateTimeSlider()

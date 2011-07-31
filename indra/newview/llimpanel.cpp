@@ -1298,6 +1298,7 @@ void LLFloaterIMPanel::init(const std::string& session_label)
 			//we don't need to need to wait for any responses
 			//so we're already initialized
 			mSessionInitialized = TRUE;
+			checkPFVS();
 			mSessionStartMsgPos = 0;
 		}
 		else
@@ -1425,15 +1426,6 @@ BOOL LLFloaterIMPanel::postBuild()
 		if ( IM_SESSION_GROUP_START == mDialog )
 		{
 			childSetEnabled("profile_btn", FALSE);
-			// AO: Hack for prefixing viewer type to Phoenix support chat
-			if (mSessionUUID == LLUUID("3a1be8d4-01f3-bc1a-2703-442f0cc8f2dd")) // hardset to phoenix/firestorm viewer support
-			{
-				LLCheckBoxCtrl* prefixViewer = getChild<LLCheckBoxCtrl>("prefixViewerToggle");
-				childSetCommitCallback("prefixViewerToggle", onClickToggleViewerPrefix, this);
-				childSetVisible("prefixViewerToggle",TRUE);
-				childSetVisible("prefixViewerExtraText",TRUE);
-				prefixViewer->setValue(gSavedSettings.getBOOL("PhoenixSupportGroupchatPrefix"));
-			}
 		}
 		if(IM_SESSION_IRC_START == mDialog || IM_PRIVATE_IRC == mDialog)
 		{
@@ -1467,6 +1459,7 @@ BOOL LLFloaterIMPanel::postBuild()
 		sTitleString = getString("title_string");
 		sTypingStartString = getString("typing_start_string");
 		sSessionStartString = getString("session_start_string");
+		checkPFVS();
 
 		if (mSpeakerPanel)
 		{
@@ -1510,6 +1503,28 @@ void* LLFloaterIMPanel::createSpeakersPanel(void* data)
 	LLFloaterIMPanel* floaterp = (LLFloaterIMPanel*)data;
 	floaterp->mSpeakerPanel = new LLPanelActiveSpeakers(floaterp->mSpeakers, TRUE);
 	return floaterp->mSpeakerPanel;
+}
+
+void LLFloaterIMPanel::checkPFVS()
+// AO: PVFS custom viewer prefix support
+{
+	mPFVS = FALSE;
+	if ((mSessionUUID == LLUUID("3a1be8d4-01f3-bc1a-2703-442f0cc8f2dd")) ||  // PVFS Main
+	    (mSessionUUID == LLUUID("57dff5fb-83cd-6a87-cf76-262e7a043b7d")) ||  // PVFS Dutch
+	    (mSessionUUID == LLUUID("e2ba45d0-63e6-f1d4-565a-e0d9aab18cab")) ||  // PVFS French
+	    (mSessionUUID == LLUUID("32bda2a4-099e-7331-3bf8-ce4687ff2559")) ||  // PVFS German
+	    (mSessionUUID == LLUUID("5696328d-f7e4-1066-afc1-8dc85a5598a0")) ||  // PVFS Hungarian
+	    (mSessionUUID == LLUUID("d3b4c8a3-cfd7-3218-65fb-d7e499d1efab")) ||  // PVFS Italian
+	    (mSessionUUID == LLUUID("e689fa7b-33a5-d2a4-860f-77729a04b143")) ||  // PVFS Portugese
+	    (mSessionUUID == LLUUID("bb1d5028-6b2a-56a3-da2c-313d5ddeb41b")) )   // PVFS Spanish
+	{
+		mPFVS = TRUE;
+		LLCheckBoxCtrl* prefixViewer = getChild<LLCheckBoxCtrl>("prefixViewerToggle");
+		childSetCommitCallback("prefixViewerToggle", onClickToggleViewerPrefix, this);
+		childSetVisible("prefixViewerToggle",TRUE);
+		childSetVisible("prefixViewerExtraText",TRUE);
+		prefixViewer->setValue(gSavedSettings.getBOOL("PhoenixSupportGroupchatPrefix"));
+	}
 }
 
 //static
@@ -3075,7 +3090,7 @@ void LLFloaterIMPanel::sendMsg()
 			}
 			
 			// AO: PVFS Viewer Prefix Hack
-			if ((mSessionUUID == LLUUID("3a1be8d4-01f3-bc1a-2703-442f0cc8f2dd")) && gSavedSettings.getBOOL("PhoenixSupportGroupchatPrefix"))
+			if (mPFVS && gSavedSettings.getBOOL("PhoenixSupportGroupchatPrefix"))
 			{
 				utf8_text.insert(0,"(PH) ");
 			}
@@ -3400,6 +3415,7 @@ void LLFloaterIMPanel::setIRCSpeakers(const LLSD& speaker_list)
 void LLFloaterIMPanel::sessionInitReplyReceived(const LLUUID& session_id)
 {
 	mSessionUUID = session_id;
+	checkPFVS();
 	mVoiceChannel->updateSessionID(session_id);
 	mSessionInitialized = TRUE;
 

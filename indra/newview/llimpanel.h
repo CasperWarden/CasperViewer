@@ -221,6 +221,9 @@ public:
 	static void onAvatarNameLookup(const LLUUID& id, const LLAvatarName& avatar_name, void* user_data);	
     // [/Ansariel/Henri: Display name support]
 
+	//AO: PFVS Group support
+	void checkPFVS();
+
 	/*virtual*/ BOOL postBuild();
 
 	// Check typing timeout timer.
@@ -379,6 +382,7 @@ private:
 	LLVoiceChannel*	mVoiceChannel;
 
 	BOOL mSessionInitialized;
+	BOOL mPFVS; // AO: PVFS groupchat prefix support
 	LLSD mQueuedMsgsForInit;
 
 	// The value mOtherParticipantUUID depends on how the IM session was started:

@@ -422,7 +422,7 @@
 		   <check_box bottom_delta="-17" left_delta="0" label="Crossfade region environment changes for Parcel WL" control_name="PhoenixInterpolateParcelWL" enabled="true" follows="left|top" font="SansSerifSmall" height="16" initial_value="true" mouse_opaque="true" name="PhoenixInterpolateParcelWL" radio_style="false" width="256" tool_tip="Same as above options for Interpolation but for the ParcelWL." />
 
 		<text_editor bottom="20" left="10" bg_visible="false" border_drop_shadow_visible="false" border_visible="false" drop_shadow_visible="true" enabled="false" follows="left|bottom" font="SansSerifSmall" height="56" mouse_opaque="true" name="TextText" width="430" word_wrap="true" hide_scrollbar="true" >
-		* Turning these options off will/should keep manually set environment settings default between logins and from changing anatomically when moving to different regions/parcels.
+		* Turning these options off will/should keep manually set environment settings default between logins and from changing automatically  when moving to different regions/parcels.
 		</text_editor>
 	  </panel>
 	  
