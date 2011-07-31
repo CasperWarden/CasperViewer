@@ -45,11 +45,14 @@ public:
 	// Loads unescaped url in either internal web browser or external
 	// browser, depending on user settings.
 	static void loadURL(const std::string& url);
+	static void loadURL(const std::string& url, const std::string& target);
 	
 	static void loadURL(const char* url) { loadURL( ll_safe_string(url) ); }
 
-	// Loads unescaped url in external browser.
+	/// Load the given url in the operating system's web browser, async if we want to return immediately
+	/// before browser has spawned.
 	static void loadURLExternal(const std::string& url);
+	static void loadURLExternal(const std::string& url, bool async);
 
 	// Returns escaped (eg, " " to "%20") url
 	static std::string escapeURL(const std::string& url);

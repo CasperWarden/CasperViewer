@@ -74,6 +74,7 @@ public:
 	/*virtual*/ void handleMediaEvent(LLPluginClassMedia* self, EMediaEvent event);
 
 	void openMedia(const std::string& media_url);
+	void openMedia(const std::string& media_url, const std::string& target);
 	void buildURLHistory();
 	std::string getSupportURL();
 	void setCurrentURL(const std::string& url);

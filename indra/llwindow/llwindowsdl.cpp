@@ -2293,7 +2293,7 @@ void exec_cmd(const std::string& cmd, const std::string& arg)
 
 // Open a URL with the user's default web browser.
 // Must begin with protocol identifier.
-void LLWindowSDL::spawnWebBrowser(const std::string& escaped_url)
+void LLWindowSDL::spawnWebBrowser(const std::string& escaped_url, bool async)
 {
 	llinfos << "spawn_web_browser: " << escaped_url << llendl;
 	
@@ -2321,7 +2321,7 @@ void LLWindowSDL::spawnWebBrowser(const std::string& escaped_url)
 
 void LLWindowSDL::openFile(const std::string& file_name)
 {
-	spawnWebBrowser(file_name);
+	spawnWebBrowser(file_name, true);
 }
 
 void *LLWindowSDL::getPlatformWindow()

@@ -53,6 +53,7 @@
 #include "llappviewer.h"
 #include "llfilepicker.h"
 #include "llfloatermediabrowser.h"	// for handling window close requests and geometry change requests in media browser windows.
+#include "llweb.h"
 
 
 // Merov: Temporary definitions while porting the new viewer media code to Snowglobe
@@ -699,7 +700,7 @@ void LLViewerMediaImpl::setMediaType(const std::string& media_type)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /*static*/
-LLPluginClassMedia* LLViewerMediaImpl::newSourceFromMediaType(std::string media_type, LLPluginClassMediaOwner *owner /* may be NULL */, S32 default_width, S32 default_height)
+LLPluginClassMedia* LLViewerMediaImpl::newSourceFromMediaType(std::string media_type, LLPluginClassMediaOwner *owner /* may be NULL */, S32 default_width, S32 default_height, const std::string target)
 {
 	std::string plugin_basename = LLMIMETypes::implType(media_type);
 
@@ -756,9 +757,8 @@ LLPluginClassMedia* LLViewerMediaImpl::newSourceFromMediaType(std::string media_
 			bool javascript_enabled = gSavedSettings.getBOOL( "BrowserJavascriptEnabled" );
 			media_source->setJavascriptEnabled( javascript_enabled );
 
-			//TODO: see if this is needed at all and change to an overloaded function if needed.
-			//media_source->setTarget(target);
-			
+			media_source->setTarget(target);
+
 			if (media_source->init(launcher_name, plugin_name, false)) //No more user_data_path
 			{
 				return media_source;
@@ -790,7 +790,7 @@ bool LLViewerMediaImpl::initializePlugin(const std::string& media_type)
 	// and unconditionally set the mime type
 	mMimeType = media_type;
 
-	LLPluginClassMedia* media_source = newSourceFromMediaType(media_type, this, mMediaWidth, mMediaHeight);
+	LLPluginClassMedia* media_source = newSourceFromMediaType(media_type, this, mMediaWidth, mMediaHeight, mTarget);
 	
 	if (media_source)
 	{
@@ -1583,6 +1583,12 @@ void LLViewerMediaImpl::handleMediaEvent(LLPluginClassMedia* plugin, LLPluginCla
 		case MEDIA_EVENT_CLICK_LINK_HREF:
 		{
 			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_CLICK_LINK_HREF, target is \"" << plugin->getClickTarget() << "\", uri is " << plugin->getClickURL() << LL_ENDL;
+			// retrieve the event parameters
+			std::string url = plugin->getClickURL();
+			std::string target = plugin->getClickTarget();
+//			std::string uuid = plugin->getClickUUID();
+			// loadURL now handles distinguishing between _blank, _external, and other named targets.
+			LLWeb::loadURL(url, target);
 		};
 		break;
 		case MEDIA_EVENT_PLUGIN_FAILED_LAUNCH:

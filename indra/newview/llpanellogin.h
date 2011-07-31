@@ -102,6 +102,7 @@ public:
 	static bool confirm_version(const LLSD& notification, const LLSD& response);
 
 private:
+	void reshapeBrowser();
 	static void onClickConnect(void*);
 	static void onClickConnectReal(void*);
 	static void onClickNewAccount(void*);

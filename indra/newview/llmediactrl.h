@@ -83,8 +83,6 @@ class LLMediaCtrl :
 		void navigateToLocalPage( const std::string& subdir, const std::string& filename_in );
 		bool canNavigateBack();
 		bool canNavigateForward();
-		void setOpenInExternalBrowser( bool valIn );
-		void setOpenInInternalBrowser( bool valIn );
 		std::string getCurrentNavUrl();
 
 		// By default, we do not handle "secondlife:///app/" SLURLs, because
@@ -97,6 +95,8 @@ class LLMediaCtrl :
 
 		void setHomePageUrl( const std::string urlIn );
 		std::string getHomePageUrl();
+		
+		void setTarget(const std::string& target);
 
 		// set/clear URL to visit when a 404 page is reached
 		void set404RedirectUrl( std::string redirect_url );
@@ -135,8 +135,6 @@ class LLMediaCtrl :
 		// Incoming media event dispatcher
 		virtual void handleMediaEvent(LLPluginClassMedia* self, EMediaEvent event);
 
-		// handlers for individual events (could be done inside the switch in handleMediaEvent, they're just individual functions for clarity)
-		void onClickLinkHref( LLPluginClassMedia* self );
 		void onClickLinkNoFollow( LLPluginClassMedia* self );
 		
 	protected:
@@ -150,12 +148,10 @@ class LLMediaCtrl :
 		LLViewBorder* mBorder;
 		bool mFrequentUpdates;
 		bool mForceUpdate;
-		bool mOpenLinksInExternalBrowser;
-		bool mOpenLinksInInternalBrowser;
 		bool mTrusted;
 		std::string mHomePageUrl;
-		std::string mExternalUrl;
 		std::string mCurrentNavUrl;
+		std::string mTarget;
 		bool mIgnoreUIScale;
 		bool mAlwaysRefresh;
 		viewer_media_t mMediaSource;

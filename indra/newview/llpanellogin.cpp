@@ -336,19 +336,7 @@ LLPanelLogin::LLPanelLogin(const LLRect &rect,
 	web_browser->setTabStop(FALSE);
 	// web_browser->navigateToLocalPage( "loading", "loading.html" );
 
-	// make links open in external browser
-	web_browser->setOpenInExternalBrowser( true );
-
-	// force the size to be correct (XML doesn't seem to be sufficient to do this) (with some padding so the other login screen doesn't show through)
-	LLRect htmlRect = getRect();
-#if USE_VIEWER_AUTH
-	htmlRect.setCenterAndSize( getRect().getCenterX() - 2, getRect().getCenterY(), getRect().getWidth() + 6, getRect().getHeight());
-#else
-	htmlRect.setCenterAndSize( getRect().getCenterX() - 2, getRect().getCenterY() + 40, getRect().getWidth() + 6, getRect().getHeight() - 78 );
-#endif
-	web_browser->setRect( htmlRect );
-	web_browser->reshape( htmlRect.getWidth(), htmlRect.getHeight(), TRUE );
-	reshape( getRect().getWidth(), getRect().getHeight(), 1 );
+	reshapeBrowser();
 
 	updateGridCombo();
 
@@ -376,6 +364,21 @@ LLPanelLogin::LLPanelLogin(const LLRect &rect,
 	refreshLocation( false );
 #endif
 
+}
+
+// force the size to be correct (XML doesn't seem to be sufficient to do this)
+// (with some padding so the other login screen doesn't show through)
+void LLPanelLogin::reshapeBrowser()
+{
+	LLMediaCtrl* web_browser = getChild<LLMediaCtrl>("login_html");
+	LLRect rect = gViewerWindow->getVirtualWindowRect();
+	LLRect html_rect;
+	html_rect.setCenterAndSize(
+		rect.getCenterX() - 2, rect.getCenterY() + 40,
+		rect.getWidth() + 6, rect.getHeight() - 78 );
+	web_browser->setRect( html_rect );
+	web_browser->reshape( html_rect.getWidth(), html_rect.getHeight(), TRUE );
+	reshape( rect.getWidth(), rect.getHeight(), 1 );
 }
 
 void LLPanelLogin::setSiteIsAlive( bool alive )

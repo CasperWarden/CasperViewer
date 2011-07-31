@@ -355,9 +355,16 @@ void LLFloaterMediaBrowser::onClickSeek(void* user_data)
 	if(self->mBrowser->getMediaPlugin())
 		self->mBrowser->getMediaPlugin()->start(2.0f);
 }
+
 void LLFloaterMediaBrowser::openMedia(const std::string& media_url)
 {
+	openMedia(media_url, "");
+}
+
+void LLFloaterMediaBrowser::openMedia(const std::string& media_url, const std::string& target)
+{
 	mBrowser->setHomePageUrl(media_url);
+	mBrowser->setTarget(target);
 	mBrowser->navigateTo(media_url);
 	setCurrentURL(media_url);
 }

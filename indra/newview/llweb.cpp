@@ -39,6 +39,9 @@
 
 #include "llviewercontrol.h"
 #include "llfloatermediabrowser.h"
+#include "llnotifications.h"
+
+bool on_load_url_external_response(const LLSD& notification, const LLSD& response, bool async );
 
 // static
 void LLWeb::initClass()
@@ -46,10 +49,15 @@ void LLWeb::initClass()
 	LLAlertDialog::setURLLoader(&sAlertURLLoader);
 }
 
-// static
 void LLWeb::loadURL(const std::string& url)
 {
-	if (gSavedSettings.getBOOL("UseExternalBrowser"))
+	loadURL( url, "" );
+}
+
+// static
+void LLWeb::loadURL(const std::string& url, const std::string& target)
+{
+	if (gSavedSettings.getBOOL("UseExternalBrowser") || (target == "_external"))
 	{
 		loadURLExternal(url);
 	}
@@ -63,8 +71,32 @@ void LLWeb::loadURL(const std::string& url)
 // static
 void LLWeb::loadURLExternal(const std::string& url)
 {
-	std::string escaped_url = escapeURL(url);
-	gViewerWindow->getWindow()->spawnWebBrowser(escaped_url);
+	loadURLExternal(url, true);
+}
+
+// static
+void LLWeb::loadURLExternal(const std::string& url, bool async)
+{
+	LLSD payload;
+	payload["url"] = url;
+	LLNotifications::instance().add( "WebLaunchExternalTarget", LLSD(), payload, boost::bind(on_load_url_external_response, _1, _2, async));
+}
+
+// static 
+bool on_load_url_external_response(const LLSD& notification, const LLSD& response, bool async )
+{
+	S32 option = LLNotification::getSelectedOption(notification, response);
+	if ( 0 == option )
+	{
+		LLSD payload = notification["payload"];
+		std::string url = payload["url"].asString();
+		std::string escaped_url = LLWeb::escapeURL(url);
+		if (gViewerWindow)
+		{
+			gViewerWindow->getWindow()->spawnWebBrowser(escaped_url, async);
+		}
+	}
+	return false;
 }
 
 

@@ -70,13 +70,10 @@ LLMediaCtrl::LLMediaCtrl( const std::string& name, const LLRect& rect ) :
 	mBorder(NULL),
 	mFrequentUpdates( true ),
 	mForceUpdate( false ),
-	mOpenLinksInExternalBrowser( false ),
-	mOpenLinksInInternalBrowser( false ),
 	mTrusted( false ),
 	mHomePageUrl( "" ),
 	mIgnoreUIScale( true ),
 	mAlwaysRefresh( false ),
-	mExternalUrl( "" ),
 	mMediaSource( 0 ),
 	mTakeFocusOnClick( true ),
 	mCurrentNavUrl( "about:blank" ),
@@ -146,20 +143,6 @@ void LLMediaCtrl::setTakeFocusOnClick( bool take_focus )
 {
 	mTakeFocusOnClick = take_focus;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// set flag that forces the embedded browser to open links in the external system browser
-void LLMediaCtrl::setOpenInExternalBrowser( bool valIn )
-{
-	mOpenLinksInExternalBrowser = valIn;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-// set flag that forces the embedded browser to open links in the internal browser floater
-void LLMediaCtrl::setOpenInInternalBrowser( bool valIn )
-{
-	mOpenLinksInInternalBrowser = valIn;
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 void LLMediaCtrl::setTrusted( bool valIn )
@@ -572,6 +555,15 @@ void LLMediaCtrl::setHomePageUrl( const std::string urlIn )
 	mHomePageUrl = urlIn;
 }
 
+void LLMediaCtrl::setTarget(const std::string& target)
+{
+	mTarget = target;
+	if (mMediaSource)
+	{
+		mMediaSource->setTarget(mTarget);
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 bool LLMediaCtrl::setCaretColor(unsigned int red, unsigned int green, unsigned int blue)
@@ -756,20 +748,6 @@ void LLMediaCtrl::convertInputCoords(S32& x, S32& y)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// static 
-bool LLMediaCtrl::onClickLinkExternalTarget(const LLSD& notification, const LLSD& response )
-{
-	S32 option = LLNotification::getSelectedOption(notification, response);
-	if ( 0 == option )
-	{
-		// open in external browser because we don't support 
-		// creation of our own secondary browser windows
-		LLWeb::loadURLExternal( notification["payload"]["external_url"].asString() );
-	}
-	return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // inherited from LLViewerMediaObserver
 //virtual 
 void LLMediaCtrl::handleMediaEvent(LLPluginClassMedia* self, EMediaEvent event)
@@ -854,7 +832,6 @@ void LLMediaCtrl::handleMediaEvent(LLPluginClassMedia* self, EMediaEvent event)
 		case MEDIA_EVENT_CLICK_LINK_HREF:
 		{
 			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_CLICK_LINK_HREF, target is \"" << self->getClickTarget() << "\", uri is " << self->getClickURL() << LL_ENDL;
-			onClickLinkHref(self);
 		};
 		break;
 		
@@ -910,62 +887,6 @@ void LLMediaCtrl::handleMediaEvent(LLPluginClassMedia* self, EMediaEvent event)
 
 	// chain all events to any potential observers of this object.
 	emitEvent(self, event);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// 
-void LLMediaCtrl::onClickLinkHref( LLPluginClassMedia* self )
-{
-	// retrieve the event parameters
-	std::string target = self->getClickTarget();
-	std::string url = self->getClickURL();
-	
-	// if there is a value for the target
-	if ( !target.empty() )
-	{
-		if ( target == "_external" )		
-		{
-			mExternalUrl = url;
-			LLSD payload;
-			payload["external_url"] = mExternalUrl;
-			LLNotifications::instance().add( "WebLaunchExternalTarget", LLSD(), payload, onClickLinkExternalTarget);
-			return;
-		}
-	}
-
-	const std::string protocol1( "http://" );
-	const std::string protocol2( "https://" );
-	if( mOpenLinksInExternalBrowser )
-	{
-		if ( !url.empty() )
-		{
-			if ( LLStringUtil::compareInsensitive( url.substr( 0, protocol1.length() ), protocol1 ) == 0 ||
-				 LLStringUtil::compareInsensitive( url.substr( 0, protocol2.length() ), protocol2 ) == 0 )
-			{
-				LLWeb::loadURLExternal( url );
-			}
-		}
-	}
-	else
-	if( mOpenLinksInInternalBrowser )
-	{
-		if ( !url.empty() )
-		{
-			if ( LLStringUtil::compareInsensitive( url.substr( 0, protocol1.length() ), protocol1 ) == 0 ||
-				 LLStringUtil::compareInsensitive( url.substr( 0, protocol2.length() ), protocol2 ) == 0 )
-			{
-				// If we spawn a new LLFloaterHTML, assume we want it to
-				// follow this LLMediaCtrl's trust for whether or
-				// not to open secondlife:///app/ links. JC.
-//				const bool open_links_externally = false;
-//				LLFloaterHtml::getInstance()->show( 
-//					event_in.mStringPayload, 
-//						"Second Life Browser",
-//							open_links_externally,
-//								mTrusted);
-			}
-		}
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
