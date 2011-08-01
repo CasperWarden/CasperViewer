@@ -248,7 +248,7 @@ ATI FirePro 7000				.*ATI.*FirePro V7.*					3		1
 ATI FirePro M					.*ATI.*FirePro M.*					3		1
 ATI Technologies				.*ATI.*Technologies.*				0		1
 // This entry is last to work around the "R300" driver problem.
-ATI R300 (9700)					.*(ATI)?.*R300.*					1		1
+ATI R300 (9700)					.*ATI.*R300.*						1		1
 Intel X3100						.*Intel.*X3100.*					0		1
 Intel 830M						.*Intel.*830M						0		0
 Intel 845G						.*Intel.*845G						0		0
