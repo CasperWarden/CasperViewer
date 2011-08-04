@@ -287,19 +287,19 @@ void LLPreviewTexture::draw()
 			std::string assetid(mImageID.asString());
 			if (mIsCopyable) childSetText("uuid", assetid);
 
-			if (uploaderkey.isNull()&&(mImage->decodedComment.find("a")!=mImage->decodedComment.end()))
+			if (uploaderkey.isNull()&&(mImage->mDecodedComment.find("a")!=mImage->mDecodedComment.end()))
 			{
-				uploaderkey = LLUUID(mImage->decodedComment["a"]);
-				childSetText("uploader", mImage->decodedComment["a"]);
+				uploaderkey = LLUUID(mImage->mDecodedComment["a"]);
+				childSetText("uploader", mImage->mDecodedComment["a"]);
 				gCacheName->get(uploaderkey, FALSE, callbackLoadAvatarName);
 			}
-			if (color.empty()&&(mImage->decodedComment.find("c")!=mImage->decodedComment.end()))
+			if (color.empty()&&(mImage->mDecodedComment.find("c")!=mImage->mDecodedComment.end()))
 			{
-				color = mImage->decodedComment["c"];
+				color = mImage->mDecodedComment["c"];
 			}
-			if (time.empty()&&(mImage->decodedComment.find("z")!=mImage->decodedComment.end()))
+			if (time.empty()&&(mImage->mDecodedComment.find("z")!=mImage->mDecodedComment.end()))
 			{
-				time=mImage->decodedComment["z"];
+				time=mImage->mDecodedComment["z"];
 				std::string year = time.substr(0,4);
 				std::string month = time.substr(4,2);
 				std::string day = time.substr(6,2);

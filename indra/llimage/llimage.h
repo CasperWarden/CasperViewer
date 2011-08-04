@@ -238,6 +238,8 @@ public:
 
 	// Src and dst are same size.  Src has 4 components.  Dst has 3 components.
 	void compositeUnscaled4onto3( LLImageRaw* src );
+	
+	std::map<std::string,std::string> decodedComment;
 
 protected:
 	// Create an image from a local file (generally used in tools)

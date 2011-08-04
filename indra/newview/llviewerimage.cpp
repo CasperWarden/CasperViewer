@@ -62,8 +62,6 @@
 #include "llface.h"
 #include "llviewercamera.h"
 
-#include "llimagemetadatareader.h"
-#include "lltexturecache.h"
 ///////////////////////////////////////////////////////////////////////////////
 
 // statics
@@ -98,56 +96,6 @@ S32 LLViewerImage::sMaxSmallImageSize = MAX_CACHED_RAW_IMAGE_AREA ;
 BOOL LLViewerImage::sFreezeImageScalingDown = FALSE ;
 //debug use
 S32 LLViewerImage::sLLViewerImageCount = 0 ;
-
-class CommentCacheReadResponder : public LLTextureCache::ReadResponder
-{
-public:
-	CommentCacheReadResponder(LLPointer<LLViewerImage> image)
-		: mViewerImage(image)
-	{
-		mID = image->getID();
-	}
-	void setData(U8* data, S32 datasize, S32 imagesize, S32 imageformat, BOOL imagelocal)
-	{
-		if (mFormattedImage.notNull())
-		{
-			if(imageformat==IMG_CODEC_TGA && mFormattedImage->getCodec()==IMG_CODEC_J2C)
-			{
-				//llwarns<<"Bleh its a tga not saving"<<llendl;
-				mFormattedImage=NULL;
-				mImageSize=0;
-				return;
-			}
-			llassert_always(mFormattedImage->getCodec() == imageformat);
-			mFormattedImage->appendData(data, datasize);
-		}
-		else
-		{
-			mFormattedImage = LLImageFormatted::createFromType(imageformat);
-			mFormattedImage->setData(data,datasize);
-		}
-		mImageSize = imagesize;
-		mImageLocal = imagelocal;
-	}
-
-	virtual void completed(bool success)
-	{
-		if(success && (mFormattedImage.notNull()) && mImageSize>0 && mViewerImage.notNull())
-		{
-			//llinfos << "SUCCESS getting texture "<<mID<< llendl;
-			mViewerImage->decodedComment = LLImageMetaDataReader::ExtractKDUUploadComment(
-				mFormattedImage->getData(),
-				mFormattedImage->getDataSize());
-		}
-		if(mFormattedImage.notNull())
-			mFormattedImage->deleteData();		
-		mFormattedImage=NULL;
-	}
-private:
-	LLPointer<LLImageFormatted> mFormattedImage;
-	LLPointer<LLViewerImage> mViewerImage;
-	LLUUID mID;
-};
 
 // static
 void LLViewerImage::initClass()
@@ -560,6 +508,9 @@ BOOL LLViewerImage::createTexture(S32 usename/*= 0*/)
 // 						mRawDiscardLevel, 
 // 						mRawImage->getWidth(), mRawImage->getHeight(),mRawImage->getDataSize())
 // 			<< mID.getString() << llendl;
+
+	mDecodedComment = mRawImage->decodedComment;
+
 	BOOL res = TRUE;
 	if (!gNoRender)
 	{
@@ -603,13 +554,6 @@ BOOL LLViewerImage::createTexture(S32 usename/*= 0*/)
 			setIsMissingAsset();
 			destroyRawImage();
 			return FALSE;
-		}
-
-		static LLCachedControl<BOOL> PhoenixShowCommentsForAll("PhoenixShowCommentsForAll",0);
-		if(PhoenixShowCommentsForAll)
-		{
-			CommentCacheReadResponder* responder = new CommentCacheReadResponder(this);
-			LLAppViewer::getTextureCache()->readFromCache(getID(),LLWorkerThread::PRIORITY_HIGH,0,999999,responder);
 		}
 
 		res = LLImageGL::createGLTexture(mRawDiscardLevel, mRawImage, usename);

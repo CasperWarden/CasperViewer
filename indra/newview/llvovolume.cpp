@@ -592,7 +592,7 @@ void LLVOVolume::updateTextureVirtualSize()
 			if(imagep)
 			{
 				std::map<std::string,std::string>::iterator it;
-				for ( it=imagep->decodedComment.begin() ; it != imagep->decodedComment.end(); it++ )
+				for ( it=imagep->mDecodedComment.begin() ; it != imagep->mDecodedComment.end(); it++ )
 				{
 					faceinfo+=llformat("(%d)",i)+(*it).first+" => "+(*it).second+"\n";
 				}

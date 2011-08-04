@@ -30,7 +30,7 @@
 
 #include "linden_common.h"
 #include "llimagemetadatareader.h"
-LLJ2cParser::LLJ2cParser(U8* data,int data_size)
+LLJ2cParser::LLJ2cParser(U8* data, S32 data_size)
 {
 	if(data && data_size)
 	{
@@ -52,7 +52,7 @@ U8 LLJ2cParser::nextChar()
 	return rtn;
 }
 
-std::vector<U8> LLJ2cParser::nextCharArray(int len)
+std::vector<U8> LLJ2cParser::nextCharArray(S32 len)
 {
 	std::vector<U8> array;
 	if(len > 0)
@@ -98,7 +98,7 @@ std::vector<U8> LLJ2cParser::GetNextComment()
 	return content;
 }
 
-std::map<std::string,std::string> LLImageMetaDataReader::ExtractKDUUploadComment(U8* data,int data_size)
+std::map<std::string,std::string> LLImageMetaDataReader::ExtractKDUUploadComment(U8* data, S32 data_size)
 {
 	LLJ2cParser parser = LLJ2cParser(data,data_size);
 	LL_DEBUGS("Comment Reader")  << "Reading data with size "<<data_size<<LL_ENDL;
@@ -113,14 +113,14 @@ std::map<std::string,std::string> LLImageMetaDataReader::ExtractKDUUploadComment
 
 			//result["full"]=fullComment;
 			//a=abbee3b5-fbe0-4cfa-8d15-323d6800448e&h=480&w=640&z=20081118204138&c=26961aff
-			int pos = 0;//where we are in the string
+			S32 pos = 0;//where we are in the string
 			while(pos<fullComment.length())
 			{
-				int equalsPos = fullComment.find("=",pos);
+				S32 equalsPos = fullComment.find("=",pos);
 				std::string infoType = fullComment.substr(pos,equalsPos-pos);
 				if(infoType.length()>2 && infoType.length()<30)infoType="Other";
 				pos=fullComment.find("&",pos);
-				if(pos==(int)std::string::npos)pos=fullComment.length();
+				if(pos==(S32)std::string::npos)pos=fullComment.length();
 				pos++;
 				std::string info = fullComment.substr(equalsPos+1,pos-2-equalsPos);
 				result[infoType]=info;

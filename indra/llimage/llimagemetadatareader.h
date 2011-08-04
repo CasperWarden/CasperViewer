@@ -40,7 +40,7 @@
 class LLJ2cParser
 {
 public:
-	LLJ2cParser(U8* data,int data_size);
+	LLJ2cParser(U8* data, S32 data_size);
 	std::vector<U8> GetNextComment();
 	std::vector<U8> mData;
 private:
@@ -51,6 +51,6 @@ private:
 class LLImageMetaDataReader
 {
 public:
-	static std::map<std::string,std::string> ExtractKDUUploadComment(U8* data,int data_size);
+	static std::map<std::string,std::string> ExtractKDUUploadComment(U8* data, S32 data_size);
 };
 #endif

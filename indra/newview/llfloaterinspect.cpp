@@ -376,7 +376,7 @@ void LLFloaterInspect::drawTextureEntry(const LLViewerImage* img, const U8 i)
 		mTex[i].blacklistbtn->setVisible(TRUE);
 		if (mTex[i].ctrl)
 		{
-			std::map<std::string,std::string> decodedComment = img->decodedComment;
+			std::map<std::string,std::string> decodedComment = img->mDecodedComment;
 			if (decodedComment.find("a")!=decodedComment.end())
 			{
 				mTex[i].uploaderkey = LLUUID(decodedComment["a"]);
