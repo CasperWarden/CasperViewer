@@ -223,30 +223,35 @@ static void request(
 	LLURLRequest* req = new LLURLRequest(method, url);
 	req->checkRootCertificate(true);
 
-    // Insert custom headers is the caller sent any
-    if (headers.isMap())
-    {
-        LLSD::map_const_iterator iter = headers.beginMap();
-        LLSD::map_const_iterator end  = headers.endMap();
+	// Insert custom headers if the caller sent any
+	if (headers.isMap())
+	{
+		if (headers.has("Cookie"))
+		{
+			req->allowCookies();
+		}
 
-        for (; iter != end; ++iter)
-        {
-            std::ostringstream header;
-            //if the header is "Pragma" with no value
-            //the caller intends to force libcurl to drop
-            //the Pragma header it so gratuitously inserts
-            //Before inserting the header, force libcurl
-            //to not use the proxy (read: llurlrequest.cpp)
+		LLSD::map_const_iterator iter = headers.beginMap();
+		LLSD::map_const_iterator end  = headers.endMap();
+
+		for (; iter != end; ++iter)
+		{
+			std::ostringstream header;
+			//if the header is "Pragma" with no value
+			//the caller intends to force libcurl to drop
+			//the Pragma header it so gratuitously inserts
+			//Before inserting the header, force libcurl
+			//to not use the proxy (read: llurlrequest.cpp)
 			static const std::string PRAGMA("Pragma");
 			if ((iter->first == PRAGMA) && (iter->second.asString().empty()))
-            {
-                req->useProxy(false);
-            }
-            header << iter->first << ": " << iter->second.asString() ;
-            lldebugs << "header = " << header.str() << llendl;
-            req->addHeader(header.str().c_str());
-        }
-    }
+			{
+				req->useProxy(false);
+			}
+			header << iter->first << ": " << iter->second.asString() ;
+			lldebugs << "header = " << header.str() << llendl;
+			req->addHeader(header.str().c_str());
+		}
+	}
 
 	// Check to see if we have already set Accept or not. If no one
 	// set it, set it to application/llsd+xml since that's what we

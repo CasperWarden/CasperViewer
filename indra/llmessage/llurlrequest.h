@@ -172,6 +172,11 @@ public:
      * @ brief Set the CURLOPT_PROXY header to the given value.
      */
 	void useProxy(const std::string& proxy);
+	
+	/**
+	 * @brief Turn on cookie handling for this request with CURLOPT_COOKIEFILE.
+	 */
+	void allowCookies();
 
 public:
 	/** 
