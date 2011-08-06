@@ -101,6 +101,9 @@ class LLViewerMedia
 	// Set the "cookies enabled" flag for all loaded plugins
 	static void setCookiesEnabled(bool enabled);
 	
+	// Set the proxy config for all loaded plugins
+	static void setProxyConfig(bool enable, const std::string &host, int port);
+	
 	static LLPluginCookieStore *getCookieStore();
 	static void loadCookieFile();
 	static void saveCookieFile();

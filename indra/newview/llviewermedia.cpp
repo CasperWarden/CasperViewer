@@ -504,6 +504,22 @@ void LLViewerMedia::setCookiesEnabled(bool enabled)
 	}
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
+// static 
+void LLViewerMedia::setProxyConfig(bool enable, const std::string &host, int port)
+{
+	// Set the proxy config for all loaded plugins
+	impl_list::iterator iter = sViewerMediaImplList.begin();
+	impl_list::iterator end = sViewerMediaImplList.end();
+	for (; iter != end; iter++)
+	{
+		LLViewerMediaImpl* pimpl = *iter;
+		if(pimpl->mMediaSource)
+		{
+			pimpl->mMediaSource->proxy_setup(enable, host, port);
+		}
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // static 
@@ -936,6 +952,8 @@ bool LLViewerMediaImpl::initializePlugin(const std::string& media_type)
 		}
 		// set the path to the CA.pem file
 		media_source->addCertificateFilePath( ca_path );
+		
+		media_source->proxy_setup(gSavedSettings.getBOOL("BrowserProxyEnabled"), gSavedSettings.getString("BrowserProxyAddress"), gSavedSettings.getS32("BrowserProxyPort"));
 
 		// TODO: Only send cookies to plugins that need them
 		//  Ideally, the plugin should tell us whether it handles cookies or not -- either via the init response or through a separate message.
