@@ -1779,6 +1779,15 @@ bool idle_startup()
 			{
 				gSavedSettings.setString("MapServerURL", map_server_url);
 			}
+			
+			// Start the process of fetching the OpenID session cookie for this user login
+			std::string openid_url = LLUserAuth::getInstance()->getResponse("openid_url");
+			if(!openid_url.empty())
+			{ 
+				std::string openid_token = LLUserAuth::getInstance()->getResponse("openid_token");
+				LLViewerMedia::openIDSetup(openid_url, openid_token);
+			}
+			
 			// Override grid info with anything sent in the login response
 			std::string tmp = LLUserAuth::getInstance()->getResponse("gridname");
 			if (!tmp.empty()) gHippoGridManager->getConnectedGrid()->setGridName(tmp);
