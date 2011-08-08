@@ -43,4 +43,13 @@ public:
 	/*virtual*/ void search(const std::string& search_text);
 };
 
+// marketplace panel
+class LLPanelDirMarket : public LLPanelDirFind
+{
+public:
+	LLPanelDirMarket(const std::string& name, LLFloaterDirectory* floater);
+
+	/*virtual*/ void search(const std::string& search_text);
+};
+
 #endif

@@ -101,6 +101,7 @@ LLFloaterDirectory::LLFloaterDirectory(const std::string& name)
 	factory_map["land_sales_panel"] = LLCallbackMap(createLand, this);
 	factory_map["people_panel"] = LLCallbackMap(createPeople, this);
 	factory_map["groups_panel"] = LLCallbackMap(createGroups, this);
+	factory_map["market_panel"] = LLCallbackMap(createMarket, this);
 
 	factory_map["classified_details_panel"] = LLCallbackMap(createClassifiedDetail, this);
 	factory_map["event_details_panel"] = LLCallbackMap(createEventDetail, this);
@@ -127,6 +128,7 @@ LLFloaterDirectory::LLFloaterDirectory(const std::string& name)
 	childSetTabChangeCallback("Directory Tabs", "land_sales_panel", onTabChanged, this);
 	childSetTabChangeCallback("Directory Tabs", "people_panel", onTabChanged, this);
 	childSetTabChangeCallback("Directory Tabs", "groups_panel", onTabChanged, this);
+	childSetTabChangeCallback("Directory Tabs", "market_panel", onTabChanged, this);
 }
 
 LLFloaterDirectory::~LLFloaterDirectory()
@@ -177,6 +179,13 @@ void* LLFloaterDirectory::createShowcase(void* userdata)
 {
 	LLFloaterDirectory *self = (LLFloaterDirectory*)userdata;
 	return new LLPanelDirPopular("showcase_panel", self);
+}
+
+// static
+void* LLFloaterDirectory::createMarket(void* userdata)
+{
+	LLFloaterDirectory *self = (LLFloaterDirectory*)userdata;
+	return new LLPanelDirMarket("market_panel", self);
 }
 
 // static

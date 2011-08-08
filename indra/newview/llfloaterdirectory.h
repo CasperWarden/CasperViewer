@@ -102,6 +102,7 @@ private:
 	static void* createClassified(void* userdata);
 	static void* createEvents(void* userdata);
 	static void* createShowcase(void* userdata);
+	static void* createMarket(void* userdata);
 	static void* createPlaces(void* userdata);
 	static void* createLand(void* userdata);
 	static void* createPeople(void* userdata);

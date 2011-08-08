@@ -46,3 +46,17 @@ void LLPanelDirPopular::search(const std::string& search_text)
 	// no-op, initial page is loaded during construction and there
 	// is no search interface, just browse
 }
+
+// marketplace panel
+LLPanelDirMarket::LLPanelDirMarket(const std::string& name, LLFloaterDirectory* floater)
+:	LLPanelDirFind(name, floater, "market_browser")
+{
+	// *NOTE: This is now the "Marketplace" section
+}
+
+// virtual
+void LLPanelDirMarket::search(const std::string& search_text)
+{
+	// no-op, initial page is loaded during construction and there
+	// is no search interface, just browse
+}
