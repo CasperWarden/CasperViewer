@@ -34,12 +34,19 @@
 #include "llviewerprecompiledheaders.h"
 
 #include "llweb.h"
-
+#include "llagent.h"
+#include "llappviewer.h"
 #include "llviewerwindow.h"
-
+#include "llversionviewer.h"
 #include "llviewercontrol.h"
 #include "llfloatermediabrowser.h"
 #include "llnotifications.h"
+#include "llviewernetwork.h"
+#include "llviewerparcelmgr.h"
+#include "llviewerregion.h"
+#include "llparcel.h"
+#include "llsd.h"
+
 
 bool on_load_url_external_response(const LLSD& notification, const LLSD& response, bool async );
 
@@ -124,6 +131,79 @@ std::string LLWeb::escapeURL(const std::string& url)
 		}
 	}
 	return escaped_url;
+}
+
+//static
+std::string LLWeb::expandURLSubstitutions(const std::string &url, const LLStringUtil::format_map_t &default_subs)
+{
+	std::ostringstream stream;
+	stream << LL_VERSION_MAJOR << "."
+		<< LL_VERSION_MINOR << "."
+		<< LL_VERSION_PATCH << "."
+		<< LL_VERSION_BUILD;
+	std::string version = stream.str();
+	
+	std::ostringstream streammajor;
+	streammajor << LL_VERSION_MAJOR;
+	std::string major = streammajor.str();
+	
+	std::ostringstream streamminor;
+	streamminor << LL_VERSION_MINOR;
+	std::string minor = streamminor.str();
+	
+	std::ostringstream streampatch;
+	streampatch << LL_VERSION_PATCH;
+	std::string patch = streampatch.str();
+	
+	std::ostringstream streambuild;
+	streambuild << LL_VERSION_BUILD;
+	std::string build = streambuild.str();
+  
+	LLStringUtil::format_map_t substitution = default_subs;
+	substitution["[VERSION]"] = version;
+	substitution["[VERSION_MAJOR]"] = major;
+	substitution["[VERSION_MINOR]"] = minor;
+	substitution["[VERSION_PATCH]"] = patch;
+	substitution["[VERSION_BUILD]"] = build;
+	substitution["[CHANNEL]"] = std::string(LL_CHANNEL);
+	substitution["[GRID]"] = LLViewerLogin::getInstance()->getGridLabel();
+	substitution["[OS]"] = LLAppViewer::instance()->getOSInfo().getOSStringSimple();
+	substitution["[SESSION_ID]"] = gAgent.getSessionID().asString();
+	substitution["[FIRST_LOGIN]"] = (gAgent.isFirstLogin() ? "TRUE" : "FALSE");
+
+	// work out the current language
+	std::string lang = LLUI::getLanguage();
+	if (lang == "en-us")
+	{
+		// *HACK: the correct fix is to change English.lproj/language.txt,
+		// but we're late in the release cycle and this is a less risky fix
+		lang = "en";
+	}
+	substitution["[LANGUAGE]"] = lang;
+
+	// find the region ID
+	LLUUID region_id;
+	LLViewerRegion *region = gAgent.getRegion();
+	if (region)
+	{
+		region_id = region->getRegionID();
+	}
+	substitution["[REGION_ID]"] = region_id.asString();
+
+	// find the parcel local ID
+	S32 parcel_id = 0;
+	LLParcel* parcel = LLViewerParcelMgr::getInstance()->getAgentParcel();
+	if (parcel)
+	{
+		parcel_id = parcel->getLocalID();
+	}
+	substitution["[PARCEL_ID]"] = llformat("%d", parcel_id);
+
+	// expand all of the substitution strings and escape the url
+	std::string expanded_url = url;
+	LLStringUtil::format(expanded_url, substitution);
+
+	return LLWeb::escapeURL(expanded_url);
 }
 
 // virtual

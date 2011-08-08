@@ -53,6 +53,7 @@
 #include "llappviewer.h"
 #include "llfilepicker.h"
 #include "llfloatermediabrowser.h"	// for handling window close requests and geometry change requests in media browser windows.
+#include "llfloateravatarinfo.h"	// for getProfileURL() function
 #include "llweb.h"
 
 
@@ -208,6 +209,41 @@ public:
 
 };
 
+class LLViewerMediaWebProfileResponder : public LLHTTPClient::Responder
+{
+LOG_CLASS(LLViewerMediaWebProfileResponder);
+public:
+	LLViewerMediaWebProfileResponder(std::string host)
+	{
+		mHost = host;
+	}
+
+	~LLViewerMediaWebProfileResponder()
+	{
+	}
+
+	/* virtual */ void completedHeader(U32 status, const std::string& reason, const LLSD& content)
+	{
+		LL_DEBUGS("MediaAuth") << "status = " << status << ", reason = " << reason << LL_ENDL;
+		LL_DEBUGS("MediaAuth") << content << LL_ENDL;
+
+		std::string cookie = content["set-cookie"].asString();
+
+		LLViewerMedia::getCookieStore()->setCookiesFromHost(cookie, mHost);
+	}
+
+	 void completedRaw(
+		U32 status,
+		const std::string& reason,
+		const LLChannelDescriptors& channels,
+		const LLIOPipe::buffer_ptr_t& buffer)
+	{
+		// This is just here to disable the default behavior (attempting to parse the response as llsd).
+		// We don't care about the content of the response, only the set-cookie header.
+	}
+
+	std::string mHost;
+};
 
 LLPluginCookieStore *LLViewerMedia::sCookieStore = NULL;
 LLURL LLViewerMedia::sOpenIDURL;
@@ -675,6 +711,19 @@ void LLViewerMedia::setOpenIDCookie()
 		}
 		
 		getCookieStore()->setCookiesFromHost(sOpenIDCookie, authority.substr(host_start, host_end - host_start));
+		
+		// Do a web profile get so we can store the cookie 
+		LLSD headers = LLSD::emptyMap();
+		headers["Accept"] = "*/*";
+		headers["Cookie"] = sOpenIDCookie;
+		headers["User-Agent"] = getCurrentUserAgent();
+
+		std::string profile_url = getProfileURL("");
+		LLURL raw_profile_url( profile_url.c_str() );
+
+		LLHTTPClient::get(profile_url,  
+			new LLViewerMediaWebProfileResponder(raw_profile_url.getAuthority()),
+			headers);
 	}
 }
 

@@ -41,6 +41,8 @@
 #include "llcommandhandler.h"
 #include "llpanelavatar.h"
 #include "lluictrlfactory.h"
+#include "llviewercontrol.h"
+#include "llweb.h"
 
 // linden library includes
 #include "llinventory.h"
@@ -299,4 +301,14 @@ LLPreview::EAssetStatus LLFloaterAvatarInfo::getAssetStatus()
 		mAssetStatus = PREVIEW_ASSET_LOADED;
 	}
 	return mAssetStatus;
+}
+
+std::string getProfileURL(const std::string& agent_name)
+{
+	std::string url = gSavedSettings.getString("WebProfileURL");
+	LLStringUtil::format_map_t subs;
+	subs["[AGENT_NAME]"] = agent_name;
+	url = LLWeb::expandURLSubstitutions(url,subs);
+	LLStringUtil::toLower(url);
+	return url;
 }

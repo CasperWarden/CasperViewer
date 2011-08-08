@@ -57,6 +57,9 @@ public:
 	// Returns escaped (eg, " " to "%20") url
 	static std::string escapeURL(const std::string& url);
 
+	/// Expands various strings like [LANG], [VERSION], etc. in a URL
+	static std::string expandURLSubstitutions(const std::string &url, const LLStringUtil::format_map_t &default_subs);
+
 	class URLLoader : public LLAlertDialog::URLLoader
 	{
 		virtual void load(const std::string& url);

@@ -103,5 +103,6 @@ private:
 	EOnlineStatus	mSuggestedOnlineStatus;
 };
 
+std::string getProfileURL(const std::string& agent_name);
 
 #endif
