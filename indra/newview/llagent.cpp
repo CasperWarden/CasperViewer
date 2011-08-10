@@ -493,9 +493,9 @@ void LLAgent::init()
 
 	mEffectColor = gSavedSettings.getColor4("EffectColor");
 	ignorePrejump = gSavedSettings.getBOOL("PhoenixIgnoreFinishAnimation");
-	gSavedSettings.getControl("PhoenixIgnoreFinishAnimation")->getSignal()->connect(&updateIgnorePrejump);
+	gSavedSettings.getControl("PhoenixIgnoreFinishAnimation")->getSignal()->connect((boost::function<void (const LLSD &)>) &updateIgnorePrejump);
 	PhoenixForceFly = gSavedSettings.getBOOL("PhoenixAlwaysFly");
-	gSavedSettings.getControl("PhoenixAlwaysFly")->getSignal()->connect(&updatePhoenixForceFly);
+	gSavedSettings.getControl("PhoenixAlwaysFly")->getSignal()->connect((boost::function<void (const LLSD &)>) &updatePhoenixForceFly);
 	mBlockSpam=gSavedSettings.getBOOL("PhoenixBlockSpam");
 	mInitialized = TRUE;
 }

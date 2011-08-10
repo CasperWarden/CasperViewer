@@ -954,23 +954,23 @@ bool LLAppViewer::init()
 
 	LLViewerJoystick::getInstance()->init(false);
 
-        gSavedSettings.getControl("PhoenixGeneralSpamEnabled")->getSignal()->connect(&gSpam);
+        gSavedSettings.getControl("PhoenixGeneralSpamEnabled")->getSignal()->connect((boost::function<void (const LLSD &)>) &gSpam);
         generalSpamOn = gSavedSettings.getBOOL("PhoenixGeneralSpamEnabled");
-        gSavedSettings.getControl("PhoenixChatSpamEnabled")->getSignal()->connect(&chSpam);
+        gSavedSettings.getControl("PhoenixChatSpamEnabled")->getSignal()->connect((boost::function<void (const LLSD &)>) &chSpam);
         chatSpamOn = gSavedSettings.getBOOL("PhoenixChatSpamEnabled");
-        gSavedSettings.getControl("PhoenixDialogSpamEnabled")->getSignal()->connect(&dSpam);
+        gSavedSettings.getControl("PhoenixDialogSpamEnabled")->getSignal()->connect((boost::function<void (const LLSD &)>) &dSpam);
         dialogSpamOn = gSavedSettings.getBOOL("PhoenixDialogSpamEnabled");
-        gSavedSettings.getControl("PhoenixCardSpamEnabled")->getSignal()->connect(&cSpam);
+        gSavedSettings.getControl("PhoenixCardSpamEnabled")->getSignal()->connect((boost::function<void (const LLSD &)>) &cSpam);
         callingSpamOn = gSavedSettings.getBOOL("PhoenixCardSpamEnabled");
-        gSavedSettings.getControl("PhoenixSpamTime")->getSignal()->connect(&setSpamTime);
+        gSavedSettings.getControl("PhoenixSpamTime")->getSignal()->connect((boost::function<void (const LLSD &)>) &setSpamTime);
         spamTime = gSavedSettings.getF32("PhoenixSpamTime");
-        gSavedSettings.getControl("PhoenixSpamCount")->getSignal()->connect(&setSpamCount);
+        gSavedSettings.getControl("PhoenixSpamCount")->getSignal()->connect((boost::function<void (const LLSD &)>) &setSpamCount);
         spamCount = gSavedSettings.getF32("PhoenixSpamCount");
-        gSavedSettings.getControl("PhoenixChatSpamTime")->getSignal()->connect(&setChatSpamTime);
+        gSavedSettings.getControl("PhoenixChatSpamTime")->getSignal()->connect((boost::function<void (const LLSD &)>) &setChatSpamTime);
         chatSpamTime = gSavedSettings.getF32("PhoenixChatSpamTime");
-        gSavedSettings.getControl("PhoenixChatSpamCount")->getSignal()->connect(&setChatSpamCount);
+        gSavedSettings.getControl("PhoenixChatSpamCount")->getSignal()->connect((boost::function<void (const LLSD &)>) &setChatSpamCount);
         chatSpamCount = gSavedSettings.getF32("PhoenixChatSpamCount");
-		gSavedSettings.getControl("PhoenixRenderHighlightSelections")->getSignal()->connect(&setHighlights);
+		gSavedSettings.getControl("PhoenixRenderHighlightSelections")->getSignal()->connect((boost::function<void (const LLSD &)>) &setHighlights);
 
 	return true;
 }

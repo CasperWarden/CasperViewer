@@ -155,7 +155,7 @@ BOOL LLOverlayBar::postBuild()
 
 	sAdvSettingsPopup = gSavedSettings.getBOOL("wlfAdvSettingsPopup");
 	
-	gSavedSettings.getControl("wlfAdvSettingsPopup")->getSignal()->connect(&updateAdvSettingsPopup);
+	gSavedSettings.getControl("wlfAdvSettingsPopup")->getSignal()->connect((boost::function<void (const LLSD &)>) &updateAdvSettingsPopup);
 	
 	
 	
