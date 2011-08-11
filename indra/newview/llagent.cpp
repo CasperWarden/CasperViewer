@@ -2183,8 +2183,9 @@ U32 LLAgent::getControlFlags()
 //-----------------------------------------------------------------------------
 void LLAgent::setControlFlags(U32 mask)
 {
+	U32 old_flags = mControlFlags;
 	mControlFlags |= mask;
-	mbFlagsDirty = TRUE;
+	mbFlagsDirty = mControlFlags ^ old_flags;
 }
 
 
