@@ -40,7 +40,9 @@
 						</array>
 					<key>tags</key>
 						<array>
-              <string>ShaderLoading</string>
+							<!--
+							<string>ShaderLoading</string>
+							-->
 						</array>
 				</map>
 			</array>
