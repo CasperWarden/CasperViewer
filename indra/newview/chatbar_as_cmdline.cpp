@@ -76,6 +76,7 @@
 #include "lggautocorrect.h"
 
 #include "rlvhandler.h"
+#include "lggfriendsgroupsfloater.h"
 
 //#define JC_PROFILE_GSAVED
 
@@ -896,6 +897,12 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
 			{
 				lggAutoCorrectFloaterStart::show(TRUE,NULL);
 				cmdline_printchat("Displaying Auto Correction Floater.");
+				return false;
+			}
+			else if(revised_text == "/fg")
+			{
+				lggFriendsGroupsFloaterStart::show(TRUE,NULL);
+				cmdline_printchat("Displaying Friends Groups Floater.");
 				return false;
 			}
 			else if(command == *sPhoenixCmdLineAutocorrect)

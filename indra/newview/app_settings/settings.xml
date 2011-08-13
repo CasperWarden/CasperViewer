@@ -13,6 +13,61 @@
       <key>Value</key>
       <string />
     </map>
+    <key>PhoenixFriendsGroupsShowOnline</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to show online friends in the freinds groups floater</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>PhoenixFriendsGroupsShowOffline</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to show offline friends in the freinds groups floater</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>PhoenixFriendsGroupsShowAllFriends</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to show all friends in the window, instead of only the selected group</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>PhoenixFriendsGroupsShowOtherGroups</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to show and colorize other groups in the friends groups floater</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>PhoenixFriendsGroupsSelectedGroup</key>
+    <map>
+      <key>Comment</key>
+      <string>Current Selected group in the floater (saved for logoffs)</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>String</string>
+      <key>Value</key>
+      <string></string>
+    </map>
     <key>PhoenixSupportGroupchatPrefix</key>
     <map>
       <key>Comment</key>

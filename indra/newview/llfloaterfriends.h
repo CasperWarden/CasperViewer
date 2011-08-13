@@ -127,6 +127,7 @@ private:
 	static void onPickAvatar(const std::vector<std::string>& names, const std::vector<LLUUID>& ids, void* user_data);
 	static void onMaximumSelect(void* user_data);
 
+	static void onClickOpenFriendsGroups(void* user_data);
 	static void onClickIM(void* user_data);
 	static void onClickProfile(void* user_data);
 	static void onClickAddFriend(void* user_data);

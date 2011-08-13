@@ -74,6 +74,7 @@
 #include "llviewermenu.h"
 #include "llviewernetwork.h"
 #include "hippogridmanager.h"
+#include "lggfriendsgroupsfloater.h"
 
 //Maximum number of people you can select to do an operation on at once.
 #define MAX_FRIEND_SELECT 20
@@ -211,6 +212,7 @@ BOOL LLPanelFriends::postBuild()
 	U32 changed_mask = LLFriendObserver::ADD | LLFriendObserver::REMOVE | LLFriendObserver::ONLINE;
 	refreshNames(changed_mask);
 
+	childSetAction("lgg_fg_openFG", onClickOpenFriendsGroups, this);
 	childSetAction("im_btn", onClickIM, this);
 	childSetAction("profile_btn", onClickProfile, this);
 	childSetAction("offer_teleport_btn", onClickOfferTeleport, this);
@@ -653,6 +655,11 @@ void LLPanelFriends::onClickProfile(void* user_data)
 	}
 }
 
+// static
+void LLPanelFriends::onClickOpenFriendsGroups(void* user_data)
+{
+	lggFriendsGroupsFloaterStart::show(TRUE,NULL);
+}
 // static
 void LLPanelFriends::onClickIM(void* user_data)
 {

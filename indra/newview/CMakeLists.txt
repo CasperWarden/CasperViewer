@@ -79,6 +79,8 @@ set(viewer_SOURCE_FILES
     cofmgr.cpp
 	lggautocorrectfloater.cpp
 	lggautocorrect.cpp
+	lggfriendsgroups.cpp
+	lggfriendsgroupsfloater.cpp
 	lgghunspell_wrapper.cpp
 	lggdicdownload.cpp
 	lggbeamscolors.cpp
@@ -586,6 +588,8 @@ set(viewer_HEADER_FILES
 	jcfloater_areasearch.h
 	lggautocorrectfloater.h
 	lggautocorrect.h
+	lggfriendsgroups.h
+	lggfriendsgroupsfloater.h
 	lggbeamcolormapfloater.h
 	lggbeamscolors.h
 	lggbeammapfloater.h
