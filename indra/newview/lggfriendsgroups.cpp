@@ -1,4 +1,4 @@
-/* Copyright (C) 2011 LordGregGreg Back
+/* Copyright (C) 2011 Greg Hendrickson (LordGregGreg Back)
    
    This is free software; you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as
@@ -22,6 +22,7 @@
 #include "llcontrol.h"
 #include "llviewercontrol.h"
 #include "llnotifications.h"
+#include "lldir.h"
 
 LGGFriendsGroups* LGGFriendsGroups::sInstance;
 
@@ -58,11 +59,11 @@ void LGGFriendsGroups::save()
 }
 std::string LGGFriendsGroups::getFileName()
 {
-	std::string path=gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS, "");
+	std::string path=gDirUtilp->getExpandedFilename(LL_PATH_PER_SL_ACCOUNT, "");
 
 	if (!path.empty())
 	{
-		path = gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS, "settings_friends_groups.xml");
+		path = gDirUtilp->getExpandedFilename(LL_PATH_PER_SL_ACCOUNT, "settings_friends_groups.xml");
 	}
 	return path;  
 }
@@ -334,7 +335,17 @@ void LGGFriendsGroups::setNotifyForGroup(std::string groupName, BOOL notify)
 		mFriendsGroups[groupName]["notify"]=notify;
 		save();
 	}
-
+}
+BOOL LGGFriendsGroups::getNotifyForGroup(std::string groupName)
+{
+	if(mFriendsGroups.has(groupName))
+	{
+		if(mFriendsGroups[groupName].has("notify"))
+		{
+			return mFriendsGroups[groupName]["notify"].asBoolean();
+		}
+	}
+	return FALSE;
 }
 void LGGFriendsGroups::setGroupColor(std::string groupName, LLColor4 color)
 {

@@ -65,6 +65,7 @@
 #include "llimpanel.h"
 #include "llavatarname.h"
 #include "llavatarnamecache.h"
+#include "lggfriendsgroups.h"
 
 ///----------------------------------------------------------------------------
 /// Local function declarations, constants, enums, and typedefs
@@ -665,7 +666,7 @@ void LLAvatarTracker::processNotify(LLMessageSystem* msg, bool online)
 			if(info)
 			{
 				setBuddyOnline(agent_id,online);
-				if(chat_notify)
+				if(chat_notify||LGGFriendsGroups::getInstance()->notifyForFriend(agent_id))
 				{
 					std::string fullname;
 					LLAvatarName avatar_name;

@@ -28,6 +28,9 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+#ifndef LGG_FRIENDS_GROUPS_FLOATER_H
+#define LGG_FRIENDS_GROUPS_FLOATER_H
 #include "llview.h"
 #include "llviewerinventory.h"
 
@@ -38,3 +41,5 @@ class lggFriendsGroupsFloaterStart
 	static void show( BOOL showw , void * data);
 };
 
+
+#endif 

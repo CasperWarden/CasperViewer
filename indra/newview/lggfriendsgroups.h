@@ -1,4 +1,4 @@
-/* Copyright (C) 2011 LordGregGreg Back
+/* Copyright (C) 2011 Greg Hendrickson (LordGregGreg Back)
 
    This is free software; you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as
@@ -16,8 +16,8 @@
    02111-1307, USA.  */
 
 
-#ifndef LGG_FRIENDS_GROUPS
-#define LGG_FRIENDS_GROUPS
+#ifndef LGG_FRIENDS_GROUPS_H
+#define LGG_FRIENDS_GROUPS_H
 class LGGFriendsGroups
 {
 	LGGFriendsGroups();
@@ -45,6 +45,7 @@ public:
 	void addGroup(std::string groupName);
 	void deleteGroup(std::string groupName);
 	void setNotifyForGroup(std::string groupName, BOOL notify);
+	BOOL getNotifyForGroup(std::string groupName);
 	void setGroupColor(std::string groupName, LLColor4 color);
 
 
