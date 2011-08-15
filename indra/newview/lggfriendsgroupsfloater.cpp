@@ -100,11 +100,11 @@ public:
 	void toggleSelect(int pos);
 	static BOOL compareAv(LLUUID av1, LLUUID av2);
 
+	static void onClickSettings(void* data);
 	static void onClickNew(void* data);
 	static void onClickDelete(void* data);
 
 	static void onBackgroundChange(LLUICtrl* ctrl, void* userdata);
-	static void onDefaultBackgroundChange(LLUICtrl* ctrl, void* userdata);
 
 	static void onNoticesChange(LLUICtrl* ctrl, void* userdata);
 	static void onCheckBoxChange(LLUICtrl* ctrl, void* userdata);
@@ -142,22 +142,20 @@ lggFriendsGroupsFloater::~lggFriendsGroupsFloater()
 	sInstance = NULL;
 }
 lggFriendsGroupsFloater::lggFriendsGroupsFloater(const LLSD& seed)
-:mouse_x(0),mouse_y(0),hovered(0.f),justClicked(FALSE),scrollLoc(0),showRightClick(FALSE),maxSize(0)
+:mouse_x(0),mouse_y(900),hovered(0.f),justClicked(FALSE),scrollLoc(0),showRightClick(FALSE),maxSize(0)
 {
+	if(sInstance)delete sInstance;
+	sInstance = this;
 	selected.clear();
 	currentList.clear();
 	LLAvatarTracker::instance().addObserver(this);
-
-	LLUICtrlFactory::getInstance()->buildFloater(this, "floater_friendsgroups.xml");
-
+	
 	if (getRect().mLeft == 0 
 		&& getRect().mBottom == 0)
 	{
 		center();
 	}
-	if(sInstance)delete sInstance;
-	sInstance = this;
-
+	LLUICtrlFactory::getInstance()->buildFloater(this, "floater_friendsgroups.xml");
 }
 void lggFriendsGroupsFloater::changed(U32 mask)
 {
@@ -173,16 +171,6 @@ void lggFriendsGroupsFloater::onBackgroundChange(LLUICtrl* ctrl, void* userdata)
 
 		LGGFriendsGroups::getInstance()->setGroupColor(*currentGroup,cctrl->get());
 
-	}
-
-}
-void lggFriendsGroupsFloater::onDefaultBackgroundChange(LLUICtrl* ctrl, void* userdata)
-{
-	LLColorSwatchCtrl* cctrl = (LLColorSwatchCtrl*)ctrl;
-
-	if(cctrl)
-	{
-		LGGFriendsGroups::getInstance()->setDefaultColor(cctrl->get());
 	}
 
 }
@@ -264,10 +252,9 @@ BOOL lggFriendsGroupsFloater::postBuild(void)
 	
 	childSetAction("lgg_fg_groupCreate",onClickNew,this);
 	childSetAction("lgg_fg_groupDelete",onClickDelete,this);
+	childSetAction("lgg_fg_openSettings",onClickSettings,this);
+
 	groupColorBox->setCommitCallback(onBackgroundChange);
-		
-	getChild<LLColorSwatchCtrl>("colordefault")->setCommitCallback(onDefaultBackgroundChange);
-	getChild<LLColorSwatchCtrl>("colordefault")->set(LGGFriendsGroups::getInstance()->getDefaultColor());
 
 	noticeBox = getChild<LLCheckBoxCtrl>("lgg_fg_showNotices");
 	noticeBox->setCommitCallback(onNoticesChange);
@@ -289,15 +276,6 @@ BOOL lggFriendsGroupsFloater::postBuild(void)
 void lggFriendsGroupsFloater::setData(void * data)
 {
 	phpanel = (LLPanelPhoenix*)data;
-}
-
-void lggFriendsGroupsFloaterStart::show(BOOL showin,void * data)
-{
-	if(showin)
-	{
-		lggFriendsGroupsFloater* dic_floater = lggFriendsGroupsFloater::showInstance();
-		dic_floater->setData(data);
-	}
 }
 
 
@@ -709,6 +687,12 @@ void lggFriendsGroupsFloater::draw()
 	LLFontGL* font = LLFontGL::getFontSansSerifSmall();
 	LLFontGL* bigFont = LLFontGL::getFontSansSerifBig();
 	LLFontGL* hugeFont = LLFontGL::getFontSansSerifHuge();
+
+
+	static std::string *currentGroup = rebind_llcontrol<std::string>("PhoenixFriendsGroupsSelectedGroup", &gSavedSettings, true);
+	static BOOL *textNotBg = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsColorizeText",&gSavedSettings,true);
+	static BOOL *barNotBg = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsColorizeBar",&gSavedSettings,true);
+	
 		
 	std::vector<LLUUID> workingList;
 	workingList= currentList;
@@ -732,7 +716,6 @@ void lggFriendsGroupsFloater::draw()
 		{
 			LLUIImage *arrowUpImage = LLUI::getUIImage("map_avatar_above_32.tga");
 			LLUIImage *arrowDownImage = LLUI::getUIImage("map_avatar_below_32.tga");
-			std::string *currentGroup = rebind_llcontrol<std::string>("PhoenixFriendsGroupsSelectedGroup", &gSavedSettings, true);
 			LLColor4 active = LGGFriendsGroups::getInstance()->getGroupColor(*currentGroup);
 			LLColor4 unactive = LGGFriendsGroups::toneDownColor(active,.5);
 
@@ -826,6 +809,9 @@ void lggFriendsGroupsFloater::draw()
 
 			BOOL *showOtherGroups = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsShowOtherGroups", &gSavedSettings, true);
 			std::string *cg = rebind_llcontrol<std::string>("PhoenixFriendsGroupsSelectedGroup", &gSavedSettings, true);
+			std::vector<std::string> groupsIsIn;				
+			groupsIsIn= LGGFriendsGroups::getInstance()->getFriendGroups(agent_id);
+
 			LLColor4 color = LGGFriendsGroups::getInstance()->getGroupColor(*cg);
 			if(!LGGFriendsGroups::getInstance()->isFriendInGroup(agent_id,*cg))
 				color = LGGFriendsGroups::getInstance()->getDefaultColor();
@@ -836,14 +822,22 @@ void lggFriendsGroupsFloater::draw()
 				color = LGGFriendsGroups::toneDownColor(color,((F32)bubble)/((F32)bMag));
 			
 			gGL.color4fv(color.mV);			
-			gl_rect_2d(box);
+			if(!(*barNotBg) && !(*textNotBg))
+			{
+				gl_rect_2d(box);
+			}else
+			{
+				LLRect smallBox = box;
+				smallBox.setLeftTopAndSize(box.mLeft,box.mTop,10+(bubble/2),box.getHeight());
+				gl_rect_2d(smallBox);
+				smallBox.setLeftTopAndSize(box.mLeft+10+(bubble/2),box.mTop,box.getWidth()-(10+(bubble/2)),box.getHeight());
+				gGL.color4fv(LGGFriendsGroups::toneDownColor(LGGFriendsGroups::getInstance()->getDefaultColor(),((F32)bubble)/((F32)bMag)).mV);
+				gl_rect_2d(smallBox);
+			}
 
 			//draw over lays (other group names)
 			if(box.getHeight()>25)
 			{
-				std::vector<std::string> groupsIsIn;
-				
-				groupsIsIn= LGGFriendsGroups::getInstance()->getFriendGroups(agent_id);
 				int breathingRoom = 0;
 				if(box.getHeight()>35)breathingRoom=4;
 
@@ -1032,13 +1026,19 @@ void lggFriendsGroupsFloater::draw()
 				LLFontGL* useFont = font;
 				if(thisSize>14)useFont = bigFont;
 				if(thisSize>25)useFont = hugeFont;
+				
+				int roomForBar = 0;
+				if((*barNotBg)||(*textNotBg))roomForBar=10+(bubble/2);
+
+				LLColor4 nameTextColor = LLColor4::white;
+				if((*textNotBg)&(groupsIsIn.size()>0))nameTextColor=LGGFriendsGroups::toneDownColor(color,1.0f);
 
 				useFont->renderUTF8(
 					text
 					, 0,
-					box.mLeft+0,
+					box.mLeft+roomForBar,
 					top-(thisSize/2),
-					LLColor4::white, LLFontGL::LEFT,
+					nameTextColor, LLFontGL::LEFT,
 					LLFontGL::BASELINE, LLFontGL::DROP_SHADOW);
 
 				//useFont->renderUTF8(llformat(" %d ",p),0,box.mLeft+0,top-(thisSize/2),LLColor4::white,LLFontGL::LEFT,
@@ -1160,11 +1160,11 @@ BOOL lggFriendsGroupsFloater::compareAv(LLUUID av1, LLUUID av2)
 }
 BOOL lggFriendsGroupsFloater::generateCurrentList()
 {
-	BOOL *showOnline = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsShowOnline", &gSavedSettings, true);
-	BOOL *showOffline = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsShowOffline", &gSavedSettings, true);
-	BOOL *yshowAllFriends = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsShowAllFriends", &gSavedSettings, true);
+	static BOOL *showOnline = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsShowOnline", &gSavedSettings, true);
+	static BOOL *showOffline = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsShowOffline", &gSavedSettings, true);
+	static BOOL *yshowAllFriends = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsShowAllFriends", &gSavedSettings, true);
 	//static BOOL *showOtherGroups = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsShowOtherGroups", &gSavedSettings, true);
-	std::string *currentGroup = rebind_llcontrol<std::string>("PhoenixFriendsGroupsSelectedGroup", &gSavedSettings, true);
+	static std::string *currentGroup = rebind_llcontrol<std::string>("PhoenixFriendsGroupsSelectedGroup", &gSavedSettings, true);
 
 	currentList.clear();
 	std::map<LLUUID, LLRelationship*>::iterator p;
@@ -1200,4 +1200,74 @@ void lggFriendsGroupsFloater::onClickNew(void* data)
 		LGGFriendsGroups::getInstance()->addGroup(text);
 
 	sInstance->updateGroupsList();
+}
+void lggFriendsGroupsFloater::onClickSettings(void* data)
+{
+	lggFriendsGroupsFloaterStart::showSettings(TRUE);
+}
+class lggFriendsGroupsFloaterSettings;
+class lggFriendsGroupsFloaterSettings : public LLFloater, public LLFloaterSingleton<lggFriendsGroupsFloaterSettings>
+{
+public:
+	lggFriendsGroupsFloaterSettings(const LLSD& seed);
+	virtual ~lggFriendsGroupsFloaterSettings();
+
+	BOOL postBuild(void);
+	static void onClickOk(void* data);
+	static void onDefaultBackgroundChange(LLUICtrl* ctrl, void* userdata);
+	static lggFriendsGroupsFloaterSettings* sSettingsInstance;
+};
+
+
+lggFriendsGroupsFloaterSettings* lggFriendsGroupsFloaterSettings::sSettingsInstance;
+
+lggFriendsGroupsFloaterSettings::~lggFriendsGroupsFloaterSettings()
+{
+	sSettingsInstance = NULL;
+}
+lggFriendsGroupsFloaterSettings::lggFriendsGroupsFloaterSettings(const LLSD& seed)
+{
+	if(sSettingsInstance)delete sSettingsInstance;
+	sSettingsInstance= this;
+	
+	if (getRect().mLeft == 0 
+		&& getRect().mBottom == 0)
+	{
+		center();
+	}
+	LLUICtrlFactory::getInstance()->buildFloater(this, "floater_friendsgroups_settings.xml");
+}
+BOOL lggFriendsGroupsFloaterSettings::postBuild(void)
+{
+	childSetAction("lgg_fg_okButton",onClickOk,this);
+	getChild<LLColorSwatchCtrl>("colordefault")->setCommitCallback(onDefaultBackgroundChange);
+	getChild<LLColorSwatchCtrl>("colordefault")->set(LGGFriendsGroups::getInstance()->getDefaultColor());
+	return TRUE;
+}
+void lggFriendsGroupsFloaterSettings::onDefaultBackgroundChange(LLUICtrl* ctrl, void* userdata)
+{
+	LLColorSwatchCtrl* cctrl = (LLColorSwatchCtrl*)ctrl;
+	if(cctrl)
+	{
+		LGGFriendsGroups::getInstance()->setDefaultColor(cctrl->get());
+	}
+}
+void lggFriendsGroupsFloaterSettings::onClickOk(void* data)
+{
+	sSettingsInstance->close();
+}
+void lggFriendsGroupsFloaterStart::show(BOOL showin,void * data)
+{
+	if(showin)
+	{
+		lggFriendsGroupsFloater* fg_floater = lggFriendsGroupsFloater::showInstance();
+		fg_floater->setData(data);
+	}
+}
+void lggFriendsGroupsFloaterStart::showSettings(BOOL showin)
+{
+	if(showin)
+	{
+		/*lggFriendsGroupsFloaterSettings* settings_floater =*/ lggFriendsGroupsFloaterSettings::showInstance();
+	}
 }

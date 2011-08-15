@@ -5,8 +5,8 @@
   <check_box bottom_delta="0" enabled="true" follows="left|top" font="SansSerifSmall" height="16" initial_value="false" label="" left_delta="177" mouse_opaque="true" name="lgg_fg_showNotices" visible="true" radio_style="false" width="270" control_name="lgg_fg_showNotices"/>
   <text bottom_delta="11" follows="left|top" font="SansSerifSmall" height="10" left_delta="20" name="lgg_fg_text2a" width="110">Show notices</text>
   <text bottom_delta="-11" follows="left|top" font="SansSerifSmall" height="10" left_delta="0" name="lgg_fg_text2b" width="110">for this Group</text>
-  <color_swatch border_color="0.45098, 0.517647, 0.607843, 1" bottom_delta="-20" can_apply_immediately="true" color="1, 1, 1, 1" follows="left|top" height="40" label="" left_delta="101" mouse_opaque="true" name="colordefault" tool_tip="Default color for friends not in a group" width="65" control_name="lgg_fg_groupColor"/>
-  <button bottom_delta="18" follows="top|left" font="SansSerifSmall" height="20" label="Delete Group" name="lgg_fg_groupDelete" left_delta="92" width="80"/>
+    <button bottom_delta="-2" follows="top|left" font="SansSerifSmall" height="20" label="Settings" name="lgg_fg_openSettings" left_delta="93" width="80"/>
+  <button bottom_delta="0" follows="top|left" font="SansSerifSmall" height="20" label="Delete Group" name="lgg_fg_groupDelete" left_delta="100" width="80"/>
   <color_swatch border_color="0.45098, 0.517647, 0.607843, 1" bottom_delta="-33" can_apply_immediately="true" color="1, 1, 1, 1" follows="left|top" height="55" label="Group Color" left_delta="90" mouse_opaque="true" name="colorswatch" tool_tip="Click to open Color Picker" width="65" control_name="lgg_fg_groupColor"/>
   <view_border blevel_style="in" bottom_delta="2" follows="left|top" height="26" left="5" mouse_opaque="false" name="lgg_fg_border1" width="300"/>
   <text bottom_delta="10" follows="left|top" font="SansSerifSmall" height="10" left="7" name="lgg_fg_text3" width="100">Show:</text>

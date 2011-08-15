@@ -90,6 +90,7 @@
 
 // [RLVa:KB]
 #include "rlvhandler.h"
+#include "lggfriendsgroups.h"
 // [/RLVa:KB]
 
 //
@@ -577,12 +578,19 @@ LLColor4 get_text_color(const LLChat& chat)
 				//Phoenix:KC - color chat from friends. taking care not to color when RLV hide names is in effect, lol
 				static BOOL* sPhoenixColorFriendsChat = rebind_llcontrol<BOOL>("PhoenixColorFriendsChat", &gSavedSettings, true);
 				static BOOL* sPhoenixColorLindensChat = rebind_llcontrol<BOOL>("PhoenixColorLindensChat", &gSavedSettings, true);
-				if (*sPhoenixColorFriendsChat
+				static BOOL* sPhoenixColorFriendsGroupsChat = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsColorizeChat", &gSavedSettings, true);
+				if ( (*sPhoenixColorFriendsChat || *sPhoenixColorFriendsGroupsChat)
 				&& LLAvatarTracker::instance().isBuddy(chat.mFromID)
 				&& (!rlv_handler_t::isEnabled()
 				|| !gRlvHandler.hasBehaviour(RLV_BHVR_SHOWNAMES)))
 				{
 					text_color = gSavedSettings.getColor4("PhoenixFriendChatColor");
+					if(*sPhoenixColorFriendsGroupsChat)
+					{
+						LLColor4 fgColor = LGGFriendsGroups::getInstance()->getFriendColor(chat.mFromID);
+						if(fgColor!=LGGFriendsGroups::getInstance()->getDefaultColor())
+							text_color=fgColor;
+					}
 				}
 				else if(gAgent.getID() == chat.mFromID)
 				{

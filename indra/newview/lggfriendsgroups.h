@@ -31,7 +31,7 @@ public:
 	LLSD exportGroup(std::string groupName);
 	LLSD getFriendsGroups();
 	LLColor4 getGroupColor(std::string groupName);
-	LLColor4 getFriendColor(LLUUID friend_id, std::string ignoredGroupName);
+	LLColor4 getFriendColor(LLUUID friend_id, std::string ignoredGroupName="");
 	LLColor4 getDefaultColor();
 	void setDefaultColor(LLColor4 dColor);
 	std::vector<std::string> getFriendGroups(LLUUID friend_id);

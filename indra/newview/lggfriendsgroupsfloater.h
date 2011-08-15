@@ -37,8 +37,9 @@
 
 class lggFriendsGroupsFloaterStart
 {
-	public:
+public:
 	static void show( BOOL showw , void * data);
+	static void showSettings( BOOL showw );
 };
 
 

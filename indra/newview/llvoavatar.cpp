@@ -144,6 +144,7 @@
 #pragma warning (disable:4702)
 #endif
 #include <boost/lexical_cast.hpp>
+#include "lggfriendsgroups.h"
 
 using namespace LLVOAvatarDefines;
 
@@ -3587,8 +3588,15 @@ void LLVOAvatar::idleUpdateNameTagText(BOOL new_name)
 	
 	//Phoenix:KC - color friend's name tags
 	static BOOL* sPhoenixColorFriendsNameTags = rebind_llcontrol<BOOL>("PhoenixColorFriendsNameTags", &gSavedSettings, true);
+	static BOOL* sPhoenixFriendsGroupsColorizeNameTag = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsColorizeNameTag", &gSavedSettings, true);
 	static LLCachedControl<LLColor4> PhoenixFriendNameColor("PhoenixFriendNameColor", LLColor4(0.447f, 0.784f, 0.663f, 1.f));
 	if(is_friend && *sPhoenixColorFriendsNameTags) name_tag_color = PhoenixFriendNameColor;
+	if(*sPhoenixFriendsGroupsColorizeNameTag)
+	{
+		LLColor4 fgColor = LGGFriendsGroups::getInstance()->getFriendColor(getID());
+		if(fgColor!=LGGFriendsGroups::getInstance()->getDefaultColor())
+			name_tag_color=fgColor;
+	}
 
 	// Rebuild name tag if state change detected
 	if (mNameString.empty()

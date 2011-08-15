@@ -13,6 +13,72 @@
       <key>Value</key>
       <string />
     </map>
+    <key>PhoenixFriendsGroupsColorizeMiniMap</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to color a friends mini map icon based on their friends groups</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>PhoenixFriendsGroupsColorizeNameTag</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to color a friends name tag based on their friends groups</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>PhoenixFriendsGroupsColorizeRadar</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to color a friends name in the radar list based on their friends groups</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>PhoenixFriendsGroupsColorizeText</key>
+    <map>
+      <key>Comment</key>
+      <string>Colorise text instead of backgrounds in the friends groups floater</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>PhoenixFriendsGroupsColorizeBar</key>
+    <map>
+      <key>Comment</key>
+      <string>Colorise only a small area of the backgrounds in the friends groups floater</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>PhoenixFriendsGroupsColorizeChat</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to color a friends chat based on their friends groups</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
     <key>PhoenixFriendsGroupsShowOnline</key>
     <map>
       <key>Comment</key>

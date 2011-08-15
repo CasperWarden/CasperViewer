@@ -66,6 +66,7 @@
 #include "llcombobox.h"
 #include "llfloateractivespeakers.h"
 #include "llimpanel.h" // for LLVoiceChannel
+#include "lggfriendsgroups.h"
 
 void cmdline_printchat(std::string message);
 void send_chat_from_viewer(std::string utf8_out_text, EChatType type, S32 channel);
@@ -1352,6 +1353,8 @@ void LLFloaterAvatarList::refreshAvatarList()
 
 	LLColor4 av_color;
 	static LLColor4* sDefaultListText = rebind_llcontrol<LLColor4>("DefaultListText", &gColors, true);
+	static BOOL *sfriendsGroupsOnRadar = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsColorizeRadar",&gSavedSettings,true);
+
 
 	const std::string icon_image_0 = "icn_active-speakers-dot-lvl0.tga";
 	const std::string icon_image_1 = "icn_active-speakers-dot-lvl1.tga";
@@ -1421,6 +1424,12 @@ void LLFloaterAvatarList::refreshAvatarList()
 		else
 		{
 			av_color = (*sDefaultListText).getValue();
+		}
+		if((*sfriendsGroupsOnRadar)&&is_agent_friend(av_id))
+		{
+			LLColor4 fgColor = LGGFriendsGroups::getInstance()->getFriendColor(av_id);
+			if(fgColor!=LGGFriendsGroups::getInstance()->getDefaultColor())
+				av_color=fgColor;
 		}
 		
 		// Marked avatars should always show up coloured
