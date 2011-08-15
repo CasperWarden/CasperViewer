@@ -131,6 +131,7 @@ const S32 RLVa_VERSION_BUILD = 2;
 enum ERlvBehaviour {
 	RLV_BHVR_DETACH = 0,			// "detach"
 	RLV_BHVR_ATTACH,				// "attach"
+	RLV_BHVR_ATTACHOVERORREPLACE,	// "attachoverorreplace"
 	RLV_BHVR_ADDATTACH,				// "addattach"
 	RLV_BHVR_REMATTACH,				// "remattach"
 	RLV_BHVR_ADDOUTFIT,				// "addoutfit"

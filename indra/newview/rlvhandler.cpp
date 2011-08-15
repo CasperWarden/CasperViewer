@@ -1463,6 +1463,7 @@ ERlvCmdRet RlvHandler::processForceCommand(const RlvCommand& rlvCmd) const
 			}
 			break;
 		case RLV_BHVR_ATTACH:
+		case RLV_BHVR_ATTACHOVERORREPLACE:
 		case RLV_BHVR_ATTACHOVER:
 		case RLV_BHVR_ATTACHALL:
 		case RLV_BHVR_ATTACHALLOVER:
