@@ -94,7 +94,7 @@ Foutdetails: De waarschuwing genaamd &apos;[_NAME]&apos; is niet gevonden in not
 		<usetemplate name="okcancelbuttons" notext="Annuleren" yestext="Ja"/>
 	</notification>
 	<notification name="BadInstallation">
-		Er is een fout opgetreden tijdens het bijwerken van Second Life. Download alstublieft de meest recente versie van secondlife.com
+    Er is een fout opgetreden tijdens het bijwerken van Second Life. Download alstublieft de meest recente versie van PheonixViewer.com
     <usetemplate
      name="okbutton"
      yestext="OK"/>
@@ -3051,7 +3051,13 @@ Klik Accepteren om deel te nemen aan de chat of Afwijzen om de uitnodiging af te
 		Er is een fout opgetreden tijdens het verbinden met voice chat voor [VOICE_CHANNEL_NAME]. Probeert u het later alstublieft opnieuw.
 	</notification>
 	<notification name="ServerVersionChanged">
-		De regio die u bent binnengetreden wordt onder een andere simulatorversie uitgevoerd. Klik dit bericht voor meer details.
+    De regio die u bent binnengetreden wordt onder een andere simulatorversie uitgevoerd.
+Huidige simulator: [NEWVERSION]
+Vorige simulator : [OLDVERSION]
+    <unique>
+      <context key="OLDVERSION"/>
+      <context key="NEWVERSION"/>
+    </unique>
 	</notification>
 	<notification name="UnableToOpenCommandURL">
 		De URL die u heeft geklikt kan niet binnen deze webbrowser worden geopend.
