@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<panel label="Voice chat" name="chat">
+<panel label="Voicechat" name="chat">
 	<text_editor name="voice_unavailable">
 		Voice chat is niet beschikbaar
 	</text_editor>

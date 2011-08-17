@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<panel label="Tekst chat" name="chat">
+<panel label="Tekstchat" name="chat">
 	<text name="text_box">
 		Chat lettertype grootte:
 	</text>
