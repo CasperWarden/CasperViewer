@@ -33,7 +33,7 @@
 	<check_box left="136" label="Beide zijden uitrekken" name="checkbox uniform"/>
 	<check_box left="136" label="Texturen uitrekken" name="checkbox stretch textures"/>
 	<check_box left="136" label="Gebruik grid" name="checkbox snap to grid"/>
-	<button label="Opties..." label_selected="Opties..." name="Options..." height="18" bottom_delta="-15"/>
+	<button label="Opties..." label_selected="Opties..." name="Options..." height="18" bottom_delta="-16" left="220"/>
 	<text name="text status" width="280">
 		Sleep om te verplaatsen, Shift-slepen om te kopiëren
 	</text>
@@ -228,6 +228,8 @@
 			<text name="edit_object">
 				Bewerk object parameters:
 			</text>
+      <button name="link_obj" label="Link" left="5" tool_tip="Link selected objects together"  width="50" />
+			<button name="unlink_obj"  label="Unlink" left_delta="50" tool_tip="Unlinks linkset."  width="50" />
 			<check_box label="Vergrendeld" name="checkbox locked" tool_tip="Voorkomt het verplaatsen of verwijderen van objecten. Regelmatig handig tijdens het bouwen om onbedoelde bewerkingen te voorkomen."/>
 			<check_box label="Fysiek" name="Physical Checkbox Ctrl" tool_tip="Staat toe dat objecten geduwd worden en worden beïnvloed door de zwaartekracht"/>
 			<check_box label="Tijdelijk" name="Temporary Checkbox Ctrl" tool_tip="Zorgt ervoor dat het object 1 minuut na creatie wordt verwijderd."/>
@@ -238,18 +240,27 @@
 			<spinner label="X" name="Pos X"/>
 			<spinner label="Y" name="Pos Y"/>
 			<spinner label="Z" name="Pos Z"/>
+      <button left_delta="75" name="copypos" tool_tip="Copy Position"/>
+      <button name="pastepos" tool_tip="Paste Position"/>
+      <button name="pasteposclip" tool_tip="Paste Position from Clipboard"/>
 			<text name="label size">
 				Grootte (meters)
 			</text>
 			<spinner label="X" name="Scale X"/>
 			<spinner label="Y" name="Scale Y"/>
 			<spinner label="Z" name="Scale Z"/>
+      <button left_delta="75" name="copysize" tool_tip="Copy Size"/>
+      <button name="pastesize" tool_tip="Paste Size"/>
+      <button name="pastesizeclip" tool_tip="Paste Size from Clipboard"/>
 			<text name="label rotation">
 				Rotatie (graden)
 			</text>
 			<spinner label="X" name="Rot X"/>
 			<spinner label="Y" name="Rot Y"/>
 			<spinner label="Z" name="Rot Z"/>
+      <button left_delta="75" name="copyrot" tool_tip="Copy Rotation"/>
+      <button name="pasterot" tool_tip="Paste Rotation"/>
+      <button name="pasterotclip" tool_tip="Paste Rotation from Clipboard"/>
 			<text name="label material">
 				Materiaal
 			</text>
@@ -276,6 +287,8 @@
 					Rubber
 				</combo_item>
 			</combo_box>
+      <button name="copyparams" bottom="-40" label="Copy" tool_tip="Copy Parameters from Clipboard"  width="42" />
+      <button name="pasteparams" label="Paste" tool_tip="Paste Parameters from Clipboard"  width="42" />
 			<text name="label basetype">
 				Bouwbloktype
 			</text>
@@ -399,12 +412,13 @@
 		</panel>
 		<panel label="Kenmerken" name="Features">
 			<text name="select_single">
-				Selecteer slechts één primitief om kenmerken te bewerken
+				Selecteer slechts één primitief om kenmerken
+te bewerken
 			</text>
 			<text name="edit_object">
 				Bewerk objectkenmerken:
 			</text>
-			<check_box label="Flexibiliteit" name="Flexible1D Checkbox Ctrl" tool_tip="Staat toe dat objecten kunnen buigen om de Z-as. (alleen aan de client kant)"/>
+			<check_box label="Flexibiliteit" name="Flexible1D Checkbox Ctrl" bottom_delta="-40" tool_tip="Staat toe dat objecten kunnen buigen om de Z-as. (alleen aan de client kant)"/>
 			<spinner label="Zachtheid" name="FlexNumSections" width="143" label_width="80"/>
 			<spinner label="Zwaartekracht" name="FlexGravity" width="143" label_width="80"/>
 			<spinner label="Slepen" name="FlexFriction" width="143" label_width="80"/>
@@ -549,6 +563,11 @@
 (moet eerst laden)
 			</text>
 			<button label="Uitlijnen" label_selected="Uitlijnen" name="button align" left="155" />
+      <text name="textbox params">
+        Texture Params
+      </text>
+      <button label="Copy" name="copytextures" tool_tip="Copy Texture Params from Clipboard"  width="68" />
+      <button label="Paste" name="pastetextures" tool_tip="Paste Texture Params from Clipboard"  width="68" />
 		</panel>
 		<panel label="Inhoud" name="Contents">
 			<button label="Nieuw script" label_selected="Nieuw script..." name="button new script"/>
@@ -596,7 +615,8 @@
 		Klik en sleep om beeld te wijzigen
 	</string>
 	<string name="status_grab">
-		Sleep om te verplaatsen, Ctrl om op te tillen, Ctrl-Shift om te roteren.
+		Sleep om te verplaatsen, Ctrl om op te tillen,
+Ctrl-Shift om te roteren.
 	</string>
 	<string name="status_place">
 		Klik in-wereld om te bouwen
