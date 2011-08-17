@@ -139,7 +139,7 @@ Kies alstublieft slechts één item en probeer het opnieuw.
 	</notification>
 	<notification name="GrantModifyRights">
 		Het geven van wijzigingsrechten aan een andere inwoner, maakt het voor hun mogelijk om elk willekeurig object te wijzigen, te verwijderen of om WILLEKEURIGE objecten die u in wereld heeft terug te nemen. Wees HEEL voorzichtig met het uitgeven van dit recht.
-Wilt u wijzigingsrechten aan [FIRST_NAME] [LAST_NAME] geven?
+Wilt u wijzigingsrechten aan [NAME] geven?
 		<usetemplate name="okcancelbuttons" notext="Nee" yestext="Ja"/>
 	</notification>
 	<notification name="GrantModifyRightsMultiple">
@@ -148,7 +148,7 @@ Wilt u wijzigingsrechten aan de geselecteerde inwoners geven?
 		<usetemplate name="okcancelbuttons" notext="Nee" yestext="Ja"/>
 	</notification>
 	<notification name="RevokeModifyRights">
-		Wilt u de wijzigingsrechten voor [FIRST_NAME] [LAST_NAME] terugnemen?
+		Wilt u de wijzigingsrechten voor [NAME] terugnemen?
 		<usetemplate name="okcancelbuttons" notext="Nee" yestext="Ja"/>
 	</notification>
 	<notification name="RevokeModifyRightsMultiple">
@@ -988,7 +988,7 @@ Vriendschap aanbieden aan [NAME]?
 		</form>
 	</notification>
 	<notification name="RemoveFromFriends">
-		Wilt u [FIRST_NAME] [LAST_NAME] van uw Vriend lijst verwijderen?
+		Wilt u [NAME] van uw Vriend lijst verwijderen?
 		<usetemplate name="okcancelbuttons" notext="Annuleren" yestext="OK"/>
 	</notification>
 	<notification name="RemoveMultipleFromFriends">
@@ -1162,10 +1162,10 @@ Kies alstublieft een mannelijk of vrouwelijke avatar. U kunt later nog van gedac
 		[NAME] L$ [PRICE] U heeft niet genoeg L$ om dit te doen.
 	</notification>
 	<notification name="GrantedModifyRights">
-		U heeft het recht verkregen om objecten van [FIRST_NAME] [LAST_NAME] te wijzigen.
+		U heeft het recht verkregen om objecten van [NAME] te wijzigen.
 	</notification>
 	<notification name="RevokedModifyRights">
-		Uw recht om objecten van [FIRST_NAME] [LAST_NAME] is ingetrokken.
+		Uw recht om objecten van [NAME] is ingetrokken.
 	</notification>
 	<notification name="FlushMapVisibilityCaches">
 		Dit zal de Kaart cache van deze regio opschonen.
@@ -2443,10 +2443,10 @@ Wilt u de Second Life website bezoeken om dit in te stellen?
 		Onderwerp: [SUBJECT], Bericht: [MESSAGE]
 	</notification>
 	<notification name="FriendOnline">
-		[FIRST] [LAST] is Online
+		[NAME] is Online
 	</notification>
 	<notification name="FriendOffline">
-		[FIRST] [LAST] is Offline
+		[NAME] is Offline
 	</notification>
 	<notification name="AddSelfFriend">
 		U kunt uzelf niet als vriend toevoegen.
