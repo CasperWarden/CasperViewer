@@ -45,10 +45,10 @@ Able Whitman, Adeon Writer, adonaira Aabye, Aeron Kohime, Agathos Frascati, Aime
 To be a success in business, be daring, be first, be different. --Henry Marchant</text_editor>
   </panel>
   <panel border="true" label="Licences" height="386"
-    help_topic="about_licence_tab" name="credits_panel">
+    help_topic="about_licence_tab" name="licence_panel">
     <text_editor bottom="6" embedded_items="false"
      follows="left|top|right|bottom" font="SansSerifSmall" height="374" left="6"
-     max_length="65536" mouse_opaque="true" name="credits_editor" width="423"
+     max_length="65536" mouse_opaque="true" name="licences_editor" width="423"
      word_wrap="true"> 
 
 3Dconnexion SDK Copyright (C) 1992-2007 3Dconnexion
