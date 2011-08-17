@@ -54,7 +54,8 @@
 		<menu_item_separator label="-----------" name="separator6"/>
 		<menu_item_call label="Gebaren..." name="Gestures..."/>
 		<menu_item_call label="Profiel..." name="Profile..."/>
-		<menu_item_call label="Uiterlijk..." name="Appearance..."/>
+    <menu_item_call label="Uiterlijk..." name="Appearance..."/>
+    <menu_item_call label="Weergavenamen" name="Display Name..."/>
 		<menu_item_separator label="-----------" name="separator7"/>
 		<menu_item_check label="Vrienden..." name="Friends..."/>
 		<menu_item_call label="Groepen..." name="Groups..."/>
@@ -67,7 +68,7 @@
 		<menu_item_check label="Bouwen" name="Build"/>
 		<menu_item_check label="Joystick vliegcamera" name="Joystick Flycam"/>
 		<menu_item_call label="Weergave opnieuw instellen" name="Reset View"/>
-		<menu_item_call label="Kijk naar laatste geklets" name="Look at Last Chatter"/>
+		<menu_item_call label="Kijk naar laatste spreker" name="Look at Last Chatter"/>
 		<menu_item_separator label="-----------" name="separator"/>
 		<menu_item_check label="Werkbalk" name="Toolbar"/>
 		<menu_item_check label="Lokale chat" name="Chat History"/>
