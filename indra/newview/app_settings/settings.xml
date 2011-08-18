@@ -24,6 +24,28 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>PhoenixFriendsGroupsDoZoom</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to zoom in over the freind in the floater</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>PhoenixFriendsGroupsRequireCTRL</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to require the ctrl key to be pressed to multi select friends</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
     <key>PhoenixFriendsGroupsColorizeNameTag</key>
     <map>
       <key>Comment</key>

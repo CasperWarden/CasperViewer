@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <floater border="true" can_close="true" can_minimize="true" bottom="400" left="300" can_resize="true" height="879" width="600" min_width="600" min_height="300" name="lgg_fg_floater" title="Friends Groups">
-  <text bottom_delta="-35" follows="left|top" font="SansSerifSmall" height="10" left_delta="5" name="lgg_fg_text1" width="100">Group:</text>
+  <check_box bottom_delta="-5040" left_delta="60" enabled="true" follows="left|top" height="6" initial_value="false" label="0.0"  mouse_opaque="true" name="haxCheckbox" radio_style="false"  />
+  <text bottom_delta="5005" follows="left|top" font="SansSerifSmall" height="10" left_delta="-55" name="lgg_fg_text1" width="100">Group:</text>
   <combo_box allow_text_entry="false" bottom_delta="-5" left_delta="45" follows="left|top" height="18" left="10" max_chars="20" mouse_opaque="true" name="lgg_fg_groupCombo" width="170"/>
   <check_box bottom_delta="0" enabled="true" follows="left|top" font="SansSerifSmall" height="16" initial_value="false" label="" left_delta="177" mouse_opaque="true" name="lgg_fg_showNotices" visible="true" radio_style="false" width="270" control_name="lgg_fg_showNotices"/>
   <text bottom_delta="11" follows="left|top" font="SansSerifSmall" height="10" left_delta="20" name="lgg_fg_text2a" width="110">Show notices</text>

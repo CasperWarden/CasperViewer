@@ -91,13 +91,18 @@ public:
 	BOOL handleMouseDown(S32 x,S32 y,MASK mask);
 	void update();
 	BOOL handleRightMouseDown(S32 x,S32 y,MASK mask);
+	BOOL handleKeyHere( KEY key, MASK mask );
+	BOOL handleDoubleClick(S32 x, S32 y, MASK mask);
 	BOOL handleHover(S32 x, S32 y, MASK mask);
+	BOOL handleUnicodeCharHere(llwchar uni_char);
+	BOOL handleScrollWheel(S32 x, S32 y, S32 clicks);
 	
 	BOOL generateCurrentList();
 	void draw();
 	void drawScrollBars();
 	void drawRightClick();
-	void toggleSelect(int pos);
+	void drawFilter();
+	BOOL toggleSelect(int pos);
 	static BOOL compareAv(LLUUID av1, LLUUID av2);
 
 	static void onClickSettings(void* data);
@@ -108,6 +113,7 @@ public:
 
 	static void onNoticesChange(LLUICtrl* ctrl, void* userdata);
 	static void onCheckBoxChange(LLUICtrl* ctrl, void* userdata);
+	static void hitSpaceBar(LLUICtrl* ctrl, void* userdata);
 
 	void updateGroupsList();
 	void updateGroupGUIs();
@@ -126,7 +132,9 @@ private:
 	S32 mouse_x;
 	S32 mouse_y;
 	F32 hovered;
+	F32 scrollStarted;
 	S32 maxSize;
+	std::string currentFilter;
 	std::vector<S32> selected;
 	std::vector<LLUUID> currentList;
 	S32 scrollLoc;
@@ -142,7 +150,8 @@ lggFriendsGroupsFloater::~lggFriendsGroupsFloater()
 	sInstance = NULL;
 }
 lggFriendsGroupsFloater::lggFriendsGroupsFloater(const LLSD& seed)
-:mouse_x(0),mouse_y(900),hovered(0.f),justClicked(FALSE),scrollLoc(0),showRightClick(FALSE),maxSize(0)
+:mouse_x(0),mouse_y(900),hovered(0.f),justClicked(FALSE),scrollLoc(0),
+showRightClick(FALSE),maxSize(0),scrollStarted(0),currentFilter("")
 {
 	if(sInstance)delete sInstance;
 	sInstance = this;
@@ -159,7 +168,19 @@ lggFriendsGroupsFloater::lggFriendsGroupsFloater(const LLSD& seed)
 }
 void lggFriendsGroupsFloater::changed(U32 mask)
 {
-	sInstance->generateCurrentList();
+	if(mask & (LLFriendObserver::ADD | LLFriendObserver::REMOVE ))
+	{
+		sInstance->generateCurrentList();
+	}
+	if(mask & (LLFriendObserver::ONLINE))
+	{
+		static BOOL *showOnline = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsShowOnline", &gSavedSettings, true);
+		static BOOL *showOffline = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsShowOffline", &gSavedSettings, true);
+		if(!(*showOffline&&*showOnline))
+		{
+			sInstance->generateCurrentList();
+		}
+	}
 }
 void lggFriendsGroupsFloater::onBackgroundChange(LLUICtrl* ctrl, void* userdata)
 {
@@ -193,24 +214,36 @@ void lggFriendsGroupsFloater::onCheckBoxChange(LLUICtrl* ctrl, void* userdata)
 
 	if(cctrl)
 	{
-		sInstance->generateCurrentList();
-		
+		sInstance->generateCurrentList();		
 	}
+}
+void lggFriendsGroupsFloater::hitSpaceBar(LLUICtrl* ctrl, void* userdata)
+{
+	LLCheckBoxCtrl* cctrl = (LLCheckBoxCtrl*)ctrl;
 
+	if(cctrl)
+	{
+		if(sInstance->currentFilter=="")
+			sInstance->justClicked=TRUE;
+		else
+		{
+			sInstance->currentFilter+=' ';
+			sInstance->generateCurrentList();
+		}
+	}
 }
 void lggFriendsGroupsFloater::updateGroupsList()
 {
 	std::string currentGroup = gSavedSettings.getString("PhoenixFriendsGroupsSelectedGroup");
 	LLComboBox * cb = groupsList;
 	//if(	sInstance->groupsList != NULL) cb = sInstance->groupsList;
-	
+
 	cb->clear();
 	cb->removeall();
 	std::vector<std::string> groups = LGGFriendsGroups::getInstance()->getAllGroups();
 	for(int i =0;i<groups.size();i++)
 	{
 		cb->add(groups[i],groups[i],ADD_BOTTOM,TRUE);
-		
 	}
 	if((currentGroup=="")&&(groups.size()>0))
 	{
@@ -263,6 +296,8 @@ BOOL lggFriendsGroupsFloater::postBuild(void)
 	getChild<LLCheckBoxCtrl>("lgg_fg_showOffline")->setCommitCallback(onCheckBoxChange);
 	getChild<LLCheckBoxCtrl>("lgg_fg_showOtherGroups")->setCommitCallback(onCheckBoxChange);
 	getChild<LLCheckBoxCtrl>("lgg_fg_showAllFriends")->setCommitCallback(onCheckBoxChange);
+
+	getChild<LLCheckBoxCtrl>("haxCheckbox")->setCommitCallback(hitSpaceBar);
 
 	updateGroupsList();
 	generateCurrentList();
@@ -679,6 +714,56 @@ void lggFriendsGroupsFloater::drawRightClick()
 	}
 	justClicked=FALSE;	
 }
+void lggFriendsGroupsFloater::drawFilter()
+{
+	if(sInstance->currentFilter=="")return;
+	int mySize = 40;
+
+	LLRect rec = sInstance->getChild<LLPanel>("top_region")->getRect();
+	LLRect aboveThisMess;
+	aboveThisMess.setLeftTopAndSize(rec.mLeft,rec.mTop+mySize,rec.getWidth(),mySize);
+	LLColor4 backGround(0,0,0,1.0);
+	LLColor4 foreGround(1,1,1,1.0);
+	if(aboveThisMess.pointInRect(sInstance->mouse_x,sInstance->mouse_y))
+	{
+		backGround=LLColor4(0,0,0,.4);
+		foreGround=LLColor4(1,1,1,.4);
+		gGL.color4fv(LLColor4(0,0,0,.2).mV);//for main bg
+	}else
+		gGL.color4fv(LLColor4(0,0,0,.8).mV);
+
+	gl_rect_2d(aboveThisMess);
+	std::string preText("Currently Using Filter: ");
+	int width1 = LLFontGL::getFontSansSerif()->getWidth(preText)+8;
+	int width2 = LLFontGL::getFontSansSerif()->getWidth(sInstance->currentFilter)+8;
+	int tSize = 24;
+	LLRect fullTextBox;
+	fullTextBox.setLeftTopAndSize(aboveThisMess.mLeft+20,aboveThisMess.getCenterY()+(tSize/2),width1+width2,tSize);
+	gGL.color4fv(backGround.mV);
+	gl_rect_2d(fullTextBox);
+	gGL.color4fv(foreGround.mV);
+	gl_rect_2d(fullTextBox,FALSE);
+	LLRect filterTextBox;
+	filterTextBox.setLeftTopAndSize(fullTextBox.mLeft+width1,fullTextBox.mTop,width2,tSize);
+	gl_rect_2d(filterTextBox);	
+	
+	LLFontGL::getFontSansSerif()->renderUTF8(
+		preText
+		, 0,
+		fullTextBox.mLeft+4,
+		fullTextBox.mBottom+4,
+		foreGround, LLFontGL::LEFT,
+		LLFontGL::BASELINE, LLFontGL::DROP_SHADOW);
+	LLFontGL::getFontSansSerif()->renderUTF8(
+		sInstance->currentFilter
+		, 0,
+		filterTextBox.mLeft+4,
+		filterTextBox.mBottom+4,
+		backGround, LLFontGL::LEFT,
+		LLFontGL::BASELINE, LLFontGL::DROP_SHADOW);
+
+
+}
 void lggFriendsGroupsFloater::draw()
 {
 	LLFloater::draw();
@@ -692,7 +777,9 @@ void lggFriendsGroupsFloater::draw()
 	static std::string *currentGroup = rebind_llcontrol<std::string>("PhoenixFriendsGroupsSelectedGroup", &gSavedSettings, true);
 	static BOOL *textNotBg = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsColorizeText",&gSavedSettings,true);
 	static BOOL *barNotBg = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsColorizeBar",&gSavedSettings,true);
-	
+	static BOOL *requireCTRL = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsRequireCTRL",&gSavedSettings,true);
+	static BOOL *doZoom = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsDoZoom",&gSavedSettings,true);
+
 		
 	std::vector<LLUUID> workingList;
 	workingList= currentList;
@@ -700,18 +787,31 @@ void lggFriendsGroupsFloater::draw()
 
 	LLRect topScroll = getChild<LLPanel>("top_region")->getRect();
 	LLRect bottomScroll = getChild<LLPanel>("bottom_region")->getRect();
-	LLRect rec  = getChild<LLPanel>("draw_region")->getRect();
-
+	LLPanel * mainPanel = getChild<LLPanel>("draw_region");
+	LLRect rec  = mainPanel->getRect();
+	if((rec.pointInRect(mouse_x,mouse_y))&&sInstance->hasFocus())
+	{
+		//mainPanel->setFocus(TRUE);
+		//sInstance->setFocus(TRUE);
+		LLCheckBoxCtrl* haxCheck = sInstance->getChild<LLCheckBoxCtrl>("haxCheckbox");
+		haxCheck->setFocus(TRUE);
+	}
+	//LLPanel *panel = getChild<LLPanel>("draw_region");
+	
 	gGL.pushMatrix();
 	gl_circle_2d(rec.getCenterX(),rec.getCenterY(),2.0f,(S32)30,false);
 	int bMag = 35;
+	if(!(*doZoom))bMag=1;
 	//kinda magic numbers to compensate for max bloom effect and stuff
 	float sizeV = (F32)((rec.getHeight()-143)-(((F32)numberOfPanels)*1.07f)-0)/(F32)(numberOfPanels);
+	if(!(*doZoom))sizeV= (F32)((rec.getHeight()-10))/(F32)(numberOfPanels);
 	maxSize=sizeV+bMag;
-	if(sizeV<10)
+	int minSize = 10;
+	if(!(*doZoom))minSize=27;
+	if(sizeV<minSize)
 	{
 		//need scroll bars
-		sizeV=10;
+		sizeV=minSize;
 		if(this->hasFocus())
 		{
 			LLUIImage *arrowUpImage = LLUI::getUIImage("map_avatar_above_32.tga");
@@ -743,6 +843,7 @@ void lggFriendsGroupsFloater::draw()
 					FALSE); 
 			}
 			int maxS =((numberOfPanels*11)+200-(rec.getHeight()));
+			if(!(*doZoom))maxS=((numberOfPanels*(minSize+2))+10-(rec.getHeight()));
 			useColor=unactive;
 			if(mouse_y<bottomScroll.mTop && mouse_y > bottomScroll.mBottom)
 			{
@@ -895,6 +996,11 @@ void lggFriendsGroupsFloater::draw()
 			{
 				gl_rect_2d(imageBox,FALSE);
 				toDisplayToolTipText=toolTipText;
+				if(justClicked&&!showRightClick)
+				{
+					justClicked=FALSE;
+					toggleSelect(p);
+				}
 			}
 
 			LLUIImage *onlineImage = LLUI::getUIImage("icon_avatar_online.tga");
@@ -979,7 +1085,16 @@ void lggFriendsGroupsFloater::draw()
 				gGL.color4fv(LLColor4::yellow.mV);
 				gl_rect_2d(box,FALSE);
 				if(justClicked&&!showRightClick)
-					toggleSelect(p);
+				{
+					//if(requeireCTRL)//todo add setting
+					BOOL found = FALSE;
+					if((*requireCTRL)&&(!gKeyboard->getKeyDown(KEY_CONTROL)))
+					{
+						found = toggleSelect(p);
+						selected.clear();
+					}
+					if(!found)toggleSelect(p);
+				}
 				
 				if(showRightClick)
 				{
@@ -1067,12 +1182,13 @@ void lggFriendsGroupsFloater::draw()
 		LLColor4::white, LLFontGL::LEFT,
 		LLFontGL::BASELINE, LLFontGL::DROP_SHADOW);*/
 
+	drawFilter();
 	if(showRightClick)drawRightClick();
 
 	gGL.popMatrix();
 	justClicked=FALSE;
 }
-void lggFriendsGroupsFloater::toggleSelect(int pos)
+BOOL lggFriendsGroupsFloater::toggleSelect(int pos)
 {
 	justClicked=FALSE;
 	bool found = false;
@@ -1094,6 +1210,7 @@ void lggFriendsGroupsFloater::toggleSelect(int pos)
 		}
 		selected=newList;
 	}
+	return found;
 	
 }
 BOOL lggFriendsGroupsFloater::handleMouseDown(S32 x,S32 y,MASK mask)
@@ -1112,6 +1229,113 @@ BOOL lggFriendsGroupsFloater::handleRightMouseDown(S32 x,S32 y,MASK mask)
 		justClicked=TRUE;
 	}
 	return LLFloater::handleRightMouseDown(x,y,mask);
+}
+BOOL lggFriendsGroupsFloater::handleScrollWheel(S32 x, S32 y, S32 clicks)
+{
+	LLRect rec  = sInstance->getChild<LLPanel>("draw_region")->getRect();
+	int maxS =(((sInstance->currentList.size())*11)+200-(rec.getHeight()));
+
+	BOOL *doZoom = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsDoZoom",&gSavedSettings,true);
+	int moveAmt=12;
+	if(!(*doZoom))moveAmt=29;
+	
+
+	sInstance->scrollLoc=llclamp(sInstance->scrollLoc+(clicks*moveAmt),0,maxS);
+	return LLFloater::handleScrollWheel(x,y,clicks);
+}
+BOOL lggFriendsGroupsFloater::handleUnicodeCharHere(llwchar uni_char)
+{
+	if(' ' == uni_char 
+		&& !gKeyboard->getKeyRepeated(' ')
+		&& (sInstance->currentFilter==""))
+	{
+		sInstance->justClicked=TRUE;
+	}else
+	{
+		if(((U32)uni_char!=27)&&((U32)uni_char!=8))
+		{
+			sInstance->currentFilter+=uni_char;
+			sInstance->generateCurrentList();
+		}
+	}
+
+	return LLFloater::handleUnicodeCharHere(uni_char);
+}
+BOOL lggFriendsGroupsFloater::handleKeyHere( KEY key, MASK mask )
+{
+	LLRect rec  = sInstance->getChild<LLPanel>("draw_region")->getRect();
+	
+	int maxS =(((sInstance->currentList.size())*11)+200-(rec.getHeight()));
+	static BOOL *doZoom = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsDoZoom",&gSavedSettings,true);
+	if(!(*doZoom))maxS=((sInstance->currentList.size()*(29))+10-(rec.getHeight()));
+	std::string localFilter = sInstance->currentFilter;
+
+	int curLoc = sInstance->scrollLoc;
+	
+	if(key==KEY_PAGE_UP)
+	{
+		curLoc-=rec.getHeight();
+	}else if(key == KEY_UP)
+	{
+
+		if(!(*doZoom))curLoc-=29;
+		else curLoc-=12;
+	}else
+	if(key==KEY_PAGE_DOWN)
+	{
+		curLoc+=rec.getHeight();
+	}else if(key==KEY_DOWN)
+	{
+		if(!(*doZoom))curLoc+=29;
+		else curLoc+=12;
+	}
+	if(key==KEY_ESCAPE)
+	{
+		if(localFilter!="")
+		{
+			sInstance->currentFilter="";
+			sInstance->generateCurrentList();
+			return TRUE;
+		}
+	}
+	if(key==KEY_RETURN)
+	{
+		sInstance->justClicked=TRUE;
+	}
+	if(key==KEY_BACKSPACE)
+	{
+		int length = localFilter.length();
+		if(length>0)
+		{
+			length--;
+			sInstance->currentFilter=localFilter.substr(0,length);
+			sInstance->generateCurrentList();
+		}
+	}
+
+	sInstance->scrollLoc=llclamp(curLoc,0,maxS);
+
+	return LLFloater::handleKeyHere(key,mask);
+}
+BOOL lggFriendsGroupsFloater::handleDoubleClick(S32 x, S32 y, MASK mask)
+{
+	LLRect rec  = sInstance->getChild<LLPanel>("draw_region")->getRect();
+	LLRect topScroll = sInstance->getChild<LLPanel>("top_region")->getRect();
+	LLRect bottomScroll = sInstance->getChild<LLPanel>("bottom_region")->getRect();
+
+	int maxS =(((sInstance->currentList.size())*11)+200-(rec.getHeight()));
+	static BOOL *doZoom = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsDoZoom",&gSavedSettings,true);
+	if(!(*doZoom))maxS=((sInstance->currentList.size()*(29))+10-(rec.getHeight()));
+	
+	if(bottomScroll.pointInRect(x,y))
+	{
+		sInstance->scrollLoc=maxS;
+	}else if(topScroll.pointInRect(x,y))
+	{
+		sInstance->scrollLoc=0;
+	}
+
+	return LLFloater::handleDoubleClick(x,y,mask);
 }
 BOOL lggFriendsGroupsFloater::handleHover(S32 x,S32 y,MASK mask)
 {
@@ -1176,8 +1400,35 @@ BOOL lggFriendsGroupsFloater::generateCurrentList()
 	{
 		LLRelationship* relation = p->second;
 		if((! (*showOnline))&&(relation->isOnline()))continue;
-		if((! (*showOffline))&&(!relation->isOnline()))continue;
+		if((! (*showOffline))&&(!relation->isOnline()))continue;		
 		if((! (*yshowAllFriends)&&(!LGGFriendsGroups::getInstance()->isFriendInGroup(p->first,*currentGroup))))continue;
+		if(sInstance->currentFilter!="")
+		{
+			std::string avN("");
+			LLAvatarName avatar_name;
+			if (LLAvatarNameCache::get(p->first, &avatar_name))
+			{
+				std::string fullname;
+				static S32* sPhoenixNameSystem = rebind_llcontrol<S32>("PhoenixNameSystem", &gSavedSettings, true);
+				switch (*sPhoenixNameSystem)
+				{
+				case 0 : fullname = avatar_name.getLegacyName(); break;
+				case 1 : fullname = (avatar_name.mIsDisplayNameDefault? avatar_name.mDisplayName : avatar_name.getCompleteName()); break;
+				case 2 : fullname = avatar_name.mDisplayName; break;
+				default : fullname = avatar_name.getCompleteName(); break;
+				}
+
+				avN=fullname;
+			}
+
+			LLStringUtil::toLower(avN);
+			std::string workingFilter = sInstance->currentFilter;
+			LLStringUtil::toLower(workingFilter);
+			if(avN.find(workingFilter)==std::string::npos)
+			{
+				continue;
+			}
+		}
 
 		currentList.push_back(p->first);
 	}
