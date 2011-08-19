@@ -43,6 +43,7 @@ Ported to Phoenix by Wolfspirit Magic.
 
 #include <map>
 #include <set>
+#include "../newview/lggfriendsgroups.h"
 
 namespace LLAvatarNameCache
 {
@@ -625,6 +626,12 @@ bool LLAvatarNameCache::get(const LLUUID& agent_id, LLAvatarName *av_name)
 			if (it != sCache.end())
 			{
 				*av_name = it->second;
+				if(LGGFriendsGroups::getInstance()->hasPseudonym(agent_id))
+				{
+					LLSD info = av_name->asLLSD();
+					info["display_name"]=LGGFriendsGroups::getInstance()->getPseudonym(agent_id);
+					av_name->fromLLSD(info);
+				}
 
 				// re-request name if entry is expired
 				if (av_name->mExpires < LLFrameTimer::getTotalSeconds())
@@ -680,6 +687,12 @@ void LLAvatarNameCache::get(const LLUUID& agent_id, callback_slot_t slot)
 			if (it != sCache.end())
 			{
 				LLAvatarName& av_name = it->second;
+				if(LGGFriendsGroups::getInstance()->hasPseudonym(agent_id))
+				{
+					LLSD info = av_name.asLLSD();
+					info["display_name"]=LGGFriendsGroups::getInstance()->getPseudonym(agent_id);
+					av_name.fromLLSD(info);
+				}
 				
 				if (av_name.mExpires > LLFrameTimer::getTotalSeconds())
 				{

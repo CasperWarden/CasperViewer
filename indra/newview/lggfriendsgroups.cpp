@@ -192,7 +192,7 @@ LLSD LGGFriendsGroups::getExampleLLSD()
 
 LLColor4 LGGFriendsGroups::getGroupColor(std::string groupName)
 {
-	if(groupName!="")
+	if(groupName!="" && groupName!="All Groups" && groupName!="No Groups" && groupName!="ReNamed" && groupName!="Non Friends")
 		if(mFriendsGroups[groupName].has("color"))
 			return LLColor4(mFriendsGroups[groupName]["color"]);
 	return getDefaultColor();
@@ -201,6 +201,7 @@ LLColor4 LGGFriendsGroups::getFriendColor(
 	LLUUID friend_id, std::string ignoredGroupName)
 {
 	LLColor4 toReturn = getDefaultColor();
+	if(ignoredGroupName=="No Groups") return toReturn;
 	int lowest = 9999;
 	std::vector<std::string> groups = getFriendGroups(friend_id);
 	for(int i =0;i<groups.size();i++)
@@ -208,15 +209,17 @@ LLColor4 LGGFriendsGroups::getFriendColor(
 		if(groups[i]!=ignoredGroupName)
 		{
 			int membersNum = getFriendsInGroup(groups[i]).size();
+			if(membersNum==0)continue;
 			if(membersNum<lowest)
 			{
 				lowest=membersNum;
 				toReturn= LLColor4(mFriendsGroups[groups[i]]["color"]);
+				if(isNonFriend(friend_id))toReturn=toneDownColor(toReturn,.8);
 			}
 		}
 	}
 	if(lowest==9999)
-	if(isFriendInGroup(friend_id,ignoredGroupName))
+	if(isFriendInGroup(friend_id,ignoredGroupName) &&ignoredGroupName!="Non Friends" &&ignoredGroupName!="All Groups" && ignoredGroupName!="No Groups" &&ignoredGroupName!="ReNamed" &&ignoredGroupName!="")
 		return LLColor4(mFriendsGroups[ignoredGroupName]["color"]);
 	return toReturn;
 }
@@ -242,32 +245,70 @@ std::vector<std::string> LGGFriendsGroups::getFriendGroups(LLUUID friend_id)
 	for ( ; loc_it != loc_end; ++loc_it)
 	{
 		const std::string& groupName = (*loc_it).first;
-		if(mFriendsGroups[groupName]["friends"].has(friend_id.asString()))
-			toReturn.push_back(groupName);
+		if(groupName!="" && groupName!="All Groups" && groupName!="No Groups" && groupName!="ReNamed" && groupName!="Non Friends")
+			if(mFriendsGroups[groupName]["friends"].has(friend_id.asString()))
+				toReturn.push_back(groupName);
 	}
 	return toReturn;
 }
-std::vector<std::string> LGGFriendsGroups::getAllGroups()
+std::vector<std::string> LGGFriendsGroups::getAllGroups(BOOL extraGroups)
 {
 	std::vector<std::string> toReturn;
 	toReturn.clear();
+	if(extraGroups)
+	{
+		if(getAllGroups(FALSE).size()>0)
+		{
+			toReturn.push_back("All Groups");
+			toReturn.push_back("No Groups");
+		}
+		if(getListOfPseudonymAvs().size()>0)
+			toReturn.push_back("ReNamed");
+		if(getListOfNonFriends().size()>0)
+			toReturn.push_back("Non Friends");
+	}
 
 	LLSD::map_const_iterator loc_it = mFriendsGroups.beginMap();
 	LLSD::map_const_iterator loc_end = mFriendsGroups.endMap();
 	for ( ; loc_it != loc_end; ++loc_it)
 	{
 		const std::string& groupName = (*loc_it).first;
-		if((groupName!="globalSettings")&&(groupName!=""))
+		if((groupName!="globalSettings")&&(groupName!="ReNamed")&&(groupName!="Non Friends")&&(groupName!="")&&(groupName!="extraAvs")&&(groupName!="pseudonym")&&(groupName!="All Groups")&&groupName!="No Groups")
 			toReturn.push_back(groupName);
 	}
 
 
 	return toReturn;
 }
+std::vector<LLUUID> LGGFriendsGroups::getFriendsInAnyGroup()
+{
+	std::vector<LLUUID> toReturn;
+	toReturn.clear();
+	std::vector<std::string> groups = getAllGroups(FALSE);
+	for(int g=0;g<groups.size();g++)
+	{
+		LLSD friends = mFriendsGroups[groups[g]]["friends"];	
+		LLSD::map_const_iterator loc_it = friends.beginMap();
+		LLSD::map_const_iterator loc_end = friends.endMap();
+		for ( ; loc_it != loc_end; ++loc_it)
+		{
+			const LLSD& friendID = (*loc_it).first;
+			if(std::find(toReturn.begin(), toReturn.end(), friendID)!=toReturn.end())
+			{
+				toReturn.push_back(friendID.asUUID());
+			}
+		}
+	}
+	return toReturn;
+}
 std::vector<LLUUID> LGGFriendsGroups::getFriendsInGroup(std::string groupName)
 {
 	std::vector<LLUUID> toReturn;
 	toReturn.clear();
+	if(groupName=="All Groups")return getFriendsInAnyGroup();
+	if(groupName=="No Groups")return toReturn;
+	if(groupName=="Pseudonym")return getListOfPseudonymAvs();
+	if(groupName=="Non Friends")return getListOfNonFriends();
 
 	LLSD friends = mFriendsGroups[groupName]["friends"];	
 	LLSD::map_const_iterator loc_it = friends.beginMap();
@@ -281,8 +322,22 @@ std::vector<LLUUID> LGGFriendsGroups::getFriendsInGroup(std::string groupName)
 
 	return toReturn;
 }
+BOOL LGGFriendsGroups::isFriendInAnyGroup(LLUUID friend_id)
+{
+	std::vector<std::string> groups = getAllGroups(FALSE);
+	for(int g=0;g<groups.size();g++)
+	{
+		if(mFriendsGroups[groups[g]]["friends"].has(friend_id.asString()))
+			return TRUE;
+	}
+	return FALSE;
+}
 BOOL LGGFriendsGroups::isFriendInGroup(LLUUID friend_id, std::string groupName)
 {	
+	if(groupName=="All Groups") return isFriendInAnyGroup(friend_id);
+	if(groupName=="No Groups") return !isFriendInAnyGroup(friend_id);
+	if(groupName=="ReNamed") return hasPseudonym(friend_id);
+	if(groupName=="Non Friends") return isNonFriend(friend_id);
 	return mFriendsGroups[groupName]["friends"].has(friend_id.asString());
 }
 BOOL LGGFriendsGroups::notifyForFriend(LLUUID friend_id)
@@ -297,18 +352,117 @@ BOOL LGGFriendsGroups::notifyForFriend(LLUUID friend_id)
 }
 void LGGFriendsGroups::addFriendToGroup(LLUUID friend_id, std::string groupName)
 {
-	if(friend_id.notNull() && groupName!="")
+	if(friend_id.notNull() && groupName!="" && groupName!="No Groups" && groupName!="All Groups" && groupName!="ReNamed" && groupName!="Non Friends")
 	{
 		mFriendsGroups[groupName]["friends"][friend_id.asString()]="";
 		save();
 	}
 }
+void LGGFriendsGroups::addNonFriendToList(LLUUID non_friend_id)
+{
+	mFriendsGroups["extraAvs"][non_friend_id.asString()]="";
+	save();
+}
+void LGGFriendsGroups::removeNonFriendFromList(LLUUID non_friend_id)
+{
+	if(mFriendsGroups["extraAvs"].has(non_friend_id.asString()))
+	{
+		mFriendsGroups["extraAvs"].erase(non_friend_id.asString());
+		clearPseudonym(non_friend_id);
+		removeFriendFromAllGroups(non_friend_id);
+		save();
+	}
+}
+void LGGFriendsGroups::removeFriendFromAllGroups(LLUUID friend_id)
+{
+	std::vector<std::string> groups = getFriendGroups(friend_id);
+	for(int i=0;i<groups.size();i++)
+	{
+		removeFriendFromGroup(friend_id,groups[i]);
+	}
+}
+BOOL LGGFriendsGroups::isNonFriend(LLUUID non_friend_id)
+{
+	if(mFriendsGroups["extraAvs"].has(non_friend_id.asString()))return TRUE;
+	return FALSE;
+}
+std::vector<LLUUID> LGGFriendsGroups::getListOfNonFriends()
+{
+	std::vector<LLUUID> toReturn;
+	toReturn.clear();
+
+	LLSD friends = mFriendsGroups["extraAvs"];	
+	LLSD::map_const_iterator loc_it = friends.beginMap();
+	LLSD::map_const_iterator loc_end = friends.endMap();
+	for ( ; loc_it != loc_end; ++loc_it)
+	{
+		const LLSD& friendID = (*loc_it).first;
+		if(friendID.asUUID().notNull())
+			toReturn.push_back(friendID.asUUID());
+	}	
+
+	return toReturn;
+}
+std::vector<LLUUID> LGGFriendsGroups::getListOfPseudonymAvs()
+{
+	std::vector<LLUUID> toReturn;
+	toReturn.clear();
+
+	LLSD friends = mFriendsGroups["pseudonym"];	
+	LLSD::map_const_iterator loc_it = friends.beginMap();
+	LLSD::map_const_iterator loc_end = friends.endMap();
+	for ( ; loc_it != loc_end; ++loc_it)
+	{
+		const LLSD& friendID = (*loc_it).first;
+		if(friendID.asUUID().notNull())
+			toReturn.push_back(friendID.asUUID());
+	}	
+
+	return toReturn;
+}
+void LGGFriendsGroups::setPseudonym(LLUUID friend_id, std::string pseudonym)
+{
+	mFriendsGroups["pseudonym"][friend_id.asString()]=pseudonym;
+	save();
+}
+std::string LGGFriendsGroups::getPseudonym(LLUUID friend_id)
+{
+	if(mFriendsGroups["pseudonym"].has(friend_id.asString()))
+	{
+		return mFriendsGroups["pseudonym"][friend_id.asString()];
+	}
+	return "";
+}
+void LGGFriendsGroups::clearPseudonym(LLUUID friend_id)
+{
+	if(mFriendsGroups["pseudonym"].has(friend_id.asString()))
+	{
+		mFriendsGroups["pseudonym"].erase(friend_id.asString());
+		save();
+	}
+}
+BOOL LGGFriendsGroups::hasPseudonym(LLUUID friend_id)
+{
+	if(getPseudonym(friend_id)!="")return TRUE;
+	return FALSE;
+}
 void LGGFriendsGroups::removeFriendFromGroup(LLUUID friend_id, std::string groupName)
 {
+	if(groupName=="extraAvs"||groupName=="Non Friends")
+	{
+		return removeNonFriendFromList(friend_id);
+	}
+	if(groupName=="ReNamed")
+	{
+		return clearPseudonym(friend_id);
+	}
 	if(friend_id.notNull() && groupName!="")
 	{	
-		mFriendsGroups[groupName]["friends"].erase(friend_id.asString());
-		save();
+		if(mFriendsGroups[groupName]["friends"].has(friend_id.asString()))
+		{
+			mFriendsGroups[groupName]["friends"].erase(friend_id.asString());
+			save();
+		}
 	}
 }
 void LGGFriendsGroups::addGroup(std::string groupName)
@@ -330,6 +484,8 @@ void LGGFriendsGroups::deleteGroup(std::string groupName)
 }
 void LGGFriendsGroups::setNotifyForGroup(std::string groupName, BOOL notify)
 {
+	if(groupName=="All Groups" || groupName == "" || groupName =="No Groups"||groupName=="ReNamed"||groupName=="Non Friends")return;
+
 	if(mFriendsGroups.has(groupName))
 	{
 		mFriendsGroups[groupName]["notify"]=notify;
@@ -349,6 +505,8 @@ BOOL LGGFriendsGroups::getNotifyForGroup(std::string groupName)
 }
 void LGGFriendsGroups::setGroupColor(std::string groupName, LLColor4 color)
 {
+	if(groupName=="All Groups" || groupName == "" || groupName =="No Groups"||groupName=="ReNamed"||groupName=="Non Friends")return;
+
 	if(mFriendsGroups.has(groupName))
 	{
 		mFriendsGroups[groupName]["color"]=color.getValue();

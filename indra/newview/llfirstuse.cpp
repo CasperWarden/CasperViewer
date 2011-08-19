@@ -77,7 +77,35 @@ void LLFirstUse::resetFirstUse()
 		gSavedSettings.setWarning(*iter, TRUE);
 	}
 }
+// static
+void LLFirstUse::usePhoenixFriendsGroup()
+{
+	if (gSavedSettings.getWarning("FirstPhoenixFriendsGroupOpen"))
+	{
+		gSavedSettings.setWarning("FirstPhoenixFriendsGroupOpen", FALSE);
+		LLNotifications::instance().add("FirstPhoenixFriendsGroupOpen");
+	}
+}
 
+//static
+void LLFirstUse::usePhoenixFriendsNonFriend()
+{
+	if (gSavedSettings.getWarning("FirstPhoenixFriendsGroupNonFriend"))
+	{
+		gSavedSettings.setWarning("FirstPhoenixFriendsGroupNonFriend", FALSE);
+		LLNotifications::instance().add("FirstPhoenixFriendsGroupNonFriend");
+	}
+}
+
+// static 
+void LLFirstUse::usePhoenixFriendsGroupRename()
+{
+	if (gSavedSettings.getWarning("FirstPhoenixFriendsGroupRename"))
+	{
+		gSavedSettings.setWarning("FirstPhoenixFriendsGroupRename", FALSE);
+		LLNotifications::instance().add("FirstPhoenixFriendsGroupRename");
+	}
+}
 
 // Called whenever the viewer detects that your balance went up
 void LLFirstUse::useBalanceIncrease(S32 delta)

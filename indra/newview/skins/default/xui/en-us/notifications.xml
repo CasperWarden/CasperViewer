@@ -6393,9 +6393,46 @@ Click the &apos;Stand Up&apos; button to get up.
    icon="notify.tga"
    name="FirstMap"
    type="notify">
-Click and drag to scroll the map.
-Double-click to teleport.
-Use the controls on the right to find things and display different backgrounds.
+    Click and drag to scroll the map.
+    Double-click to teleport.
+    Use the controls on the right to find things and display different backgrounds.
+  </notification>
+
+  <notification
+   icon="notify.tga"
+   name="FirstPhoenixFriendsGroupOpen"
+   type="notify">
+    This is your first time opening the friends groups floater!
+    This floater will allow you to organize your freinds into groups.
+    
+    To get started, type in a name of a group you want,
+    Then press the Create Group button.
+    
+    To add someone to this group, click or ctrl+click some friends,
+    Then RIGHT-CLICK and add them to a group.
+  </notification>
+
+  <notification
+   icon="notify.tga"
+   name="FirstPhoenixFriendsGroupNonFriend"
+   type="notify">
+    You just added someone not on your friends list, to the freinds groups floater!
+    You can use this to colorize and rename people
+    Please be aware that mass tp and confrence calls will still only use people from your friends list.
+
+    You may remove them from the list by right clicking the name and choosing the option.
+  </notification>
+
+  <notification
+   icon="notify.tga"
+   name="FirstPhoenixFriendsGroupRename"
+   type="notify">
+    You just renamed a avatar!
+    This will replace this avatars display name with the one you choose.
+
+    Please be aware that this may take time to apear across the viewer.
+
+    You may remove this name by right clicking the name and choosing Remove Pseudonym.
   </notification>
 
   <notification

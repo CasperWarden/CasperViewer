@@ -1,3 +1,4 @@
+#include "v4color.h"
 /* Copyright (C) 2011 Greg Hendrickson (LordGregGreg Back)
 
    This is free software; you can redistribute it and/or modify it
@@ -35,12 +36,25 @@ public:
 	LLColor4 getDefaultColor();
 	void setDefaultColor(LLColor4 dColor);
 	std::vector<std::string> getFriendGroups(LLUUID friend_id);
-	std::vector<std::string> getAllGroups();
+	std::vector<std::string> getAllGroups(BOOL extraGroups=TRUE);
 	std::vector<LLUUID> getFriendsInGroup(std::string groupName);
 	BOOL isFriendInGroup(LLUUID friend_id, std::string groupName);
+	BOOL isFriendInAnyGroup(LLUUID friend_id);
+	std::vector<LLUUID> getFriendsInAnyGroup();
 	BOOL notifyForFriend(LLUUID friend_id);
 
 	void addFriendToGroup(LLUUID friend_id, std::string groupName);
+	void addNonFriendToList(LLUUID non_friend_id);
+	void removeNonFriendFromList(LLUUID non_friend_id);
+	BOOL isNonFriend(LLUUID non_friend_id);
+	std::vector<LLUUID> getListOfNonFriends();
+	void setPseudonym(LLUUID friend_id, std::string pseudonym);
+	std::string getPseudonym(LLUUID friend_id);
+	std::vector<LLUUID> getListOfPseudonymAvs();
+	void clearPseudonym(LLUUID friend_id);
+	void removeFriendFromAllGroups(LLUUID friend_id);
+	BOOL hasPseudonym(LLUUID friend_id);
+
 	void removeFriendFromGroup(LLUUID friend_id, std::string groupName);
 	void addGroup(std::string groupName);
 	void deleteGroup(std::string groupName);

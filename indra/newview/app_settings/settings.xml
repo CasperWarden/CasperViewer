@@ -13,6 +13,61 @@
       <key>Value</key>
       <string />
     </map>
+    <key>WarnFirstPhoenixFriendsGroupRename</key>
+    <map>
+      <key>Comment</key>
+      <string>Enables FirstPhoenixFriendsGroupRename warning dialog</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>WarnFirstPhoenixFriendsGroupOpen</key>
+    <map>
+      <key>Comment</key>
+      <string>Enables FirstPhoenixFriendsGroupOpen warning dialog</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>WarnFirstPhoenixFriendsGroupOpen</key>
+    <map>
+      <key>Comment</key>
+      <string>Enables FirstPhoenixFriendsGroupOpen warning dialog</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>WarnFirstPhoenixFriendsGroupNonFriend</key>
+    <map>
+      <key>Comment</key>
+      <string>Enables FirstPhoenixFriendsGroupNonFriend warning dialog</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+	<key>PhoenixFriendsGroupsScrollSpeed</key>
+    <map>
+      <key>Comment</key>
+      <string>How fast to scroll the friends groups list while hovering over the bar 1-100</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>S32</string>
+      <key>Value</key>
+      <integer>50</integer>
+    </map>
     <key>PhoenixFriendsGroupsColorizeMiniMap</key>
     <map>
       <key>Comment</key>
@@ -27,7 +82,7 @@
     <key>PhoenixFriendsGroupsDoZoom</key>
     <map>
       <key>Comment</key>
-      <string>Whether to zoom in over the freind in the floater</string>
+      <string>Whether to zoom in over the friend in the floater</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -104,7 +159,7 @@
     <key>PhoenixFriendsGroupsShowOnline</key>
     <map>
       <key>Comment</key>
-      <string>Whether to show online friends in the freinds groups floater</string>
+      <string>Whether to show online friends in the friends groups floater</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -115,7 +170,7 @@
     <key>PhoenixFriendsGroupsShowOffline</key>
     <map>
       <key>Comment</key>
-      <string>Whether to show offline friends in the freinds groups floater</string>
+      <string>Whether to show offline friends in the friends groups floater</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -148,7 +203,7 @@
     <key>PhoenixFriendsGroupsSelectedGroup</key>
     <map>
       <key>Comment</key>
-      <string>Current Selected group in the floater (saved for logoffs)</string>
+      <string>Current Selected group in the friends group floater (saved for logoffs)</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
