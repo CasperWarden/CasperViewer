@@ -213,8 +213,11 @@ LLColor4 LGGFriendsGroups::getFriendColor(
 			if(membersNum<lowest)
 			{
 				lowest=membersNum;
-				toReturn= LLColor4(mFriendsGroups[groups[i]]["color"]);
-				if(isNonFriend(friend_id))toReturn=toneDownColor(toReturn,.8);
+				if(mFriendsGroups[groups[i]].has("color"))
+				{
+					toReturn= LLColor4(mFriendsGroups[groups[i]]["color"]);
+					if(isNonFriend(friend_id))toReturn=toneDownColor(toReturn,.8);
+				}
 			}
 		}
 	}
@@ -245,7 +248,7 @@ std::vector<std::string> LGGFriendsGroups::getFriendGroups(LLUUID friend_id)
 	for ( ; loc_it != loc_end; ++loc_it)
 	{
 		const std::string& groupName = (*loc_it).first;
-		if(groupName!="" && groupName!="All Groups" && groupName!="No Groups" && groupName!="ReNamed" && groupName!="Non Friends")
+		if(groupName!="" && groupName!="All Groups" && groupName!="No Groups" && groupName!="ReNamed" && groupName!="Non Friends" && groupName!="extraAvs" && groupName!="pseudonym")
 			if(mFriendsGroups[groupName]["friends"].has(friend_id.asString()))
 				toReturn.push_back(groupName);
 	}
@@ -307,7 +310,7 @@ std::vector<LLUUID> LGGFriendsGroups::getFriendsInGroup(std::string groupName)
 	toReturn.clear();
 	if(groupName=="All Groups")return getFriendsInAnyGroup();
 	if(groupName=="No Groups")return toReturn;
-	if(groupName=="Pseudonym")return getListOfPseudonymAvs();
+	if(groupName=="pseudonym")return getListOfPseudonymAvs();
 	if(groupName=="Non Friends")return getListOfNonFriends();
 
 	LLSD friends = mFriendsGroups[groupName]["friends"];	

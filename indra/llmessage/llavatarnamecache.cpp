@@ -630,6 +630,7 @@ bool LLAvatarNameCache::get(const LLUUID& agent_id, LLAvatarName *av_name)
 				{
 					LLSD info = av_name->asLLSD();
 					info["display_name"]=LGGFriendsGroups::getInstance()->getPseudonym(agent_id);
+					info["is_display_name_default"]=FALSE;
 					av_name->fromLLSD(info);
 				}
 
@@ -691,6 +692,7 @@ void LLAvatarNameCache::get(const LLUUID& agent_id, callback_slot_t slot)
 				{
 					LLSD info = av_name.asLLSD();
 					info["display_name"]=LGGFriendsGroups::getInstance()->getPseudonym(agent_id);
+					info["is_display_name_default"]=FALSE;
 					av_name.fromLLSD(info);
 				}
 				

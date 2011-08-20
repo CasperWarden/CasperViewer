@@ -548,7 +548,7 @@ void lggFriendsGroupsFloater::drawRightClick()
 		sInstance->currentRightClickText
 			, 0,
 			inTextBox.mLeft,
-			inTextBox.mBottom+8,
+			inTextBox.mBottom+6,
 			LLColor4::black, LLFontGL::LEFT,
 			LLFontGL::BASELINE, LLFontGL::DROP_SHADOW);
 
@@ -1468,6 +1468,11 @@ BOOL lggFriendsGroupsFloater::handleScrollWheel(S32 x, S32 y, S32 clicks)
 }
 BOOL lggFriendsGroupsFloater::handleUnicodeCharHere(llwchar uni_char)
 {
+	if ((uni_char < 0x20) || (uni_char == 0x7F)) // Control character or DEL
+	{
+		return FALSE;
+	}
+
 	if(' ' == uni_char 
 		&& !gKeyboard->getKeyRepeated(' ')
 		&& 
@@ -1590,7 +1595,6 @@ BOOL lggFriendsGroupsFloater::handleDoubleClick(S32 x, S32 y, MASK mask)
 	{
 		sInstance->scrollLoc=0;
 	}
-	LGGFriendsGroups::getInstance()->setPseudonym(LLUUID("8465bb86-bc30-4589-b738-6c303e35ffc5"),"<3 Cazzie");
 	return LLFloater::handleDoubleClick(x,y,mask);
 }
 BOOL lggFriendsGroupsFloater::handleHover(S32 x,S32 y,MASK mask)
