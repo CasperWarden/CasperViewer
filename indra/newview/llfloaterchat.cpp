@@ -580,7 +580,7 @@ LLColor4 get_text_color(const LLChat& chat)
 				static BOOL* sPhoenixColorLindensChat = rebind_llcontrol<BOOL>("PhoenixColorLindensChat", &gSavedSettings, true);
 				static BOOL* sPhoenixColorFriendsGroupsChat = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsColorizeChat", &gSavedSettings, true);
 				if ( (*sPhoenixColorFriendsChat || *sPhoenixColorFriendsGroupsChat)
-				&& LLAvatarTracker::instance().isBuddy(chat.mFromID)
+					&& (LLAvatarTracker::instance().isBuddy(chat.mFromID)||(LGGFriendsGroups::getInstance()->isNonFriend(chat.mFromID)))
 				&& (!rlv_handler_t::isEnabled()
 				|| !gRlvHandler.hasBehaviour(RLV_BHVR_SHOWNAMES)))
 				{

@@ -357,12 +357,12 @@ void lggFriendsGroupsFloater::drawRightClick()
 	int width = 200;
 	BOOL drawRemove=FALSE;
 
-	int extras = 4;//make sure we have room for the extra options
+	int extras = 5;//make sure we have room for the extra options
 	BOOL canMap = FALSE;
 	int isNonFriend=0;
 	if(selected.size()==1)
 	{
-		extras+=7;//space,name,tp, profile, im, rename 
+		extras+=6;//space,name,tp, profile, im, rename 
 		//map
 		if(LGGFriendsGroups::getInstance()->isNonFriend(currentList[selected[0]]))
 		{
@@ -996,7 +996,7 @@ void lggFriendsGroupsFloater::draw()
 	if(!(*doZoom))bMag=1;
 	//kinda magic numbers to compensate for max bloom effect and stuff
 	float sizeV = (F32)((rec.getHeight()-143)-(((F32)numberOfPanels)*1.07f)-0)/(F32)(numberOfPanels);
-	if(!(*doZoom))sizeV= (F32)((rec.getHeight()-10))/(F32)(numberOfPanels);
+	if(!(*doZoom))sizeV= (F32)((rec.getHeight()-0-(numberOfPanels*2)))/(F32)(numberOfPanels);
 	maxSize=sizeV+bMag;
 	int minSize = 10;
 	if(!(*doZoom))minSize=27;
@@ -1662,11 +1662,33 @@ BOOL lggFriendsGroupsFloater::generateCurrentList()
 		if((! (*showOnline))&&(relation->isOnline()))continue;
 		if((! (*showOffline))&&(!relation->isOnline()))continue;		
 		if((! (*yshowAllFriends)&&(!LGGFriendsGroups::getInstance()->isFriendInGroup(p->first,*currentGroup))))continue;
-		if(sInstance->currentFilter!="")
+		
+
+		currentList.push_back(p->first);
+	}
+	//add ppl not in friends list
+	std::vector<LLUUID> nonFriends = LGGFriendsGroups::getInstance()->getListOfNonFriends();
+	//currentList.insert(currentList.end(), nonFriends.begin(), nonFriends.end());
+	for(int i=0;i<nonFriends.size();i++)
+	{
+		if(! (*showOffline))continue;	
+		if((! (*yshowAllFriends)&&(!LGGFriendsGroups::getInstance()->isFriendInGroup(nonFriends[i],*currentGroup))))continue;
+
+		currentList.push_back(nonFriends[i]);
+	}
+
+	//filter \o/
+	if(sInstance->currentFilter!="")
+	{
+		std::vector<LLUUID> newList;
+		std::string workingFilter = sInstance->currentFilter;
+		LLStringUtil::toLower(workingFilter);
+		for(int itFilter=0;itFilter<currentList.size();itFilter++)
 		{
+
 			std::string avN("");
 			LLAvatarName avatar_name;
-			if (LLAvatarNameCache::get(p->first, &avatar_name))
+			if (LLAvatarNameCache::get(currentList[itFilter], &avatar_name))
 			{
 				std::string fullname;
 				static S32* sPhoenixNameSystem = rebind_llcontrol<S32>("PhoenixNameSystem", &gSavedSettings, true);
@@ -1677,26 +1699,18 @@ BOOL lggFriendsGroupsFloater::generateCurrentList()
 				case 2 : fullname = avatar_name.mDisplayName; break;
 				default : fullname = avatar_name.getCompleteName(); break;
 				}
-
 				avN=fullname;
 			}
 
-			LLStringUtil::toLower(avN);
-			std::string workingFilter = sInstance->currentFilter;
-			LLStringUtil::toLower(workingFilter);
-			if(avN.find(workingFilter)==std::string::npos)
+			LLStringUtil::toLower(avN);			
+			if(avN.find(workingFilter)!=std::string::npos)
 			{
-				continue;
+				newList.push_back(currentList[itFilter]);
 			}
 		}
-
-		currentList.push_back(p->first);
+		currentList=newList;
 	}
-	//add ppl not in friends list
-	std::vector<LLUUID> nonFriends = LGGFriendsGroups::getInstance()->getListOfNonFriends();
-	//currentList.insert(currentList.end(), nonFriends.begin(), nonFriends.end());
-	for(int i=0;i<nonFriends.size();i++)
-		currentList.push_back(nonFriends[i]);
+
 
 	std::sort(currentList.begin(),currentList.end(),&lggFriendsGroupsFloater::compareAv);
 	return TRUE;

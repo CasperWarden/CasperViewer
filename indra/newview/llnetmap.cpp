@@ -391,7 +391,7 @@ void LLNetMap::draw()
 					gCacheName->getName(avatar_ids[i], first, last);
 
 			if(LLMuteList::getInstance()->isMuted(avatar_ids[i])) avatar_color = muted_color;
-			if(is_agent_friend(avatar_ids[i]))
+			if(is_agent_friend(avatar_ids[i])||LGGFriendsGroups::getInstance()->isNonFriend(avatar_ids[i]))
 			{
 				if(*friendsGroupsOnMinimap)
 				{

@@ -670,7 +670,7 @@ void LLIMMgr::addMessage(
 		color = gSavedSettings.getColor("UserChatColor");
 	}
 	else if ((*sPhoenixColorFriendsChat||*sPhoenixColorFriendsGroupsChat)
-	&& LLAvatarTracker::instance().isBuddy(other_participant_id)
+		&& (LLAvatarTracker::instance().isBuddy(other_participant_id)||(LGGFriendsGroups::getInstance()->isNonFriend(other_participant_id)))
 	&& (!rlv_handler_t::isEnabled()
 	|| !gRlvHandler.hasBehaviour(RLV_BHVR_SHOWNAMES)))
 	{

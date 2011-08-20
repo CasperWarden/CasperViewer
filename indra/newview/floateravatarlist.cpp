@@ -1425,7 +1425,7 @@ void LLFloaterAvatarList::refreshAvatarList()
 		{
 			av_color = (*sDefaultListText).getValue();
 		}
-		if((*sfriendsGroupsOnRadar)&&is_agent_friend(av_id))
+		if((*sfriendsGroupsOnRadar)&&(is_agent_friend(av_id)||(LGGFriendsGroups::getInstance()->isNonFriend(av_id))))
 		{
 			LLColor4 fgColor = LGGFriendsGroups::getInstance()->getFriendColor(av_id);
 			if(fgColor!=LGGFriendsGroups::getInstance()->getDefaultColor())

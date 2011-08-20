@@ -23,6 +23,7 @@
 #include "llviewercontrol.h"
 #include "llnotifications.h"
 #include "lldir.h"
+#include "llcallingcard.h"
 
 LGGFriendsGroups* LGGFriendsGroups::sInstance;
 
@@ -371,8 +372,11 @@ void LGGFriendsGroups::removeNonFriendFromList(LLUUID non_friend_id)
 	if(mFriendsGroups["extraAvs"].has(non_friend_id.asString()))
 	{
 		mFriendsGroups["extraAvs"].erase(non_friend_id.asString());
-		clearPseudonym(non_friend_id);
-		removeFriendFromAllGroups(non_friend_id);
+		if(!LLAvatarTracker::instance().isBuddy(non_friend_id))
+		{
+			clearPseudonym(non_friend_id);
+			removeFriendFromAllGroups(non_friend_id);
+		}
 		save();
 	}
 }
@@ -386,6 +390,7 @@ void LGGFriendsGroups::removeFriendFromAllGroups(LLUUID friend_id)
 }
 BOOL LGGFriendsGroups::isNonFriend(LLUUID non_friend_id)
 {
+	if(LLAvatarTracker::instance().isBuddy(non_friend_id))return FALSE;
 	if(mFriendsGroups["extraAvs"].has(non_friend_id.asString()))return TRUE;
 	return FALSE;
 }
@@ -401,7 +406,8 @@ std::vector<LLUUID> LGGFriendsGroups::getListOfNonFriends()
 	{
 		const LLSD& friendID = (*loc_it).first;
 		if(friendID.asUUID().notNull())
-			toReturn.push_back(friendID.asUUID());
+			if(!LLAvatarTracker::instance().isBuddy(friendID))
+				toReturn.push_back(friendID.asUUID());
 	}	
 
 	return toReturn;
