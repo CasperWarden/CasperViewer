@@ -106,7 +106,7 @@ public:
 	void drawScrollBars();
 	void drawRightClick();
 	void drawFilter();
-	BOOL toggleSelect(int pos);
+	BOOL toggleSelect(LLUUID whoToToggle);
 	static BOOL compareAv(LLUUID av1, LLUUID av2);
 
 	static void onClickSettings(void* data);
@@ -142,7 +142,7 @@ private:
 	S32 maxSize;
 	std::string currentFilter;
 	std::string currentRightClickText;
-	std::vector<S32> selected;
+	std::vector<LLUUID> selected;
 	std::vector<LLUUID> currentList;
 	S32 scrollLoc;
 	BOOL showRightClick;
@@ -347,7 +347,6 @@ void lggContactSetsFloater::drawScrollBars()
 }
 void lggContactSetsFloater::drawRightClick()
 {
-	std::vector<LLUUID> snapShotCurrentList = currentList;
 	std::string *currentGroup = rebind_llcontrol<std::string>("PhoenixContactSetsSelectedGroup", &gSavedSettings, true);
 
 	if(!sInstance->hasFocus())
@@ -366,21 +365,21 @@ void lggContactSetsFloater::drawRightClick()
 	{
 		extras+=6;//space,name,tp, profile, im, rename 
 		//map
-		if(LGGContactSets::getInstance()->isNonFriend(snapShotCurrentList[selected[0]]))
+		if(LGGContactSets::getInstance()->isNonFriend(selected[0]))
 		{
 			isNonFriend=1;
 			extras+=1;//add remove option
 
 		}else
-		if((LLAvatarTracker::instance().getBuddyInfo(snapShotCurrentList[selected[0]])->getRightsGrantedFrom())& LLRelationship::GRANT_MAP_LOCATION)
+		if((LLAvatarTracker::instance().getBuddyInfo(selected[0])->getRightsGrantedFrom())& LLRelationship::GRANT_MAP_LOCATION)
 		{
-			if(LLAvatarTracker::instance().getBuddyInfo(snapShotCurrentList[selected[0]])->isOnline())
+			if(LLAvatarTracker::instance().getBuddyInfo(selected[0])->isOnline())
 			{
 				extras+=1;
 				canMap=TRUE;
 			}
 		}
-		if(LGGContactSets::getInstance()->hasPseudonym(snapShotCurrentList[selected[0]]))
+		if(LGGContactSets::getInstance()->hasPseudonym(selected[0]))
 		{
 			extras+=1;//for clearing it
 		}
@@ -390,7 +389,7 @@ void lggContactSetsFloater::drawRightClick()
 		extras+=4;//name, conference, mass tp, space
 		for(int i=0;i<selected.size();i++)
 		{
-			if(LGGContactSets::getInstance()->isNonFriend(snapShotCurrentList[selected[i]]))
+			if(LGGContactSets::getInstance()->isNonFriend(selected[i]))
 				isNonFriend++;
 		}
 	}
@@ -444,7 +443,7 @@ void lggContactSetsFloater::drawRightClick()
 			{
 				for(int v=0;v<selected.size();v++)
 				{
-					LLUUID afriend = snapShotCurrentList[selected[v]];
+					LLUUID afriend = selected[v];
 					LGGContactSets::getInstance()->addFriendToGroup(
 						afriend,groups[i]);
 				}
@@ -481,7 +480,7 @@ void lggContactSetsFloater::drawRightClick()
 			{
 				for(int v=0;v<selected.size();v++)
 				{
-					LLUUID afriend = snapShotCurrentList[selected[v]];
+					LLUUID afriend = selected[v];
 					LGGContactSets::getInstance()->removeFriendFromGroup(
 						afriend,*currentGroup);
 
@@ -509,9 +508,9 @@ void lggContactSetsFloater::drawRightClick()
 
 		std::string avName("");
 		LLAvatarName avatar_name;
-		if(LLAvatarNameCache::get(snapShotCurrentList[selected[0]], &avatar_name))avName=avatar_name.getLegacyName();
+		if(LLAvatarNameCache::get(selected[0], &avatar_name))avName=avatar_name.getLegacyName();
 
-		LLColor4 friendColor = LGGContactSets::getInstance()->getFriendColor(snapShotCurrentList[selected[0]],"");
+		LLColor4 friendColor = LGGContactSets::getInstance()->getFriendColor(selected[0],"");
 		
 		
 		remBackGround.setLeftTopAndSize(contextRect.mLeft,top,width,heightPer);
@@ -538,7 +537,7 @@ void lggContactSetsFloater::drawRightClick()
 
 		remBackGround.setLeftTopAndSize(contextRect.mLeft,top,width,heightPer);
 		//draw text block background after the :rename text
-		int remWidth = LLFontGL::getFontSansSerif()->getWidth("Set Alias");
+		int remWidth = LLFontGL::getFontSansSerif()->getWidth("Set Alias:");
 		LLRect inTextBox;
 		inTextBox.setLeftTopAndSize(remBackGround.mLeft+8+remWidth,remBackGround.mTop,
 			remBackGround.getWidth()-8-remWidth,remBackGround.getHeight());
@@ -564,15 +563,15 @@ void lggContactSetsFloater::drawRightClick()
 				//rename avatar
 				if(sInstance->currentRightClickText!="")
 				{
-					LGGContactSets::getInstance()->setPseudonym(snapShotCurrentList[selected[0]],sInstance->currentRightClickText);
+					LGGContactSets::getInstance()->setPseudonym(selected[0],sInstance->currentRightClickText);
 					sInstance->updateGroupsList();
 					LLFirstUse::usePhoenixContactSetRename();
-					LLVOAvatar::invalidateNameTag(snapShotCurrentList[selected[0]]);
+					LLVOAvatar::invalidateNameTag(selected[0]);
 				}
 			}
 		}
 		LLFontGL::getFontSansSerif()->renderUTF8(
-			"Rename:"
+			"Set Alias:"
 			, 0,
 			contextRect.mLeft,
 			top-(heightPer/2)-2,
@@ -580,7 +579,7 @@ void lggContactSetsFloater::drawRightClick()
 			LLFontGL::BASELINE, LLFontGL::DROP_SHADOW);
 		top-=heightPer;
 
-		if(LGGContactSets::getInstance()->hasPseudonym(snapShotCurrentList[selected[0]]))
+		if(LGGContactSets::getInstance()->hasPseudonym(selected[0]))
 		{
 
 			remBackGround.setLeftTopAndSize(contextRect.mLeft,top,width,heightPer);
@@ -592,8 +591,8 @@ void lggContactSetsFloater::drawRightClick()
 				if(justClicked)
 				{
 					//cler avs rename
-					LGGContactSets::getInstance()->clearPseudonym(snapShotCurrentList[selected[0]]);
-					LLVOAvatar::invalidateNameTag(snapShotCurrentList[selected[0]]);
+					LGGContactSets::getInstance()->clearPseudonym(selected[0]);
+					LLVOAvatar::invalidateNameTag(selected[0]);
 					sInstance->generateCurrentList();
 					sInstance->updateGroupsList();
 				}
@@ -620,7 +619,7 @@ void lggContactSetsFloater::drawRightClick()
 				if(justClicked)
 				{
 					//cler avs rename
-					LGGContactSets::getInstance()->removeNonFriendFromList(snapShotCurrentList[selected[0]]);
+					LGGContactSets::getInstance()->removeNonFriendFromList(selected[0]);
 					sInstance->generateCurrentList();
 				}
 			}
@@ -649,7 +648,7 @@ void lggContactSetsFloater::drawRightClick()
 			if(justClicked)
 			{
 				//profileclick
-				LLFloaterAvatarInfo::showFromDirectory(snapShotCurrentList[selected[0]]);
+				LLFloaterAvatarInfo::showFromDirectory(selected[0]);
 			}
 		}
 		LLFontGL::getFontSansSerif()->renderUTF8(
@@ -677,7 +676,7 @@ void lggContactSetsFloater::drawRightClick()
 					//mapclick
 					if( gFloaterWorldMap )
 					{
-						gFloaterWorldMap->trackAvatar(snapShotCurrentList[selected[0]],avName);
+						gFloaterWorldMap->trackAvatar(selected[0],avName);
 						LLFloaterWorldMap::show(NULL, TRUE);
 					}
 
@@ -706,14 +705,14 @@ void lggContactSetsFloater::drawRightClick()
 				//im avatar
 				char buffer[MAX_STRING];
 				LLAvatarName avatar_name;
-				if (LLAvatarNameCache::get(snapShotCurrentList[selected[0]], &avatar_name))
+				if (LLAvatarNameCache::get(selected[0], &avatar_name))
 				{
 					snprintf(buffer, MAX_STRING, "%s", avatar_name.getLegacyName().c_str());
 					gIMMgr->setFloaterOpen(TRUE);
 					gIMMgr->addSession(
 						buffer,
 						IM_NOTHING_SPECIAL,
-						snapShotCurrentList[selected[0]]);
+						selected[0]);
 				}
 			}
 		}
@@ -737,7 +736,7 @@ void lggContactSetsFloater::drawRightClick()
 			if(justClicked)
 			{
 				//offer tp click
-				handle_lure(snapShotCurrentList[selected[0]]);
+				handle_lure(selected[0]);
 			}
 		}
 		LLFontGL::getFontSansSerif()->renderUTF8(
@@ -756,7 +755,7 @@ void lggContactSetsFloater::drawRightClick()
 		LLDynamicArray<LLUUID> ids;
 		for(int se=0;se<selected.size();se++)
 		{
-			LLUUID avid= snapShotCurrentList[selected[se]];
+			LLUUID avid= selected[se];
 			if(!LGGContactSets::getInstance()->isNonFriend(avid))//dont mass tp or confrence non friends
 			{
 				ids.push_back(avid);
@@ -861,11 +860,11 @@ void lggContactSetsFloater::drawRightClick()
 		gl_rect_2d(remBackGround,FALSE);
 		if(justClicked)
 		{
-			std::vector<S32> newSelected;
+			std::vector<LLUUID> newSelected;
 			newSelected.clear();
 			for(int pp=0;pp<currentList.size();pp++)//dont use snapshot, get anyhting new
 			{
-				newSelected.push_back(pp);
+				newSelected.push_back(currentList[pp]);
 			}
 			selected=newSelected;
 		}
@@ -1098,7 +1097,7 @@ void lggContactSetsFloater::draw()
 			BOOL iAMSelected = FALSE;
 			for(int i = 0; i < (int)selected.size();i++)
 			{	
-				if(selected[i]==p)
+				if(selected[i]==workingList[p])
 				{
 					iAMSelected=TRUE;
 				}
@@ -1197,7 +1196,7 @@ void lggContactSetsFloater::draw()
 				if(justClicked&&!showRightClick)
 				{
 					justClicked=FALSE;
-					toggleSelect(p);
+					toggleSelect(workingList[p]);
 				}
 			}
 
@@ -1316,16 +1315,16 @@ void lggContactSetsFloater::draw()
 					BOOL found = FALSE;
 					if((*requireCTRL)&&(!gKeyboard->getKeyDown(KEY_CONTROL)))
 					{
-						found = toggleSelect(p);
+						found = toggleSelect(workingList[p]);
 						selected.clear();
 					}
-					if(!found)toggleSelect(p);
+					if(!found)toggleSelect(workingList[p]);
 				}
 				
 				if(showRightClick)
 				{
 					if(selected.size()<1)
-						toggleSelect(p);
+						toggleSelect(workingList[p]);
 				}
 				
 			}
@@ -1414,24 +1413,24 @@ void lggContactSetsFloater::draw()
 	gGL.popMatrix();
 	justClicked=FALSE;
 }
-BOOL lggContactSetsFloater::toggleSelect(int pos)
+BOOL lggContactSetsFloater::toggleSelect(LLUUID whoToToggle)
 {
 	justClicked=FALSE;
 	bool found = false;
 	for(int i = 0; i < (int)selected.size();i++)
 	{
-		if(selected[i]==pos)
+		if(selected[i]==whoToToggle)
 			found=true;
 	}
 	if(!found)
-		selected.push_back(pos);
+		selected.push_back(whoToToggle);
 	else
 	{
-		std::vector<S32> newList;
+		std::vector<LLUUID> newList;
 		newList.clear();
 		for(int i = 0; i < (int)selected.size();i++)
 		{
-			if(selected[i]!=pos)
+			if(selected[i]!=whoToToggle)
 				newList.push_back(selected[i]);
 		}
 		selected=newList;

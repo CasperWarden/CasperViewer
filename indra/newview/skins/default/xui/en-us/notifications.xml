@@ -6403,7 +6403,7 @@ Click the &apos;Stand Up&apos; button to get up.
    name="FirstPhoenixContactSetOpen"
    type="notify">
     This is your first time opening the Contact Sets floater!
-    This floater will allow you to organize your freinds into groups.
+    This floater will allow you to organize your friends into groups.
     
     To get started, type in a name of a group you want,
     Then press the Create Set button.
@@ -6429,7 +6429,7 @@ Click the &apos;Stand Up&apos; button to get up.
    icon="notify.tga"
    name="FirstPhoenixContactSetRename"
    type="notify">
-    You just renamed a avatar!
+    You just renamed an avatar!
     This will replace this avatars display name with the one you choose.
 
     Please be aware that this may take time to apear across the viewer.

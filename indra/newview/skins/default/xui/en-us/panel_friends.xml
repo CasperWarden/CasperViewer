@@ -26,7 +26,7 @@
 		<column name="friend_last_update_generation" width="0" />
 	</scroll_list>
 	<pad bottom="-7" height="0" left="-90" width="1" />
-	<button bottom_delta="-25" follows="top|right" height="22" label="FriendGroups"
+	<button bottom_delta="-25" follows="top|right" height="22" label="Contact Sets"
 	     left_delta="-2" name="lgg_fg_openFG" tool_tip="List your friends divided in groups"
 	     width="85" />
 	<button bottom_delta="-25" follows="top|right" height="22" label="IM/Call"
