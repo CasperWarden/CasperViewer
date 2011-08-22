@@ -165,6 +165,7 @@ extern LLMap< const LLUUID, LLFloaterAvatarInfo* > gAvatarInfoInstances; // Only
 // [$PLOTR$]
 #include "otr_wrapper.h"
 #include "a_phoenixviewerlink.h"
+#include "lggcontactsets.h"
 // [/$PLOTR$]
 //
 //silly spam define D:
@@ -3327,11 +3328,11 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
 					    static S32* sPhoenixNameSystem = rebind_llcontrol<S32>("PhoenixNameSystem", &gSavedSettings, true);
 						if (*sPhoenixNameSystem == 2 || (*sPhoenixNameSystem == 1 && avatar_name.mIsDisplayNameDefault))
 						{
-							from_name = avatar_name.mDisplayName;
+							from_name = (LGGContactSets::getInstance()->hasVisuallyDiferentPseudonym(from_id)?"'"+avatar_name.mDisplayName+"'":avatar_name.mDisplayName);
 						}
 						else
 						{
-							from_name = avatar_name.getCompleteName();
+							from_name = (LGGContactSets::getInstance()->hasVisuallyDiferentPseudonym(from_id)?"'"+avatar_name.mDisplayName+"' ("+avatar_name.getLegacyName()+")":avatar_name.getCompleteName());
 						}
 					}
 					chat.mFromName = from_name;

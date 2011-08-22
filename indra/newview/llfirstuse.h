@@ -93,9 +93,9 @@ public:
 	// These methods are called each time the appropriate action is
 	// taken.  The functions themselves handle only showing the dialog
 	// the first time, or subsequent times if the user wishes.
-	static void usePhoenixFriendsGroup();
+	static void usePhoenixContactSet();
 	static void usePhoenixFriendsNonFriend();
-	static void usePhoenixFriendsGroupRename();
+	static void usePhoenixContactSetRename();
 	static void useBalanceIncrease(S32 delta);
 	static void useBalanceDecrease(S32 delta);
 	static void useSit();

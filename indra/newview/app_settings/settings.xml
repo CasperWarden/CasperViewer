@@ -13,10 +13,10 @@
       <key>Value</key>
       <string />
     </map>
-    <key>WarnFirstPhoenixFriendsGroupRename</key>
+    <key>WarnFirstPhoenixContactSetRename</key>
     <map>
       <key>Comment</key>
-      <string>Enables FirstPhoenixFriendsGroupRename warning dialog</string>
+      <string>Enables FirstPhoenixContactSetRename warning dialog</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -24,10 +24,10 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
-    <key>WarnFirstPhoenixFriendsGroupOpen</key>
+    <key>WarnFirstPhoenixContactSetOpen</key>
     <map>
       <key>Comment</key>
-      <string>Enables FirstPhoenixFriendsGroupOpen warning dialog</string>
+      <string>Enables FirstPhoenixContactSetOpen warning dialog</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -35,10 +35,10 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
-    <key>WarnFirstPhoenixFriendsGroupOpen</key>
+    <key>WarnFirstPhoenixContactSetOpen</key>
     <map>
       <key>Comment</key>
-      <string>Enables FirstPhoenixFriendsGroupOpen warning dialog</string>
+      <string>Enables FirstPhoenixContactSetOpen warning dialog</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -46,10 +46,10 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
-    <key>WarnFirstPhoenixFriendsGroupNonFriend</key>
+    <key>WarnFirstPhoenixContactSetNonFriend</key>
     <map>
       <key>Comment</key>
-      <string>Enables FirstPhoenixFriendsGroupNonFriend warning dialog</string>
+      <string>Enables FirstPhoenixContactSetNonFriend warning dialog</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -57,7 +57,7 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
-	<key>PhoenixFriendsGroupsScrollSpeed</key>
+	<key>PhoenixContactSetsScrollSpeed</key>
     <map>
       <key>Comment</key>
       <string>How fast to scroll the friends groups list while hovering over the bar 1-100</string>
@@ -68,7 +68,7 @@
       <key>Value</key>
       <integer>50</integer>
     </map>
-    <key>PhoenixFriendsGroupsColorizeMiniMap</key>
+    <key>PhoenixContactSetsColorizeMiniMap</key>
     <map>
       <key>Comment</key>
       <string>Whether to color a friends mini map icon based on their friends groups</string>
@@ -79,7 +79,7 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
-    <key>PhoenixFriendsGroupsDoZoom</key>
+    <key>PhoenixContactSetsDoZoom</key>
     <map>
       <key>Comment</key>
       <string>Whether to zoom in over the friend in the floater</string>
@@ -90,7 +90,7 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
-    <key>PhoenixFriendsGroupsRequireCTRL</key>
+    <key>PhoenixContactSetsRequireCTRL</key>
     <map>
       <key>Comment</key>
       <string>Whether to require the ctrl key to be pressed to multi select friends</string>
@@ -101,7 +101,7 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
-    <key>PhoenixFriendsGroupsColorizeNameTag</key>
+    <key>PhoenixContactSetsColorizeNameTag</key>
     <map>
       <key>Comment</key>
       <string>Whether to color a friends name tag based on their friends groups</string>
@@ -112,7 +112,7 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
-    <key>PhoenixFriendsGroupsColorizeRadar</key>
+    <key>PhoenixContactSetsColorizeRadar</key>
     <map>
       <key>Comment</key>
       <string>Whether to color a friends name in the radar list based on their friends groups</string>
@@ -123,7 +123,7 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
-    <key>PhoenixFriendsGroupsColorizeText</key>
+    <key>PhoenixContactSetsColorizeText</key>
     <map>
       <key>Comment</key>
       <string>Colorise text instead of backgrounds in the friends groups floater</string>
@@ -134,7 +134,7 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
-    <key>PhoenixFriendsGroupsColorizeBar</key>
+    <key>PhoenixContactSetsColorizeBar</key>
     <map>
       <key>Comment</key>
       <string>Colorise only a small area of the backgrounds in the friends groups floater</string>
@@ -145,7 +145,7 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
-    <key>PhoenixFriendsGroupsColorizeChat</key>
+    <key>PhoenixContactSetsColorizeChat</key>
     <map>
       <key>Comment</key>
       <string>Whether to color a friends chat based on their friends groups</string>
@@ -156,7 +156,7 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
-    <key>PhoenixFriendsGroupsShowOnline</key>
+    <key>PhoenixContactSetsShowOnline</key>
     <map>
       <key>Comment</key>
       <string>Whether to show online friends in the friends groups floater</string>
@@ -167,7 +167,7 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
-    <key>PhoenixFriendsGroupsShowOffline</key>
+    <key>PhoenixContactSetsShowOffline</key>
     <map>
       <key>Comment</key>
       <string>Whether to show offline friends in the friends groups floater</string>
@@ -178,7 +178,7 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
-    <key>PhoenixFriendsGroupsShowAllFriends</key>
+    <key>PhoenixContactSetsShowAllFriends</key>
     <map>
       <key>Comment</key>
       <string>Whether to show all friends in the window, instead of only the selected group</string>
@@ -189,7 +189,7 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
-    <key>PhoenixFriendsGroupsShowOtherGroups</key>
+    <key>PhoenixContactSetsShowOtherGroups</key>
     <map>
       <key>Comment</key>
       <string>Whether to show and colorize other groups in the friends groups floater</string>
@@ -200,7 +200,7 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
-    <key>PhoenixFriendsGroupsSelectedGroup</key>
+    <key>PhoenixContactSetsSelectedGroup</key>
     <map>
       <key>Comment</key>
       <string>Current Selected group in the friends group floater (saved for logoffs)</string>

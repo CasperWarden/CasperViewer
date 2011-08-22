@@ -16,7 +16,7 @@
    02111-1307, USA.  */
 
 #include "llviewerprecompiledheaders.h"
-#include "lggfriendsgroups.h"
+#include "lggcontactsets.h"
 #include "llsdserialize.h"
 #include "llboost.h"
 #include "llcontrol.h"
@@ -24,41 +24,54 @@
 #include "llnotifications.h"
 #include "lldir.h"
 #include "llcallingcard.h"
+#include "llavatarnamecache.h"
 
-LGGFriendsGroups* LGGFriendsGroups::sInstance;
+LGGContactSets* LGGContactSets::sInstance;
 
-LGGFriendsGroups::LGGFriendsGroups()
+LGGContactSets::LGGContactSets()
 {
 	sInstance = this;
 	sInstance->loadFromDisk();
 }
 
-LGGFriendsGroups::~LGGFriendsGroups()
+LGGContactSets::~LGGContactSets()
 {
 	sInstance = NULL;
 }
 
-LGGFriendsGroups* LGGFriendsGroups::getInstance()
+LGGContactSets* LGGContactSets::getInstance()
 {
 	if(sInstance)return sInstance;
 	else
 	{
-		sInstance = new LGGFriendsGroups();
+		sInstance = new LGGContactSets();
 		return sInstance;
 	}
 }
-LLColor4 LGGFriendsGroups::toneDownColor(LLColor4 inColor, float strength)
+LLColor4 LGGContactSets::toneDownColor(LLColor4 inColor, float strength)
 {
 	if(strength<.4)strength=.4;
 	return LLColor4(LLColor3(inColor),strength);
 	return inColor;
 }
-
-void LGGFriendsGroups::save()
+bool LGGContactSets::callbackAliasReset(const LLSD& notification, const LLSD& response)
 {
-	saveToDisk(mFriendsGroups);
+	S32 option = LLNotification::getSelectedOption(notification, response);
+	if (option == 0)
+	{
+		LGGContactSets::getInstance()->clearPseudonym(notification["payload"]["agent_id"].asUUID());
+	}
+	else
+	{
+
+	}
+	return false;
 }
-std::string LGGFriendsGroups::getFileName()
+void LGGContactSets::save()
+{
+	saveToDisk(mContactSets);
+}
+std::string LGGContactSets::getFileName()
 {
 	std::string path=gDirUtilp->getExpandedFilename(LL_PATH_PER_SL_ACCOUNT, "");
 
@@ -68,7 +81,7 @@ std::string LGGFriendsGroups::getFileName()
 	}
 	return path;  
 }
-std::string LGGFriendsGroups::getDefaultFileName()
+std::string LGGContactSets::getDefaultFileName()
 {
 	std::string path=gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "");
 
@@ -78,24 +91,24 @@ std::string LGGFriendsGroups::getDefaultFileName()
 	}
 	return path;  
 }
-LLSD LGGFriendsGroups::exportGroup(std::string groupName)
+LLSD LGGContactSets::exportGroup(std::string groupName)
 {
 	LLSD toReturn;
-	if(mFriendsGroups.has(groupName))
+	if(mContactSets.has(groupName))
 	{
 		toReturn["groupname"]=groupName;
-		toReturn["color"]=mFriendsGroups[groupName]["color"];
-		toReturn["notices"]=mFriendsGroups[groupName]["notices"];
-		toReturn["friends"]=mFriendsGroups[groupName]["friends"];
+		toReturn["color"]=mContactSets[groupName]["color"];
+		toReturn["notices"]=mContactSets[groupName]["notices"];
+		toReturn["friends"]=mContactSets[groupName]["friends"];
 	}
 	return toReturn;
 }
-LLSD LGGFriendsGroups::getFriendsGroups()
+LLSD LGGContactSets::getContactSets()
 {
 	//loadFromDisk();
-	return mFriendsGroups;
+	return mContactSets;
 }
-void LGGFriendsGroups::loadFromDisk()
+void LGGContactSets::loadFromDisk()
 {
 	std::string filename=getFileName();
 	if (filename.empty())
@@ -119,7 +132,7 @@ void LGGFriendsGroups::loadFromDisk()
 			file.close();
 			saveToDisk(blankllsd);
 		}else
-		saveToDisk(mFriendsGroups);
+		saveToDisk(mContactSets);
 	}
 	else
 	{
@@ -127,28 +140,28 @@ void LGGFriendsGroups::loadFromDisk()
 		file.open(filename.c_str());
 		if (file.is_open())
 		{
-			LLSDSerialize::fromXML(mFriendsGroups, file);
+			LLSDSerialize::fromXML(mContactSets, file);
 		}
 		file.close();
 	}	
 }
-void LGGFriendsGroups::saveToDisk(LLSD newSettings)
+void LGGContactSets::saveToDisk(LLSD newSettings)
 {
-	mFriendsGroups=newSettings;
+	mContactSets=newSettings;
 	std::string filename=getFileName();
 	llofstream file;
 	file.open(filename.c_str());
-	LLSDSerialize::toPrettyXML(mFriendsGroups, file);
+	LLSDSerialize::toPrettyXML(mContactSets, file);
 	file.close();
 }
-void LGGFriendsGroups::runTest()
+void LGGContactSets::runTest()
 {
 	
-mFriendsGroups.clear();
+mContactSets.clear();
 }
-BOOL LGGFriendsGroups::saveGroupToDisk(std::string groupName, std::string fileName)
+BOOL LGGContactSets::saveGroupToDisk(std::string groupName, std::string fileName)
 {
-	if(mFriendsGroups.has(groupName))
+	if(mContactSets.has(groupName))
 	{
 		llofstream file;
 		file.open(fileName.c_str());
@@ -158,7 +171,7 @@ BOOL LGGFriendsGroups::saveGroupToDisk(std::string groupName, std::string fileNa
 	}
 	return FALSE;
 }
-LLSD LGGFriendsGroups::getExampleLLSD()
+LLSD LGGContactSets::getExampleLLSD()
 {
 	LLSD toReturn;
 
@@ -191,14 +204,14 @@ LLSD LGGFriendsGroups::getExampleLLSD()
 	return toReturn;
 }
 
-LLColor4 LGGFriendsGroups::getGroupColor(std::string groupName)
+LLColor4 LGGContactSets::getGroupColor(std::string groupName)
 {
 	if(groupName!="" && groupName!="All Groups" && groupName!="No Groups" && groupName!="ReNamed" && groupName!="Non Friends")
-		if(mFriendsGroups[groupName].has("color"))
-			return LLColor4(mFriendsGroups[groupName]["color"]);
+		if(mContactSets[groupName].has("color"))
+			return LLColor4(mContactSets[groupName]["color"]);
 	return getDefaultColor();
 };
-LLColor4 LGGFriendsGroups::getFriendColor(
+LLColor4 LGGContactSets::getFriendColor(
 	LLUUID friend_id, std::string ignoredGroupName)
 {
 	LLColor4 toReturn = getDefaultColor();
@@ -214,9 +227,9 @@ LLColor4 LGGFriendsGroups::getFriendColor(
 			if(membersNum<lowest)
 			{
 				lowest=membersNum;
-				if(mFriendsGroups[groups[i]].has("color"))
+				if(mContactSets[groups[i]].has("color"))
 				{
-					toReturn= LLColor4(mFriendsGroups[groups[i]]["color"]);
+					toReturn= LLColor4(mContactSets[groups[i]]["color"]);
 					if(isNonFriend(friend_id))toReturn=toneDownColor(toReturn,.8);
 				}
 			}
@@ -224,38 +237,38 @@ LLColor4 LGGFriendsGroups::getFriendColor(
 	}
 	if(lowest==9999)
 	if(isFriendInGroup(friend_id,ignoredGroupName) &&ignoredGroupName!="Non Friends" &&ignoredGroupName!="All Groups" && ignoredGroupName!="No Groups" &&ignoredGroupName!="ReNamed" &&ignoredGroupName!="")
-		return LLColor4(mFriendsGroups[ignoredGroupName]["color"]);
+		return LLColor4(mContactSets[ignoredGroupName]["color"]);
 	return toReturn;
 }
-LLColor4 LGGFriendsGroups::getDefaultColor()
+LLColor4 LGGContactSets::getDefaultColor()
 {
 	LLColor4 toReturn= LLColor4::grey;
-	if(mFriendsGroups.has("globalSettings"))
-		if(mFriendsGroups["globalSettings"].has("defaultColor"))
-			toReturn = mFriendsGroups["globalSettings"]["defaultColor"];
+	if(mContactSets.has("globalSettings"))
+		if(mContactSets["globalSettings"].has("defaultColor"))
+			toReturn = mContactSets["globalSettings"]["defaultColor"];
 	return toReturn;
 }
-void LGGFriendsGroups::setDefaultColor(LLColor4 dColor)
+void LGGContactSets::setDefaultColor(LLColor4 dColor)
 {
-	mFriendsGroups["globalSettings"]["defaultColor"]=dColor.getValue();
+	mContactSets["globalSettings"]["defaultColor"]=dColor.getValue();
 }
-std::vector<std::string> LGGFriendsGroups::getFriendGroups(LLUUID friend_id)
+std::vector<std::string> LGGContactSets::getFriendGroups(LLUUID friend_id)
 {
 	std::vector<std::string> toReturn;
 	toReturn.clear();
 
-	LLSD::map_const_iterator loc_it = mFriendsGroups.beginMap();
-	LLSD::map_const_iterator loc_end = mFriendsGroups.endMap();
+	LLSD::map_const_iterator loc_it = mContactSets.beginMap();
+	LLSD::map_const_iterator loc_end = mContactSets.endMap();
 	for ( ; loc_it != loc_end; ++loc_it)
 	{
 		const std::string& groupName = (*loc_it).first;
 		if(groupName!="" && groupName!="All Groups" && groupName!="No Groups" && groupName!="ReNamed" && groupName!="Non Friends" && groupName!="extraAvs" && groupName!="pseudonym")
-			if(mFriendsGroups[groupName]["friends"].has(friend_id.asString()))
+			if(mContactSets[groupName]["friends"].has(friend_id.asString()))
 				toReturn.push_back(groupName);
 	}
 	return toReturn;
 }
-std::vector<std::string> LGGFriendsGroups::getAllGroups(BOOL extraGroups)
+std::vector<std::string> LGGContactSets::getAllGroups(BOOL extraGroups)
 {
 	std::vector<std::string> toReturn;
 	toReturn.clear();
@@ -272,8 +285,8 @@ std::vector<std::string> LGGFriendsGroups::getAllGroups(BOOL extraGroups)
 			toReturn.push_back("Non Friends");
 	}
 
-	LLSD::map_const_iterator loc_it = mFriendsGroups.beginMap();
-	LLSD::map_const_iterator loc_end = mFriendsGroups.endMap();
+	LLSD::map_const_iterator loc_it = mContactSets.beginMap();
+	LLSD::map_const_iterator loc_end = mContactSets.endMap();
 	for ( ; loc_it != loc_end; ++loc_it)
 	{
 		const std::string& groupName = (*loc_it).first;
@@ -284,14 +297,14 @@ std::vector<std::string> LGGFriendsGroups::getAllGroups(BOOL extraGroups)
 
 	return toReturn;
 }
-std::vector<LLUUID> LGGFriendsGroups::getFriendsInAnyGroup()
+std::vector<LLUUID> LGGContactSets::getFriendsInAnyGroup()
 {
 	std::vector<LLUUID> toReturn;
 	toReturn.clear();
 	std::vector<std::string> groups = getAllGroups(FALSE);
 	for(int g=0;g<groups.size();g++)
 	{
-		LLSD friends = mFriendsGroups[groups[g]]["friends"];	
+		LLSD friends = mContactSets[groups[g]]["friends"];	
 		LLSD::map_const_iterator loc_it = friends.beginMap();
 		LLSD::map_const_iterator loc_end = friends.endMap();
 		for ( ; loc_it != loc_end; ++loc_it)
@@ -305,7 +318,7 @@ std::vector<LLUUID> LGGFriendsGroups::getFriendsInAnyGroup()
 	}
 	return toReturn;
 }
-std::vector<LLUUID> LGGFriendsGroups::getFriendsInGroup(std::string groupName)
+std::vector<LLUUID> LGGContactSets::getFriendsInGroup(std::string groupName)
 {
 	std::vector<LLUUID> toReturn;
 	toReturn.clear();
@@ -314,7 +327,7 @@ std::vector<LLUUID> LGGFriendsGroups::getFriendsInGroup(std::string groupName)
 	if(groupName=="pseudonym")return getListOfPseudonymAvs();
 	if(groupName=="Non Friends")return getListOfNonFriends();
 
-	LLSD friends = mFriendsGroups[groupName]["friends"];	
+	LLSD friends = mContactSets[groupName]["friends"];	
 	LLSD::map_const_iterator loc_it = friends.beginMap();
 	LLSD::map_const_iterator loc_end = friends.endMap();
 	for ( ; loc_it != loc_end; ++loc_it)
@@ -326,52 +339,52 @@ std::vector<LLUUID> LGGFriendsGroups::getFriendsInGroup(std::string groupName)
 
 	return toReturn;
 }
-BOOL LGGFriendsGroups::isFriendInAnyGroup(LLUUID friend_id)
+BOOL LGGContactSets::isFriendInAnyGroup(LLUUID friend_id)
 {
 	std::vector<std::string> groups = getAllGroups(FALSE);
 	for(int g=0;g<groups.size();g++)
 	{
-		if(mFriendsGroups[groups[g]]["friends"].has(friend_id.asString()))
+		if(mContactSets[groups[g]]["friends"].has(friend_id.asString()))
 			return TRUE;
 	}
 	return FALSE;
 }
-BOOL LGGFriendsGroups::isFriendInGroup(LLUUID friend_id, std::string groupName)
+BOOL LGGContactSets::isFriendInGroup(LLUUID friend_id, std::string groupName)
 {	
 	if(groupName=="All Groups") return isFriendInAnyGroup(friend_id);
 	if(groupName=="No Groups") return !isFriendInAnyGroup(friend_id);
 	if(groupName=="ReNamed") return hasPseudonym(friend_id);
 	if(groupName=="Non Friends") return isNonFriend(friend_id);
-	return mFriendsGroups[groupName]["friends"].has(friend_id.asString());
+	return mContactSets[groupName]["friends"].has(friend_id.asString());
 }
-BOOL LGGFriendsGroups::notifyForFriend(LLUUID friend_id)
+BOOL LGGContactSets::notifyForFriend(LLUUID friend_id)
 {
 	BOOL notify = FALSE;
 	std::vector<std::string> groups = getFriendGroups(friend_id);
 	for(int i =0;i<groups.size();i++)
 	{
-		if(mFriendsGroups[groups[i]]["notify"].asBoolean())return TRUE;
+		if(mContactSets[groups[i]]["notify"].asBoolean())return TRUE;
 	}
 	return notify;
 }
-void LGGFriendsGroups::addFriendToGroup(LLUUID friend_id, std::string groupName)
+void LGGContactSets::addFriendToGroup(LLUUID friend_id, std::string groupName)
 {
 	if(friend_id.notNull() && groupName!="" && groupName!="No Groups" && groupName!="All Groups" && groupName!="ReNamed" && groupName!="Non Friends")
 	{
-		mFriendsGroups[groupName]["friends"][friend_id.asString()]="";
+		mContactSets[groupName]["friends"][friend_id.asString()]="";
 		save();
 	}
 }
-void LGGFriendsGroups::addNonFriendToList(LLUUID non_friend_id)
+void LGGContactSets::addNonFriendToList(LLUUID non_friend_id)
 {
-	mFriendsGroups["extraAvs"][non_friend_id.asString()]="";
+	mContactSets["extraAvs"][non_friend_id.asString()]="";
 	save();
 }
-void LGGFriendsGroups::removeNonFriendFromList(LLUUID non_friend_id)
+void LGGContactSets::removeNonFriendFromList(LLUUID non_friend_id)
 {
-	if(mFriendsGroups["extraAvs"].has(non_friend_id.asString()))
+	if(mContactSets["extraAvs"].has(non_friend_id.asString()))
 	{
-		mFriendsGroups["extraAvs"].erase(non_friend_id.asString());
+		mContactSets["extraAvs"].erase(non_friend_id.asString());
 		if(!LLAvatarTracker::instance().isBuddy(non_friend_id))
 		{
 			clearPseudonym(non_friend_id);
@@ -380,7 +393,7 @@ void LGGFriendsGroups::removeNonFriendFromList(LLUUID non_friend_id)
 		save();
 	}
 }
-void LGGFriendsGroups::removeFriendFromAllGroups(LLUUID friend_id)
+void LGGContactSets::removeFriendFromAllGroups(LLUUID friend_id)
 {
 	std::vector<std::string> groups = getFriendGroups(friend_id);
 	for(int i=0;i<groups.size();i++)
@@ -388,18 +401,18 @@ void LGGFriendsGroups::removeFriendFromAllGroups(LLUUID friend_id)
 		removeFriendFromGroup(friend_id,groups[i]);
 	}
 }
-BOOL LGGFriendsGroups::isNonFriend(LLUUID non_friend_id)
+BOOL LGGContactSets::isNonFriend(LLUUID non_friend_id)
 {
 	if(LLAvatarTracker::instance().isBuddy(non_friend_id))return FALSE;
-	if(mFriendsGroups["extraAvs"].has(non_friend_id.asString()))return TRUE;
+	if(mContactSets["extraAvs"].has(non_friend_id.asString()))return TRUE;
 	return FALSE;
 }
-std::vector<LLUUID> LGGFriendsGroups::getListOfNonFriends()
+std::vector<LLUUID> LGGContactSets::getListOfNonFriends()
 {
 	std::vector<LLUUID> toReturn;
 	toReturn.clear();
 
-	LLSD friends = mFriendsGroups["extraAvs"];	
+	LLSD friends = mContactSets["extraAvs"];	
 	LLSD::map_const_iterator loc_it = friends.beginMap();
 	LLSD::map_const_iterator loc_end = friends.endMap();
 	for ( ; loc_it != loc_end; ++loc_it)
@@ -412,12 +425,12 @@ std::vector<LLUUID> LGGFriendsGroups::getListOfNonFriends()
 
 	return toReturn;
 }
-std::vector<LLUUID> LGGFriendsGroups::getListOfPseudonymAvs()
+std::vector<LLUUID> LGGContactSets::getListOfPseudonymAvs()
 {
 	std::vector<LLUUID> toReturn;
 	toReturn.clear();
 
-	LLSD friends = mFriendsGroups["pseudonym"];	
+	LLSD friends = mContactSets["pseudonym"];	
 	LLSD::map_const_iterator loc_it = friends.beginMap();
 	LLSD::map_const_iterator loc_end = friends.endMap();
 	for ( ; loc_it != loc_end; ++loc_it)
@@ -429,33 +442,46 @@ std::vector<LLUUID> LGGFriendsGroups::getListOfPseudonymAvs()
 
 	return toReturn;
 }
-void LGGFriendsGroups::setPseudonym(LLUUID friend_id, std::string pseudonym)
+void LGGContactSets::setPseudonym(LLUUID friend_id, std::string pseudonym)
 {
-	mFriendsGroups["pseudonym"][friend_id.asString()]=pseudonym;
+	mContactSets["pseudonym"][friend_id.asString()]=pseudonym;
 	save();
 }
-std::string LGGFriendsGroups::getPseudonym(LLUUID friend_id)
+std::string LGGContactSets::getPseudonym(LLUUID friend_id)
 {
-	if(mFriendsGroups["pseudonym"].has(friend_id.asString()))
+	if(mContactSets["pseudonym"].has(friend_id.asString()))
 	{
-		return mFriendsGroups["pseudonym"][friend_id.asString()];
+		return mContactSets["pseudonym"][friend_id.asString()];
 	}
 	return "";
 }
-void LGGFriendsGroups::clearPseudonym(LLUUID friend_id)
+void LGGContactSets::clearPseudonym(LLUUID friend_id)
 {
-	if(mFriendsGroups["pseudonym"].has(friend_id.asString()))
+	if(mContactSets["pseudonym"].has(friend_id.asString()))
 	{
-		mFriendsGroups["pseudonym"].erase(friend_id.asString());
+		mContactSets["pseudonym"].erase(friend_id.asString());
+		LLAvatarNameCache::fetch(friend_id);//update
 		save();
 	}
 }
-BOOL LGGFriendsGroups::hasPseudonym(LLUUID friend_id)
+BOOL LGGContactSets::hasPseudonym(LLUUID friend_id)
 {
 	if(getPseudonym(friend_id)!="")return TRUE;
 	return FALSE;
 }
-void LGGFriendsGroups::removeFriendFromGroup(LLUUID friend_id, std::string groupName)
+BOOL LGGContactSets::hasDisplayNameRemoved(LLUUID friend_id)
+{
+	return (getPseudonym(friend_id)=="--- ---");
+}
+BOOL LGGContactSets::hasVisuallyDiferentPseudonym(LLUUID friend_id)
+{
+	return (hasPseudonym(friend_id) && (!hasDisplayNameRemoved(friend_id)));
+}
+void LGGContactSets::removeDisplayName(LLUUID friend_id)
+{
+	setPseudonym(friend_id,"--- ---");
+}
+void LGGContactSets::removeFriendFromGroup(LLUUID friend_id, std::string groupName)
 {
 	if(groupName=="extraAvs"||groupName=="Non Friends")
 	{
@@ -467,58 +493,58 @@ void LGGFriendsGroups::removeFriendFromGroup(LLUUID friend_id, std::string group
 	}
 	if(friend_id.notNull() && groupName!="")
 	{	
-		if(mFriendsGroups[groupName]["friends"].has(friend_id.asString()))
+		if(mContactSets[groupName]["friends"].has(friend_id.asString()))
 		{
-			mFriendsGroups[groupName]["friends"].erase(friend_id.asString());
+			mContactSets[groupName]["friends"].erase(friend_id.asString());
 			save();
 		}
 	}
 }
-void LGGFriendsGroups::addGroup(std::string groupName)
+void LGGContactSets::addGroup(std::string groupName)
 {
 
 	if(groupName!="")
 	{
-		mFriendsGroups[groupName]["color"] = LLColor4::red.getValue();
+		mContactSets[groupName]["color"] = LLColor4::red.getValue();
 		save();
 	}
 }
-void LGGFriendsGroups::deleteGroup(std::string groupName)
+void LGGContactSets::deleteGroup(std::string groupName)
 {
-	if(mFriendsGroups.has(groupName))
+	if(mContactSets.has(groupName))
 	{
-		mFriendsGroups.erase(groupName);
+		mContactSets.erase(groupName);
 		save();
 	}
 }
-void LGGFriendsGroups::setNotifyForGroup(std::string groupName, BOOL notify)
+void LGGContactSets::setNotifyForGroup(std::string groupName, BOOL notify)
 {
 	if(groupName=="All Groups" || groupName == "" || groupName =="No Groups"||groupName=="ReNamed"||groupName=="Non Friends")return;
 
-	if(mFriendsGroups.has(groupName))
+	if(mContactSets.has(groupName))
 	{
-		mFriendsGroups[groupName]["notify"]=notify;
+		mContactSets[groupName]["notify"]=notify;
 		save();
 	}
 }
-BOOL LGGFriendsGroups::getNotifyForGroup(std::string groupName)
+BOOL LGGContactSets::getNotifyForGroup(std::string groupName)
 {
-	if(mFriendsGroups.has(groupName))
+	if(mContactSets.has(groupName))
 	{
-		if(mFriendsGroups[groupName].has("notify"))
+		if(mContactSets[groupName].has("notify"))
 		{
-			return mFriendsGroups[groupName]["notify"].asBoolean();
+			return mContactSets[groupName]["notify"].asBoolean();
 		}
 	}
 	return FALSE;
 }
-void LGGFriendsGroups::setGroupColor(std::string groupName, LLColor4 color)
+void LGGContactSets::setGroupColor(std::string groupName, LLColor4 color)
 {
 	if(groupName=="All Groups" || groupName == "" || groupName =="No Groups"||groupName=="ReNamed"||groupName=="Non Friends")return;
 
-	if(mFriendsGroups.has(groupName))
+	if(mContactSets.has(groupName))
 	{
-		mFriendsGroups[groupName]["color"]=color.getValue();
+		mContactSets[groupName]["color"]=color.getValue();
 		save();
 	}
 }

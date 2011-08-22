@@ -78,32 +78,32 @@ void LLFirstUse::resetFirstUse()
 	}
 }
 // static
-void LLFirstUse::usePhoenixFriendsGroup()
+void LLFirstUse::usePhoenixContactSet()
 {
-	if (gSavedSettings.getWarning("FirstPhoenixFriendsGroupOpen"))
+	if (gSavedSettings.getWarning("FirstPhoenixContactSetOpen"))
 	{
-		gSavedSettings.setWarning("FirstPhoenixFriendsGroupOpen", FALSE);
-		LLNotifications::instance().add("FirstPhoenixFriendsGroupOpen");
+		gSavedSettings.setWarning("FirstPhoenixContactSetOpen", FALSE);
+		LLNotifications::instance().add("FirstPhoenixContactSetOpen");
 	}
 }
 
 //static
 void LLFirstUse::usePhoenixFriendsNonFriend()
 {
-	if (gSavedSettings.getWarning("FirstPhoenixFriendsGroupNonFriend"))
+	if (gSavedSettings.getWarning("FirstPhoenixContactSetNonFriend"))
 	{
-		gSavedSettings.setWarning("FirstPhoenixFriendsGroupNonFriend", FALSE);
-		LLNotifications::instance().add("FirstPhoenixFriendsGroupNonFriend");
+		gSavedSettings.setWarning("FirstPhoenixContactSetNonFriend", FALSE);
+		LLNotifications::instance().add("FirstPhoenixContactSetNonFriend");
 	}
 }
 
 // static 
-void LLFirstUse::usePhoenixFriendsGroupRename()
+void LLFirstUse::usePhoenixContactSetRename()
 {
-	if (gSavedSettings.getWarning("FirstPhoenixFriendsGroupRename"))
+	if (gSavedSettings.getWarning("FirstPhoenixContactSetRename"))
 	{
-		gSavedSettings.setWarning("FirstPhoenixFriendsGroupRename", FALSE);
-		LLNotifications::instance().add("FirstPhoenixFriendsGroupRename");
+		gSavedSettings.setWarning("FirstPhoenixContactSetRename", FALSE);
+		LLNotifications::instance().add("FirstPhoenixContactSetRename");
 	}
 }
 

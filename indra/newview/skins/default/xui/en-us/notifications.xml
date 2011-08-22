@@ -6400,23 +6400,25 @@ Click the &apos;Stand Up&apos; button to get up.
 
   <notification
    icon="notify.tga"
-   name="FirstPhoenixFriendsGroupOpen"
+   name="FirstPhoenixContactSetOpen"
    type="notify">
-    This is your first time opening the friends groups floater!
+    This is your first time opening the Contact Sets floater!
     This floater will allow you to organize your freinds into groups.
     
     To get started, type in a name of a group you want,
-    Then press the Create Group button.
+    Then press the Create Set button.
     
     To add someone to this group, click or ctrl+click some friends,
     Then RIGHT-CLICK and add them to a group.
+    
+    To find a specific friends, simply begin typing in their name.
   </notification>
 
   <notification
    icon="notify.tga"
-   name="FirstPhoenixFriendsGroupNonFriend"
+   name="FirstPhoenixContactSetNonFriend"
    type="notify">
-    You just added someone not on your friends list, to the freinds groups floater!
+    You just added someone not on your friends list, to the Contact Sets floater!
     You can use this to colorize and rename people
     Please be aware that mass tp and confrence calls will still only use people from your friends list.
 
@@ -6425,14 +6427,14 @@ Click the &apos;Stand Up&apos; button to get up.
 
   <notification
    icon="notify.tga"
-   name="FirstPhoenixFriendsGroupRename"
+   name="FirstPhoenixContactSetRename"
    type="notify">
     You just renamed a avatar!
     This will replace this avatars display name with the one you choose.
 
     Please be aware that this may take time to apear across the viewer.
 
-    You may remove this name by right clicking the name and choosing Remove Pseudonym.
+    You may remove this name by right clicking the name and choosing Remove Alias.
   </notification>
 
   <notification
@@ -7525,6 +7527,25 @@ For more details on outfits in Phoenix, please see the Phoenix Viewer Wiki.
  name="DisplayNameUpdate"
  type="notifytip">
     [OLD_NAME] ([SLID]) is now known as [NEW_NAME].
+  </notification>
+
+  <notification
+ icon="notifytip.tga"
+ name="DisplayNameUpdateRemoveAlias"
+ type="notify">
+    [OLD_NAME] ([SLID]) is now known as [NEW_NAME].
+    This agent has a set alias that will replace [NEW_NAME]
+    Would you like to remove it?
+    <form name="form">
+      <button
+       index="0"
+       name="Yes"
+       text="Yes"/>
+      <button
+       index="1"
+       name="No"
+       text="No"/>
+    </form>
   </notification>
 
     <notification

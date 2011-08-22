@@ -144,7 +144,7 @@
 #pragma warning (disable:4702)
 #endif
 #include <boost/lexical_cast.hpp>
-#include "lggfriendsgroups.h"
+#include "lggcontactsets.h"
 
 using namespace LLVOAvatarDefines;
 
@@ -3588,13 +3588,13 @@ void LLVOAvatar::idleUpdateNameTagText(BOOL new_name)
 	
 	//Phoenix:KC - color friend's name tags
 	static BOOL* sPhoenixColorFriendsNameTags = rebind_llcontrol<BOOL>("PhoenixColorFriendsNameTags", &gSavedSettings, true);
-	static BOOL* sPhoenixFriendsGroupsColorizeNameTag = rebind_llcontrol<BOOL>("PhoenixFriendsGroupsColorizeNameTag", &gSavedSettings, true);
+	static BOOL* sPhoenixContactSetsColorizeNameTag = rebind_llcontrol<BOOL>("PhoenixContactSetsColorizeNameTag", &gSavedSettings, true);
 	static LLCachedControl<LLColor4> PhoenixFriendNameColor("PhoenixFriendNameColor", LLColor4(0.447f, 0.784f, 0.663f, 1.f));
 	if(is_friend && *sPhoenixColorFriendsNameTags) name_tag_color = PhoenixFriendNameColor;
-	if(*sPhoenixFriendsGroupsColorizeNameTag)
+	if(*sPhoenixContactSetsColorizeNameTag)
 	{
-		LLColor4 fgColor = LGGFriendsGroups::getInstance()->getFriendColor(getID());
-		if(fgColor!=LGGFriendsGroups::getInstance()->getDefaultColor())
+		LLColor4 fgColor = LGGContactSets::getInstance()->getFriendColor(getID());
+		if(fgColor!=LGGContactSets::getInstance()->getDefaultColor())
 			name_tag_color=fgColor;
 	}
 
@@ -3700,6 +3700,8 @@ void LLVOAvatar::idleUpdateNameTagText(BOOL new_name)
 				if (show_display_names)
 				{
 					std::string name_str = av_name.mDisplayName;
+					if(LGGContactSets::getInstance()->hasVisuallyDiferentPseudonym(getID()))
+						name_str="'"+name_str+"'";
 					if(name_str=="") {
 												name_str = firstname->getString();
 												name_str += " ";

@@ -41,6 +41,7 @@ Ported to Phoenix by Wolfspirit Magic.
 #include "llhttpnode.h"
 #include "llnotifications.h"
 #include "llui.h"					// getLanguage()
+#include "lggcontactsets.h"
 
 namespace LLViewerDisplayName
 {
@@ -194,7 +195,15 @@ class LLDisplayNameUpdate : public LLHTTPNode
 		args["OLD_NAME"] = old_display_name;
 		args["SLID"] = av_name.mUsername;
 		args["NEW_NAME"] = av_name.mDisplayName;
-		LLNotifications::instance().add("DisplayNameUpdate", args);
+		if(LGGContactSets::getInstance()->hasPseudonym(agent_id))
+		{
+			LLSD payload;
+			payload["agent_id"] = agent_id;
+			LLNotifications::instance().add("DisplayNameUpdateRemoveAlias", args, payload,
+				boost::bind(&LGGContactSets::callbackAliasReset, LGGContactSets::getInstance(), _1, _2));
+
+		}else
+			LLNotifications::instance().add("DisplayNameUpdate", args);
 		if (agent_id == gAgent.getID())
 		{
 			LLViewerDisplayName::sNameChangedSignal();

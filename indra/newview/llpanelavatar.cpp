@@ -96,6 +96,7 @@
 // [/RLVa:KB]
 
 #include "llavatarname.h"
+#include "lggcontactsets.h"
 
 // Statics
 std::list<LLPanelAvatar*> LLPanelAvatar::sAllPanels;
@@ -1552,6 +1553,8 @@ void LLPanelAvatar::setAvatarID(const LLUUID &avatar_id, const std::string &name
 		if(LLAvatarNameCache::useDisplayNames()){
 			if(LLAvatarNameCache::get(avatar_id, &av_name)){
 				dnname_edit->setText(av_name.getCompleteName());
+				if(LGGContactSets::getInstance()->hasVisuallyDiferentPseudonym(avatar_id))
+					dnname_edit->setText("'"+av_name.mDisplayName+"' ("+av_name.getLegacyName()+")");
 			}
 			else{
 				dnname_edit->setText(name_edit->getText());

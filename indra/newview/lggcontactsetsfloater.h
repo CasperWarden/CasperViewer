@@ -35,7 +35,7 @@
 #include "llviewerinventory.h"
 
 
-class lggFriendsGroupsFloaterStart
+class lggContactSetsFloaterStart
 {
 public:
 	static void show( BOOL showw , void * data);

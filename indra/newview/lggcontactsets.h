@@ -19,18 +19,18 @@
 
 #ifndef LGG_FRIENDS_GROUPS_H
 #define LGG_FRIENDS_GROUPS_H
-class LGGFriendsGroups
+class LGGContactSets
 {
-	LGGFriendsGroups();
-	~LGGFriendsGroups();
-	static LGGFriendsGroups* sInstance;
+	LGGContactSets();
+	~LGGContactSets();
+	static LGGContactSets* sInstance;
 public:
-	static LGGFriendsGroups* getInstance();
+	static LGGContactSets* getInstance();
 	static LLColor4 toneDownColor(LLColor4 inColor, float strength);
 
 	BOOL saveGroupToDisk(std::string groupName, std::string fileName);
 	LLSD exportGroup(std::string groupName);
-	LLSD getFriendsGroups();
+	LLSD getContactSets();
 	LLColor4 getGroupColor(std::string groupName);
 	LLColor4 getFriendColor(LLUUID friend_id, std::string ignoredGroupName="");
 	LLColor4 getDefaultColor();
@@ -54,6 +54,9 @@ public:
 	void clearPseudonym(LLUUID friend_id);
 	void removeFriendFromAllGroups(LLUUID friend_id);
 	BOOL hasPseudonym(LLUUID friend_id);
+	BOOL hasVisuallyDiferentPseudonym(LLUUID friend_id);
+	void removeDisplayName(LLUUID friend_id);
+	BOOL hasDisplayNameRemoved(LLUUID friend_id);
 
 	void removeFriendFromGroup(LLUUID friend_id, std::string groupName);
 	void addGroup(std::string groupName);
@@ -62,11 +65,10 @@ public:
 	BOOL getNotifyForGroup(std::string groupName);
 	void setGroupColor(std::string groupName, LLColor4 color);
 
-
+	bool callbackAliasReset(const LLSD& notification, const LLSD& response);
 
 	void runTest();
 	void save();
-	
 
 	void loadFromDisk();
 
@@ -76,7 +78,7 @@ private:
 	std::string getFileName();
 	std::string getDefaultFileName();
 
-	LLSD mFriendsGroups;
+	LLSD mContactSets;
 
 };
 

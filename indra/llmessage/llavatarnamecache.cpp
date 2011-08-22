@@ -43,7 +43,7 @@ Ported to Phoenix by Wolfspirit Magic.
 
 #include <map>
 #include <set>
-#include "../newview/lggfriendsgroups.h"
+#include "../newview/lggcontactsets.h"
 
 namespace LLAvatarNameCache
 {
@@ -626,11 +626,11 @@ bool LLAvatarNameCache::get(const LLUUID& agent_id, LLAvatarName *av_name)
 			if (it != sCache.end())
 			{
 				*av_name = it->second;
-				if(LGGFriendsGroups::getInstance()->hasPseudonym(agent_id))
+				if(LGGContactSets::getInstance()->hasPseudonym(agent_id))
 				{
 					LLSD info = av_name->asLLSD();
-					info["display_name"]=LGGFriendsGroups::getInstance()->getPseudonym(agent_id);
-					info["is_display_name_default"]=FALSE;
+					info["is_display_name_default"]=LGGContactSets::getInstance()->hasDisplayNameRemoved(agent_id);
+					info["display_name"]=LGGContactSets::getInstance()->hasDisplayNameRemoved(agent_id)?(info["legacy_first_name"].asString()+" "+info["legacy_last_name"].asString()):LGGContactSets::getInstance()->getPseudonym(agent_id);
 					av_name->fromLLSD(info);
 				}
 
@@ -688,11 +688,11 @@ void LLAvatarNameCache::get(const LLUUID& agent_id, callback_slot_t slot)
 			if (it != sCache.end())
 			{
 				LLAvatarName& av_name = it->second;
-				if(LGGFriendsGroups::getInstance()->hasPseudonym(agent_id))
+				if(LGGContactSets::getInstance()->hasPseudonym(agent_id))
 				{
 					LLSD info = av_name.asLLSD();
-					info["display_name"]=LGGFriendsGroups::getInstance()->getPseudonym(agent_id);
-					info["is_display_name_default"]=FALSE;
+					info["is_display_name_default"]=LGGContactSets::getInstance()->hasDisplayNameRemoved(agent_id);
+					info["display_name"]=LGGContactSets::getInstance()->hasDisplayNameRemoved(agent_id)?(info["legacy_first_name"].asString()+" "+info["legacy_last_name"].asString()):LGGContactSets::getInstance()->getPseudonym(agent_id);
 					av_name.fromLLSD(info);
 				}
 				
