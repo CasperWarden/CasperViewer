@@ -12,14 +12,14 @@
 *      copyright notice, this list of conditions and the following
 *      disclaimer in the documentation and/or other materials provided
 *      with the distribution.
-*   3. Neither the name Modular Systems nor the names of its contributors
-*      may be used to endorse or promote products derived from this
-*      software without specific prior written permission.
+*   3. The name LordGregGreg may not be used to endorse or promote
+*	   products derived from this software without specific prior written
+*	   permission.
 *
-* THIS SOFTWARE IS PROVIDED BY LGG AND CONTRIBUTORS "AS IS"
+* THIS SOFTWARE IS PROVIDED BY LORDGREGGREG AND CONTRIBUTORS "AS IS"
 * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-* PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MODULAR SYSTEMS OR CONTRIBUTORS
+* PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL LORDGREGGREG
 * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -1651,7 +1651,6 @@ BOOL lggContactSetsFloater::compareAv(LLUUID av1, LLUUID av2)
 }
 BOOL lggContactSetsFloater::generateCurrentList()
 {
-	int oldListSize = currentList.size();
 	static BOOL *showOnline = rebind_llcontrol<BOOL>("PhoenixContactSetsShowOnline", &gSavedSettings, true);
 	static BOOL *showOffline = rebind_llcontrol<BOOL>("PhoenixContactSetsShowOffline", &gSavedSettings, true);
 	static BOOL *yshowAllFriends = rebind_llcontrol<BOOL>("PhoenixContactSetsShowAllFriends", &gSavedSettings, true);
@@ -1721,9 +1720,6 @@ BOOL lggContactSetsFloater::generateCurrentList()
 
 
 	std::sort(currentList.begin(),currentList.end(),&lggContactSetsFloater::compareAv);
-
-	if(currentList.size()!=oldListSize)selected.clear();//will fix this better later
-
 	return TRUE;
 }
 void lggContactSetsFloater::onClickDelete(void* data)
