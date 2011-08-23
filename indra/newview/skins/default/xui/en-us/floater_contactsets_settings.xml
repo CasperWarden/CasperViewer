@@ -14,6 +14,7 @@
 	<check_box bottom_delta="-15" enabled="true" follows="left|top" font="SansSerifSmall" height="16" initial_value="false" label="Colorise text instead of backgrounds in the friends groups floater" left="25" mouse_opaque="true" name="PhoenixContactSetsColorizeText" visible="true" radio_style="false" width="270" control_name="PhoenixContactSetsColorizeText"/>
 	<check_box bottom_delta="-15" enabled="true" follows="left|top" font="SansSerifSmall" height="16" initial_value="false" label="Require CTRL key to be pressed to be able to multiselect" left="5" mouse_opaque="true" name="PhoenixContactSetsRequireCTRL" visible="true" radio_style="false" width="270" control_name="PhoenixContactSetsRequireCTRL"/>
 	<check_box bottom_delta="-15" enabled="true" follows="left|top" font="SansSerifSmall" height="16" initial_value="false" label="Use the Zoom Effect in the floater" left="5" mouse_opaque="true" name="PhoenixContactSetsDoZoom" visible="true" radio_style="false" width="270" control_name="PhoenixContactSetsDoZoom"/>
+	<check_box bottom_delta="-15" enabled="true" follows="left|top" font="SansSerifSmall" height="16" initial_value="false" label="Use the color highlight effect in the floater" left="5" mouse_opaque="true" name="PhoenixContactSetsUseColorHighlight" visible="true" radio_style="false" width="270" control_name="PhoenixContactSetsUseColorHighlight"/>
 	
 
 

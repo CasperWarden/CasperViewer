@@ -206,7 +206,7 @@ LLSD LGGContactSets::getExampleLLSD()
 
 LLColor4 LGGContactSets::getGroupColor(std::string groupName)
 {
-	if(groupName!="" && groupName!="All Groups" && groupName!="No Groups" && groupName!="ReNamed" && groupName!="Non Friends")
+	if(groupName!="" && groupName!="All Groups" && groupName !="globalSettings" && groupName!="No Groups" && groupName!="ReNamed" && groupName!="Non Friends")
 		if(mContactSets[groupName].has("color"))
 			return LLColor4(mContactSets[groupName]["color"]);
 	return getDefaultColor();
@@ -236,16 +236,24 @@ LLColor4 LGGContactSets::getFriendColor(
 		}
 	}
 	if(lowest==9999)
-	if(isFriendInGroup(friend_id,ignoredGroupName) &&ignoredGroupName!="Non Friends" &&ignoredGroupName!="All Groups" && ignoredGroupName!="No Groups" &&ignoredGroupName!="ReNamed" &&ignoredGroupName!="")
-		return LLColor4(mContactSets[ignoredGroupName]["color"]);
+	if(isFriendInGroup(friend_id,ignoredGroupName)  && ignoredGroupName!="globalSettings" && ignoredGroupName!="Non Friends" &&ignoredGroupName!="All Groups" && ignoredGroupName!="No Groups" &&ignoredGroupName!="ReNamed" &&ignoredGroupName!="")
+		if(mContactSets[ignoredGroupName].has("color"))
+			return LLColor4(mContactSets[ignoredGroupName]["color"]);
 	return toReturn;
+}
+BOOL LGGContactSets::hasFriendColorThatShouldShow(LLUUID friend_id)
+{
+	static BOOL* sPhoenixColorContactSetsChat = rebind_llcontrol<BOOL>("PhoenixContactSetsColorizeChat", &gSavedSettings, true);
+	if(!(*sPhoenixColorContactSetsChat))return FALSE;
+	if(getFriendColor(friend_id)==getDefaultColor())return FALSE;
+	return TRUE;
 }
 LLColor4 LGGContactSets::getDefaultColor()
 {
 	LLColor4 toReturn= LLColor4::grey;
 	if(mContactSets.has("globalSettings"))
 		if(mContactSets["globalSettings"].has("defaultColor"))
-			toReturn = mContactSets["globalSettings"]["defaultColor"];
+			toReturn = LLColor4(mContactSets["globalSettings"]["defaultColor"]);
 	return toReturn;
 }
 void LGGContactSets::setDefaultColor(LLColor4 dColor)
@@ -262,7 +270,7 @@ std::vector<std::string> LGGContactSets::getFriendGroups(LLUUID friend_id)
 	for ( ; loc_it != loc_end; ++loc_it)
 	{
 		const std::string& groupName = (*loc_it).first;
-		if(groupName!="" && groupName!="All Groups" && groupName!="No Groups" && groupName!="ReNamed" && groupName!="Non Friends" && groupName!="extraAvs" && groupName!="pseudonym")
+		if(groupName!="" && groupName !="globalSettings" && groupName!="All Groups" && groupName!="No Groups" && groupName!="ReNamed" && groupName!="Non Friends" && groupName!="extraAvs" && groupName!="pseudonym")
 			if(mContactSets[groupName]["friends"].has(friend_id.asString()))
 				toReturn.push_back(groupName);
 	}
@@ -369,7 +377,7 @@ BOOL LGGContactSets::notifyForFriend(LLUUID friend_id)
 }
 void LGGContactSets::addFriendToGroup(LLUUID friend_id, std::string groupName)
 {
-	if(friend_id.notNull() && groupName!="" && groupName!="No Groups" && groupName!="All Groups" && groupName!="ReNamed" && groupName!="Non Friends")
+	if(friend_id.notNull() && groupName!="" && groupName !="globalSettings" && groupName!="No Groups" && groupName!="All Groups" && groupName!="ReNamed" && groupName!="Non Friends")
 	{
 		mContactSets[groupName]["friends"][friend_id.asString()]="";
 		save();
@@ -519,7 +527,7 @@ void LGGContactSets::deleteGroup(std::string groupName)
 }
 void LGGContactSets::setNotifyForGroup(std::string groupName, BOOL notify)
 {
-	if(groupName=="All Groups" || groupName == "" || groupName =="No Groups"||groupName=="ReNamed"||groupName=="Non Friends")return;
+	if(groupName=="All Groups" || groupName =="globalSettings" || groupName == "" || groupName =="No Groups"||groupName=="ReNamed"||groupName=="Non Friends")return;
 
 	if(mContactSets.has(groupName))
 	{
@@ -540,7 +548,7 @@ BOOL LGGContactSets::getNotifyForGroup(std::string groupName)
 }
 void LGGContactSets::setGroupColor(std::string groupName, LLColor4 color)
 {
-	if(groupName=="All Groups" || groupName == "" || groupName =="No Groups"||groupName=="ReNamed"||groupName=="Non Friends")return;
+	if(groupName=="All Groups" ||   groupName =="globalSettings" || groupName == "" || groupName =="No Groups"||groupName=="ReNamed"||groupName=="Non Friends")return;
 
 	if(mContactSets.has(groupName))
 	{
