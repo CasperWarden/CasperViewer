@@ -80,7 +80,7 @@ give you the choice to allow or deny playing it, and optionally to save that cho
 	     enabled="true" follows="left|top" height="16" increment="10"
 	     initial_val="10" label="L$ Change Threshold" label_width="128" left="148"
 	     max_val="10000" min_val="0" mouse_opaque="true" name="L$ Change Threshold"
-	     width="192" />
+	     width="192" tool_tip="Plays a sound when money is spent or recieved higher than the amount set here." />
   <spinner bottom_delta="-20" control_name="UISndHealthReductionThreshold"
 	     decimal_digits="0" enabled="true" follows="left|top" height="16"
 	     increment="10" initial_val="20" label="Health Change Threshold"

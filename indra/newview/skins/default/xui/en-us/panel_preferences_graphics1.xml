@@ -240,19 +240,19 @@
 	<check_box bottom_delta="-23" control_name="RenderUseImpostors" enabled="true"
 	     follows="left|top" font="SansSerifSmall" height="16" initial_value="true"
 	     label="Avatar Impostors" left_delta="0" mouse_opaque="true"
-	     name="AvatarImpostors" radio_style="false" width="256" />
+	     name="AvatarImpostors" radio_style="false" width="256" tool_tip="If there are many avatars in sight, avatars further away will display in 2D." />
 	<check_box bottom_delta="-17" control_name="RenderAvatarVP" enabled="true"
 	     follows="left|top" font="SansSerifSmall" height="16" initial_value="true"
 	     label="Hardware Skinning" left_delta="0" mouse_opaque="true"
-	     name="AvatarVertexProgram" radio_style="false" width="256" />
+	     name="AvatarVertexProgram" radio_style="false" width="256" tool_tip="Uses features of your graphics hardware to render avatar skins" />
 	<check_box bottom_delta="-17" control_name="RenderAvatarCloth" enabled="true"
 	     follows="left|top" font="SansSerifSmall" height="16" initial_value="true"
 	     label="Avatar Cloth" left_delta="0" mouse_opaque="true" name="AvatarCloth"
-	     radio_style="false" width="256" />
+	       radio_style="false" width="256" tool_tip="Uses features of your graphics hardware to render avatar clothing" />
 	<check_box bottom_delta="-20" control_name="AvatarPhysics" enabled="true"
 	     follows="left|top" font="SansSerifSmall" height="16" initial_value="true"
 	     label="Enable Avatar Physics" left_delta="0" mouse_opaque="true"
-	     name="AvatarPhysics" radio_style="false" width="256" />
+	     name="AvatarPhysics" radio_style="false" width="256" tool_tip="Makes butt, belly, and breasts of avatars move in a more natural manner."/>
 	<slider
 		bottom_delta="-20"
 		control_name="RenderAvatarPhysicsLODFactor"
