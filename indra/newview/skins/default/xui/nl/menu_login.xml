@@ -8,6 +8,6 @@
 	</menu>
 	<menu label="Help" name="Help">
 		<menu_item_call label="Second Life Help" name="Second Life Help"/>
-		<menu_item_call label="Over Second Life..." name="About Second Life..."/>
+		<menu_item_call label="Over Phoenix Viewer..." name="About Second Life..."/>
 	</menu>
 </menu_bar>

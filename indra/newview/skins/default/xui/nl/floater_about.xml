@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<floater name="floater_about" title="Over Second Life">
-	<text_editor name="credits_editor">
+<floater name="floater_about" rect_control="FloaterAboutRect" title="Over Phoenix Viewer">
+  <tab_container name="about_tab">
+  <panel label="Info" help_topic="about_support_tab" name="support_panel">
+  <text_editor name="support_editor"/>
+    <button label="Naar klembord kopiëren" name="copy_btn" width="180" />
+  </panel>
+  <panel label="Dankbetuiging" help_topic="about_credits_tab" name="credits_panel">
+    <text_editor name="credits_editor"> 
 Phoenix wordt u aangeboden door:
 Ansariel Hiller, Arrehn Oberlander, Jessica Lyon, Kadah Coba, Kitty Barnett, Liny Odell, LordGreggreg Back, Mobius Ryba, Tankmaster Finesmith, Techwolf Lupindo, Tonya Souther, Vortex Saito, WoLf Loonie and Wolfspirit Magic.
 
@@ -21,6 +27,12 @@ Philip, Tessa, Andrew, Cory, James, Ben, Char, Charlie, Colin, Dan, Daniel, Doug
 
 Een &apos;Dank u&apos; voor de volgende bewoners voor het helpen zorgdragen dat dit de beste versie tot nu toe is:
 Able Whitman, Adeon Writer, adonaira Aabye, Aeron Kohime, Agathos Frascati, Aimee Trescothick, Aleric Inglewood, Alissa Sabre, Aminom Marvin, Angela Talamasca, Aralara Rajal, Armin Weatherwax, Ashrilyn Hayashida, Athanasius Skytower, Aura Dirval, Barney Boomslang, Biancaluce Robbiani, Biker Offcourse, Borg Capalini, Bulli Schumann, catherine pfeffer, Chalice Yao, Corre Porta, Court Goodman, Cummere Mayo, Dale Innis, Darien Caldwell, Darjeeling Schoonhoven, Daten Thielt, dimentox travanti, Dirk Talamasca, Drew Dwi, Duckless Vandyke, Elanthius Flagstaff, Electro Burnstein, emiley tomsen, Escort DeFarge, Eva Rau, Ezian Ecksol, Fire Centaur, Fluf Fredriksson, Francisco Koolhoven, Frontera Thor, Frungi Stastny, Gally Young, gearsawe stonecutter, Gigs Taggart, Gordon Wendt, Gudmund Shepherd, Gypsy Paz, Harleen Gretzky, Henri Beauchamp, Inma Rau, Irene Muni, Iskar Ariantho, Jacek Antonelli, JB Kraft, Jessicka Graves, Joeseph Albanese, Joshua Philgarlic, Khyota Wulluf, kirstenlee Cinquetti, Latif Khalifa, Lex Neva, Lilibeth Andree, Lisa Lowe, Lunita Savira, Loosey Demonia, lum pfohl, Marcos Fonzarelli, MartinRJ Fayray, Marusame Arai, Matthew Dowd, Maya Remblai, McCabe Maxsted, Meghan Dench, Melchoir Tokhes, Menos Short, Michelle2 Zenovka, Mimika Oh, Minerva Memel, Mm Alder, Ochi Wolfe, Omei Turnbull, Pesho Replacement, Phantom Ninetails, phoenixflames kukulcan, Polo Gufler, prez pessoa, princess niven, Prokofy Neva, Qie Niangao, Rem Beattie, RodneyLee Jessop, Saijanai Kuhn, Seg Baphomet, Sergen Davies, Shirley Marquez, Siana Gearz, SignpostMarv Martin, Sindy Tsure, Sira Arbizu, Skips Jigsaw, Sougent Harrop, Spritely Pixel, Squirrel Wood, StarSong Bright, Subversive Writer, Sugarcult Dagger, Sylumm Grigorovich, Tammy Nowotny, Tanooki Darkes, Tayra Dagostino, Theoretical Chemistry, Thickbrick Sleaford, valerie rosewood, Vex Streeter, Vixen Heron, Whoops Babii, Winter Ventura, Xiki Luik, Yann Dufaux, Yina Yao, Yukinoroh Kamachi, Zolute Infinity, Zwagoth Klaar, and many others.
+  
+To be a success in business, be daring, be first, be different. --Henry Marchant</text_editor>
+  
+  </panel>
+  <panel label="Licenties" help_topic="about_licence_tab" name="licence_panel">
+    <text_editor name="licences_editor"> 
 
 3Dconnexion SDK Copyright (C) 1992-2007 3Dconnexion
 APR Copyright (C) 2000-2004 The Apache Software Foundation
@@ -44,9 +56,10 @@ All rights reserved. See licenses.txt for details.
 
 Voice chat Audio coding: Polycom(R) Siren14(TM) (ITU-T Rec. G.722.1 Annex C)
 
-To be a success in business, be daring, be first, be different. --Henry Marchant
-	</text_editor>
-	<string name="you_are_at">
-		U bent op [POSITION]
-	</string>
+</text_editor>
+</panel>
+</tab_container>
+<string name="you_are_at">
+  U bevind zich op [POSITION]
+</string>
 </floater>
