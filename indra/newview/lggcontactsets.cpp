@@ -260,6 +260,39 @@ void LGGContactSets::setDefaultColor(LLColor4 dColor)
 {
 	mContactSets["globalSettings"]["defaultColor"]=dColor.getValue();
 }
+std::vector<std::string> LGGContactSets::getInnerGroups(std::string groupName)
+{
+	std::vector<std::string> toReturn;
+	toReturn.clear();
+	static BOOL *useFolders = rebind_llcontrol<BOOL>("PhoenixContactSetsShowFolders",&gSavedSettings,true);
+	static BOOL *showOnline = rebind_llcontrol<BOOL>("PhoenixContactSetsShowOnline", &gSavedSettings, true);
+	static BOOL *showOffline = rebind_llcontrol<BOOL>("PhoenixContactSetsShowOffline", &gSavedSettings, true);
+
+	if(!(*useFolders))return toReturn;
+
+	std::set<std::string> newGroups;
+	newGroups.clear();
+	if(groupName!="All Groups")newGroups.insert("All Groups");
+	std::vector<LLUUID> freindsInGroup = getFriendsInGroup(groupName);
+	for(int fn = 0; fn<freindsInGroup.size();fn++)
+	{
+		LLUUID friend_id = freindsInGroup[fn];
+		BOOL online = LLAvatarTracker::instance().isBuddyOnline(friend_id);
+		if(online && !(*showOnline))continue;
+		if(!online && !(*showOffline))continue;
+		
+		std::vector<std::string> innerGroups = getFriendGroups(friend_id);
+		for(int inIter=0;inIter<innerGroups.size();inIter++)
+		{
+			std::string innerGroupName = innerGroups[inIter];
+			if(groupName!=innerGroupName)
+				newGroups.insert(innerGroupName);
+		}
+	}
+
+	std::copy(newGroups.begin(), newGroups.end(), std::back_inserter(toReturn));
+	return toReturn;
+}
 std::vector<std::string> LGGContactSets::getFriendGroups(LLUUID friend_id)
 {
 	std::vector<std::string> toReturn;
@@ -274,6 +307,27 @@ std::vector<std::string> LGGContactSets::getFriendGroups(LLUUID friend_id)
 			if(mContactSets[groupName]["friends"].has(friend_id.asString()))
 				toReturn.push_back(groupName);
 	}
+	return toReturn;
+}
+std::vector<LLUUID> LGGContactSets::getFriendsInGroup(std::string groupName)
+{
+	std::vector<LLUUID> toReturn;
+	toReturn.clear();
+	if(groupName=="All Groups")return getFriendsInAnyGroup();
+	if(groupName=="No Groups")return toReturn;
+	if(groupName=="pseudonym"||groupName=="ReNamed")return getListOfPseudonymAvs();
+	if(groupName=="Non Friends")return getListOfNonFriends();
+
+	LLSD friends = mContactSets[groupName]["friends"];	
+	LLSD::map_const_iterator loc_it = friends.beginMap();
+	LLSD::map_const_iterator loc_end = friends.endMap();
+	for ( ; loc_it != loc_end; ++loc_it)
+	{
+		const LLSD& friendID = (*loc_it).first;
+
+		toReturn.push_back(friendID.asUUID());
+	}	
+
 	return toReturn;
 }
 std::vector<std::string> LGGContactSets::getAllGroups(BOOL extraGroups)
@@ -307,8 +361,7 @@ std::vector<std::string> LGGContactSets::getAllGroups(BOOL extraGroups)
 }
 std::vector<LLUUID> LGGContactSets::getFriendsInAnyGroup()
 {
-	std::vector<LLUUID> toReturn;
-	toReturn.clear();
+	std::set<LLUUID> friendsInAnyGroup;
 	std::vector<std::string> groups = getAllGroups(FALSE);
 	for(int g=0;g<groups.size();g++)
 	{
@@ -318,34 +371,10 @@ std::vector<LLUUID> LGGContactSets::getFriendsInAnyGroup()
 		for ( ; loc_it != loc_end; ++loc_it)
 		{
 			const LLSD& friendID = (*loc_it).first;
-			if(std::find(toReturn.begin(), toReturn.end(), friendID)!=toReturn.end())
-			{
-				toReturn.push_back(friendID.asUUID());
-			}
+			friendsInAnyGroup.insert(friendID);
 		}
 	}
-	return toReturn;
-}
-std::vector<LLUUID> LGGContactSets::getFriendsInGroup(std::string groupName)
-{
-	std::vector<LLUUID> toReturn;
-	toReturn.clear();
-	if(groupName=="All Groups")return getFriendsInAnyGroup();
-	if(groupName=="No Groups")return toReturn;
-	if(groupName=="pseudonym")return getListOfPseudonymAvs();
-	if(groupName=="Non Friends")return getListOfNonFriends();
-
-	LLSD friends = mContactSets[groupName]["friends"];	
-	LLSD::map_const_iterator loc_it = friends.beginMap();
-	LLSD::map_const_iterator loc_end = friends.endMap();
-	for ( ; loc_it != loc_end; ++loc_it)
-	{
-		const LLSD& friendID = (*loc_it).first;
-
-		toReturn.push_back(friendID.asUUID());
-	}	
-
-	return toReturn;
+	return std::vector<LLUUID>(friendsInAnyGroup.begin(),friendsInAnyGroup.end());
 }
 BOOL LGGContactSets::isFriendInAnyGroup(LLUUID friend_id)
 {
