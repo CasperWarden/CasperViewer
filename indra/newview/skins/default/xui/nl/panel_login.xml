@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<panel name="panel_login">
+  <string name="real_url">
+    http://phoenixviewer.com/app/login/
+  </string>
+  <string name="forgot_password_url">
+    http://secondlife.com/account/request.php
+  </string>
+  <text name="first_name_text">
+    Voornaam:
+  </text>
+	<combo_box name="first_name_combo" label="Naam of voornaam"
+	tool_tip="Voer hier de naam, of de voornaam van uw avatar in."/>
+	<check_box name="remember_name_check" label="Onthoud bewoner's naam" />
+	<text name="last_name_text">
+      Achternaam:
+    </text>
+    <line_editor label="Achternaam, of Resident" name="last_name_edit"  
+      tool_tip="Voer de achternaam van uw avatar in. Geef &quot;Resident&quot; op als achternaam als u er geen heeft."/>
+      <text name="password_text">
+      Wachtwoord:
+    </text>
+    <check_box label="Wachtwoord onthouden" name="remember_check" />
+    <text name="start_location_text">
+	Startlocatie:
+    </text>
+    <combo_box name="start_location_combo">
+	<combo_item name="MyHome">
+	Mijn thuislocatie
+	</combo_item>
+	<combo_item name="MyLastLocation">
+	  Mijn vorige locatie
+	</combo_item>
+	<combo_item name="Typeregionname">
+	&lt; Type een regionaam &gt;
+	</combo_item>
+  </combo_box>
+  <button label="Aanmelden" label_selected="Aanmelden" name="connect_btn"/>
+    <text name="create_new_account_text">
+Account aanmaken
+    </text>
+    <text name="forgot_password_text">
+Naam of wachtwoord vergeten?
+      </text>
+</panel>

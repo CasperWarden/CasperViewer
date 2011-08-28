@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<panel label="Netwerk" name="network">
+	<text name="text_box">
+		Maximale bandbreedte:
+	</text>
+  <slider name="max_bandwidth" left_delta="130"/>
+  <text name="text_box2">
+		kbps (kilobits per seconde)
+	</text>
+	<text name="cache_size_label_l">
+		Diskcache grootte:
+	</text>
+	<text name="text_box5">
+		MB
+	</text>
+	<text name="cache_location_label">
+    Plaats van schijfcache:
+  </text>
+  <button name="open_cache_loc" label="Openen" width="80" tool_tip="Deze lokatie verkennen"/>
+  <button name="set_cache" label="Instellen" label_selected="Instellen" left_delta="60" width="85" tool_tip="Kies een nieuwe plaats voor de cache."/>
+	<button name="reset_cache" label="Herstellen" label_selected="Instellen" left_delta="65" width="91" tool_tip="Herstel de standaardlokatie voor de cache."/>
+  <text name="sound_cache_location_label">
+    Plaats van geluidencache:
+  </text>
+  <button name="open_soundcache_loc" label="Openen" width="80" tool_tip="Deze lokatie verkennen"/>
+  <button name="set_sound_cache" label="Instellen" label_selected="Instellen" left_delta="60" width="85" tool_tip="Kies een nieuwe plaats voor de cache."/>
+  <button name="reset_sound_cache" label="Herstellen" label_selected="Instellen" left_delta="65" width="91" tool_tip="Herstel de standaardlokatie voor de cache."/>
+  <text name="chat_location_label">
+    Plaats van chatlogbestanden:
+  </text>
+  <button name="open_chat_logs_loc" label="Openen" width="80" tool_tip="Deze lokatie verkennen"/>
+  <button name="set_chat_logs" label="Instellen" label_selected="Instellen" left_delta="60" width="85" tool_tip="Kies een nieuwe plaats voor de chatlogbestanden."/>
+  <button name="reset_chat_logs" label="Herstellen" label_selected="Instellen" left_delta="65" width="91" tool_tip="Herstel de standaardlokatie voor de chatlogbestanden"/>
+  <text name="crash_location_label">
+    Plaats van crashlogbestanden:
+  </text>
+  <button name="open_crash_logs_loc" label="Openen" width="80" tool_tip="Deze lokatie verkennen"/>
+  <text name="cannot_change_crash_label" left_delta="60">
+    (Kan niet wijzigen)
+  </text>
+  <text name="user_location_label">
+    Plaats van gebruikersinstellingen:
+  </text>
+  <button name="open_user_loc" label="Openen" width="80" tool_tip="Deze lokatie verkennen"/>
+  <text name="cannot_change_user_label" left_delta="60">
+    (Kan niet wijzigen)
+  </text>
+  <button name="clear_cache" label="Cache wissen" width="100"/>
+  <button name="clear_inv_cache" label="Inventariscache wissen" width="150" left_delta="110"/>
+  <check_box name="connection_port_enabled" label="Aangepaste poortverbinding"/>
+  <spinner name="connection_port" label="Poortnummer:"/>
+</panel>
