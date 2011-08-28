@@ -1,5 +1,3 @@
-CasperViewer ReadMe
+This branch is the raw Phoenix Viewer imported from their mercurial repo.
 
-This is a Second Life Viewer project based on Phoenix.
-
-It aims to bring Mesh support to the Phoenix viewer.
+Please see master for the mesh changes.
