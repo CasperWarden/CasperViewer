@@ -1,12 +1,13 @@
 /** 
  * @file terrainV.glsl
  *
- * Copyright (c) 2007-$CurrentYear$, Linden Research, Inc.
- * $License$
+ * $LicenseInfo:firstyear=2007&license=viewerlgpl$
+ * $/LicenseInfo$
  */
+ 
+#version 120
 
 varying vec3 vary_normal;
-varying vec4 vary_position;
 
 vec4 texgen_object(vec4  vpos, vec4 tc, mat4 mat, vec4 tp0, vec4 tp1)
 {
@@ -27,7 +28,6 @@ void main()
 	//transform vertex
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 			
-	vary_position = gl_ModelViewMatrix * gl_Vertex;
 	vary_normal = normalize(gl_NormalMatrix * gl_Normal);
 	
 	// Transform and pass tex coords

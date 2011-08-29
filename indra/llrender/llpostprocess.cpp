@@ -56,10 +56,12 @@ LLPostProcess::LLPostProcess(void) :
 					mAllEffects(LLSD::emptyMap()),
 					screenW(1), screenH(1)
 {
-	mSceneRenderTexture = NULL ; 
-	mNoiseTexture = NULL ;
-	mTempBloomTexture = NULL ;
-					
+	mSceneRenderTexture = NULL; 
+	mNoiseTexture = NULL;
+	mTempBloomTexture = NULL;
+
+	noiseTextureScale = 1.0f;
+
 	/*  Do nothing.  Needs to be updated to use our current shader system, and to work with the move into llrender.
 	std::string pathName(gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "windlight", XML_FILENAME));
 	LL_DEBUGS2("AppInit", "Shaders") << "Loading PostProcess Effects settings from " << pathName << LL_ENDL;

@@ -122,8 +122,11 @@ BOOL LLVOClouds::updateGeometry(LLDrawable *drawable)
 	{
 		return TRUE;
 	}
-	
-	dirtySpatialGroup();
+
+	if (drawable->isVisible())
+	{
+		dirtySpatialGroup(TRUE);
+	}
 
 	LLFace *facep;
 	

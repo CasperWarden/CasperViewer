@@ -60,9 +60,9 @@ BOOL shouldChange(const LLVector4& v1, const LLVector4& v2)
 }
 
 LLShaderFeatures::LLShaderFeatures()
-: calculatesLighting(false), isShiny(false), isFullbright(false), hasWaterFog(false),
-hasTransport(false), hasSkinning(false), hasAtmospherics(false), isSpecular(false),
-hasGamma(false), hasLighting(false), calculatesAtmospherics(false)
+:	calculatesLighting(false), isShiny(false), isFullbright(false), hasWaterFog(false),
+	hasTransport(false), hasSkinning(false), hasObjectSkinning(false), hasAtmospherics(false), isSpecular(false),
+	hasGamma(false), hasLighting(false), calculatesAtmospherics(false)
 {
 }
 
@@ -70,7 +70,7 @@ hasGamma(false), hasLighting(false), calculatesAtmospherics(false)
 // LLGLSL Shader implementation
 //===============================
 LLGLSLShader::LLGLSLShader()
-: mProgramObject(0), mShaderLevel(0), mShaderGroup(SG_DEFAULT)
+:	mProgramObject(0), mActiveTextureChannels(0), mShaderLevel(0), mShaderGroup(SG_DEFAULT), mUniformsDirty(FALSE)
 {
 }
 
@@ -124,7 +124,7 @@ BOOL LLGLSLShader::createShader(vector<string> * attributes,
 	{
 		GLhandleARB shaderhandle = LLShaderMgr::instance()->loadShaderFile((*fileIter).first, mShaderLevel, (*fileIter).second);
 		LL_DEBUGS("ShaderLoading") << "SHADER FILE: " << (*fileIter).first << " mShaderLevel=" << mShaderLevel << LL_ENDL;
-		if (mShaderLevel > 0)
+		if (shaderhandle > 0)
 		{
 			attachObject(shaderhandle);
 		}
@@ -211,7 +211,7 @@ BOOL LLGLSLShader::mapAttributes(const vector<string> * attributes)
 	{ //read back channel locations
 
 		//read back reserved channels first
-		for (U32 i = 0; i < (S32) LLShaderMgr::instance()->mReservedAttribs.size(); i++)
+		for (U32 i = 0; i < LLShaderMgr::instance()->mReservedAttribs.size(); i++)
 		{
 			const char* name = LLShaderMgr::instance()->mReservedAttribs[i].c_str();
 			S32 index = glGetAttribLocationARB(mProgramObject, (const GLcharARB *)name);
@@ -698,17 +698,38 @@ void LLGLSLShader::uniformMatrix4fv(U32 index, U32 count, GLboolean transpose, c
 
 GLint LLGLSLShader::getUniformLocation(const string& uniform)
 {
+	GLint ret = -1;
 	if (mProgramObject > 0)
 	{
 		std::map<string, GLint>::iterator iter = mUniformMap.find(uniform);
 		if (iter != mUniformMap.end())
 		{
-			llassert(iter->second == glGetUniformLocationARB(mProgramObject, uniform.c_str()));
-			return iter->second;
+			if (gDebugGL)
+			{
+				stop_glerror();
+				if (iter->second != glGetUniformLocationARB(mProgramObject, uniform.c_str()))
+				{
+					llerrs << "Uniform does not match." << llendl;
+				}
+				stop_glerror();
+			}
+			ret = iter->second;
 		}
 	}
 
-	return -1;
+	return ret;
+}
+
+GLint LLGLSLShader::getAttribLocation(U32 attrib)
+{
+	if (attrib < mAttribute.size())
+	{
+		return mAttribute[attrib];
+	}
+	else
+	{
+		return -1;
+	}
 }
 
 void LLGLSLShader::uniform1i(const string& uniform, GLint v)
@@ -882,7 +903,9 @@ void LLGLSLShader::uniformMatrix4fv(const string& uniform, U32 count, GLboolean 
 				
 	if (location >= 0)
 	{
+		stop_glerror();
 		glUniformMatrix4fvARB(location, count, transpose, v);
+		stop_glerror();
 	}
 }
 

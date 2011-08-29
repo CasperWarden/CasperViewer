@@ -1,9 +1,12 @@
 /**
  * @file sumLightsSpecularV.glsl
  *
- * Copyright (c) 2005-$CurrentYear$, Linden Research, Inc.
- * $License$
+ * $LicenseInfo:firstyear=2005&license=viewerlgpl$
+ * $/LicenseInfo$
  */
+  
+#version 120
+
 float calcDirectionalLightSpecular(inout vec4 specular, vec3 view, vec3 n, vec3 l, vec3 lightCol, float da);
 vec3 atmosAmbient(vec3 light);
 vec3 atmosAffectDirectionalLight(float lightIntensity);

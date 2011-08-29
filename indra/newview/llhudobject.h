@@ -74,7 +74,6 @@ public:
 	static LLHUDEffect *addHUDEffect(const U8 type);
 	static void updateAll();
 	static void renderAll();
-	static void renderAllForSelect();
 
 	static void markViewerEffectsDead();
 	static void renderAllForTimer();
@@ -108,7 +107,6 @@ protected:
 	~LLHUDObject();
 
 	virtual void render() = 0;
-	virtual void renderForSelect() {};
 	virtual void renderForTimer() {};
 	
 protected:

@@ -49,6 +49,7 @@
 #include "llviewerobjectlist.h"
 #include "llface.h"
 #include "llvoavatar.h"
+#include "llhudtext.h"
 
 #include "llglheaders.h"
 

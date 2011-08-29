@@ -35,10 +35,16 @@
 #define LL_LLQUANTIZE_H
 
 const U16 U16MAX = 65535;
-const F32 OOU16MAX = 1.f/(F32)(U16MAX);
+LL_ALIGN_16(const F32 F_U16MAX_4A[4]) = { 65535.f, 65535.f, 65535.f, 65535.f };
+
+const F32 OOU16MAX = 1.f / (F32)(U16MAX);
+LL_ALIGN_16(const F32 F_OOU16MAX_4A[4]) = { OOU16MAX, OOU16MAX, OOU16MAX, OOU16MAX };
 
 const U8 U8MAX = 255;
-const F32 OOU8MAX = 1.f/(F32)(U8MAX);
+LL_ALIGN_16(const F32 F_U8MAX_4A[4]) = { 255.f, 255.f, 255.f, 255.f };
+
+const F32 OOU8MAX = 1.f / (F32)(U8MAX);
+LL_ALIGN_16(const F32 F_OOU8MAX_4A[4]) = { OOU8MAX, OOU8MAX, OOU8MAX, OOU8MAX };
 
 const U8 FIRSTVALIDCHAR = 54;
 const U8 MAXSTRINGVAL = U8MAX - FIRSTVALIDCHAR; //we don't allow newline or null 
@@ -52,7 +58,7 @@ inline U16 F32_to_U16_ROUND(F32 val, F32 lower, F32 upper)
 	val /= (upper - lower);
 
 	// round the value.   Sreturn the U16
-	return (U16)(llround(val*U16MAX));
+	return (U16)(llround(val * U16MAX));
 }
 
 

@@ -1,9 +1,11 @@
 /** 
  * @file avatarAlphaF.glsl
  *
- * Copyright (c) 2007-$CurrentYear$, Linden Research, Inc.
- * $License$
+ * $LicenseInfo:firstyear=2007&license=viewerlgpl$
+ * $/LicenseInfo$
  */
+
+#version 120
 
 uniform sampler2D diffuseMap;
 uniform sampler2DShadow shadowMap0;
@@ -12,7 +14,7 @@ uniform sampler2DShadow shadowMap2;
 uniform sampler2DShadow shadowMap3;
 uniform sampler2D noiseMap;
 
-uniform mat4 shadow_matrix[4];
+uniform mat4 shadow_matrix[6];
 uniform vec4 shadow_clip;
 
 vec3 atmosLighting(vec3 light);

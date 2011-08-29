@@ -1,9 +1,11 @@
 /**
  * @file atmosphericsV.glsl
  *
- * Copyright (c) 2005-$CurrentYear$, Linden Research, Inc.
- * $License$
+ * $LicenseInfo:firstyear=2005&license=viewerlgpl$
+ * $/LicenseInfo$
  */
+ 
+#version 120
 
 // varying param funcs
 void setSunlitColor(vec3 v);

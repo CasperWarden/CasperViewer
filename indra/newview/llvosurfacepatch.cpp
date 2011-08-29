@@ -60,27 +60,77 @@ public:
 		LLVertexBuffer(MAP_VERTEX | MAP_NORMAL | MAP_TEXCOORD0 | MAP_TEXCOORD1 | MAP_COLOR, GL_DYNAMIC_DRAW_ARB)
 	{
 		//texture coordinates 2 and 3 exist, but use the same data as texture coordinate 1
-		mOffsets[TYPE_TEXCOORD3] = mOffsets[TYPE_TEXCOORD2] = mOffsets[TYPE_TEXCOORD1];
-		mTypeMask |= MAP_TEXCOORD2 | MAP_TEXCOORD3;
 	};
 
-	/*// virtual
+	// virtual
 	void setupVertexBuffer(U32 data_mask) const
-	{		
-		if (LLDrawPoolTerrain::getDetailMode() == 0 || LLPipeline::sShadowRender)
+	{	
+		U8* base = useVBOs() ? (U8*) mAlignedOffset : mMappedData;
+
+		//assume tex coords 2 and 3 are present
+		U32 type_mask = mTypeMask | MAP_TEXCOORD2 | MAP_TEXCOORD3;
+
+		if ((data_mask & type_mask) != data_mask)
 		{
-			LLVertexBuffer::setupVertexBuffer(data_mask);
+			llerrs << "LLVertexBuffer::setupVertexBuffer missing required components for supplied data mask." << llendl;
 		}
-		else if (data_mask & LLVertexBuffer::MAP_TEXCOORD1)
+
+		if (data_mask & MAP_NORMAL)
 		{
-			LLVertexBuffer::setupVertexBuffer(data_mask);
+			glNormalPointer(GL_FLOAT, LLVertexBuffer::sTypeSize[TYPE_NORMAL], (void*)(base + mOffsets[TYPE_NORMAL]));
 		}
-		else
+		if (data_mask & MAP_TEXCOORD3)
+		{	//substitute tex coord 0 for tex coord 3
+			glClientActiveTextureARB(GL_TEXTURE3_ARB);
+			glTexCoordPointer(2,GL_FLOAT, LLVertexBuffer::sTypeSize[TYPE_TEXCOORD0], (void*)(base + mOffsets[TYPE_TEXCOORD0]));
+			glClientActiveTextureARB(GL_TEXTURE0_ARB);
+		}
+		if (data_mask & MAP_TEXCOORD2)
+		{	//substitute tex coord 0 for tex coord 2
+			glClientActiveTextureARB(GL_TEXTURE2_ARB);
+			glTexCoordPointer(2,GL_FLOAT, LLVertexBuffer::sTypeSize[TYPE_TEXCOORD0], (void*)(base + mOffsets[TYPE_TEXCOORD0]));
+			glClientActiveTextureARB(GL_TEXTURE0_ARB);
+		}
+		if (data_mask & MAP_TEXCOORD1)
 		{
-			LLVertexBuffer::setupVertexBuffer(data_mask);
+			glClientActiveTextureARB(GL_TEXTURE1_ARB);
+			glTexCoordPointer(2,GL_FLOAT, LLVertexBuffer::sTypeSize[TYPE_TEXCOORD1], (void*)(base + mOffsets[TYPE_TEXCOORD1]));
+			glClientActiveTextureARB(GL_TEXTURE0_ARB);
 		}
-		llglassertok();		
-	}*/
+		if (data_mask & MAP_BINORMAL)
+		{
+			glClientActiveTextureARB(GL_TEXTURE2_ARB);
+			glTexCoordPointer(3,GL_FLOAT, LLVertexBuffer::sTypeSize[TYPE_BINORMAL], (void*)(base + mOffsets[TYPE_BINORMAL]));
+			glClientActiveTextureARB(GL_TEXTURE0_ARB);
+		}
+		if (data_mask & MAP_TEXCOORD0)
+		{
+			glTexCoordPointer(2,GL_FLOAT, LLVertexBuffer::sTypeSize[TYPE_TEXCOORD0], (void*)(base + mOffsets[TYPE_TEXCOORD0]));
+		}
+		if (data_mask & MAP_COLOR)
+		{
+			glColorPointer(4, GL_UNSIGNED_BYTE, LLVertexBuffer::sTypeSize[TYPE_COLOR], (void*)(base + mOffsets[TYPE_COLOR]));
+		}
+		
+		if (data_mask & MAP_WEIGHT)
+		{
+			glVertexAttribPointerARB(1, 1, GL_FLOAT, FALSE, LLVertexBuffer::sTypeSize[TYPE_WEIGHT], (void*)(base + mOffsets[TYPE_WEIGHT]));
+		}
+
+		if (data_mask & MAP_WEIGHT4 && sWeight4Loc != -1)
+		{
+			glVertexAttribPointerARB(sWeight4Loc, 4, GL_FLOAT, FALSE, LLVertexBuffer::sTypeSize[TYPE_WEIGHT4], (void*)(base+mOffsets[TYPE_WEIGHT4]));
+		}
+
+		if (data_mask & MAP_CLOTHWEIGHT)
+		{
+			glVertexAttribPointerARB(4, 4, GL_FLOAT, TRUE,  LLVertexBuffer::sTypeSize[TYPE_CLOTHWEIGHT], (void*)(base + mOffsets[TYPE_CLOTHWEIGHT]));
+		}
+		if (data_mask & MAP_VERTEX)
+		{
+			glVertexPointer(3,GL_FLOAT, LLVertexBuffer::sTypeSize[TYPE_VERTEX], (void*)(base + 0));
+		}
+	}
 };
 
 //============================================================================
@@ -103,12 +153,10 @@ LLVOSurfacePatch::LLVOSurfacePatch(const LLUUID &id, const LLPCode pcode, LLView
 	setScale(LLVector3(16.f, 16.f, 16.f)); // Hack for setting scale for bounding boxes/visibility.
 }
 
-
 LLVOSurfacePatch::~LLVOSurfacePatch()
 {
 	mPatchp = NULL;
 }
-
 
 void LLVOSurfacePatch::markDead()
 {
@@ -120,12 +168,10 @@ void LLVOSurfacePatch::markDead()
 	LLViewerObject::markDead();
 }
 
-
 BOOL LLVOSurfacePatch::isActive() const
 {
 	return FALSE;
 }
-
 
 void LLVOSurfacePatch::setPixelAreaAndAngle(LLAgent &agent)
 {
@@ -133,11 +179,9 @@ void LLVOSurfacePatch::setPixelAreaAndAngle(LLAgent &agent)
 	mPixelArea = 500*500;
 }
 
-
 void LLVOSurfacePatch::updateTextures()
 {
 }
-
 
 LLFacePool *LLVOSurfacePatch::getPool()
 {
@@ -145,7 +189,6 @@ LLFacePool *LLVOSurfacePatch::getPool()
 
 	return mPool;
 }
-
 
 LLDrawable *LLVOSurfacePatch::createDrawable(LLPipeline *pipeline)
 {
@@ -176,13 +219,20 @@ LLDrawable *LLVOSurfacePatch::createDrawable(LLPipeline *pipeline)
 	return mDrawable;
 }
 
+void LLVOSurfacePatch::updateGL()
+{
+	if (mPatchp)
+	{
+		mPatchp->updateGL();
+	}
+}
 
 BOOL LLVOSurfacePatch::updateGeometry(LLDrawable *drawable)
 {
 	LLFastTimer ftm(LLFastTimer::FTM_UPDATE_TERRAIN);
 
-	dirtySpatialGroup();
-	
+	dirtySpatialGroup(TRUE);
+
 	S32 min_comp, max_comp, range;
 	min_comp = lltrunc(mPatchp->getMinComposition());
 	max_comp = lltrunc(ceil(mPatchp->getMaxComposition()));
@@ -409,7 +459,6 @@ void LLVOSurfacePatch::updateMainGeometry(LLFace *facep,
 	}
 	index_offset += num_vertices;
 }
-
 
 void LLVOSurfacePatch::updateNorthGeometry(LLFace *facep,
 										LLStrider<LLVector3> &verticesp,
@@ -817,7 +866,6 @@ void LLVOSurfacePatch::setPatch(LLSurfacePatch *patchp)
 	dirtyPatch();
 };
 
-
 void LLVOSurfacePatch::dirtyPatch()
 {
 	mDirtiedPatch = TRUE;
@@ -837,7 +885,7 @@ void LLVOSurfacePatch::dirtyGeom()
 	if (mDrawable)
 	{
 		gPipeline.markRebuild(mDrawable, LLDrawable::REBUILD_ALL, TRUE);
-		mDrawable->getFace(0)->mVertexBuffer = NULL;
+		mDrawable->getFace(0)->setVertexBuffer(NULL);
 		mDrawable->movePartition();
 	}
 }
@@ -911,7 +959,6 @@ BOOL LLVOSurfacePatch::lineSegmentIntersect(const LLVector3& start, const LLVect
 									  LLVector3* intersection,LLVector2* tex_coord, LLVector3* normal, LLVector3* bi_normal)
 	
 {
-
 	if (!lineSegmentBoundingBox(start, end))
 	{
 		return FALSE;
@@ -936,7 +983,13 @@ BOOL LLVOSurfacePatch::lineSegmentIntersect(const LLVector3& start, const LLVect
 
 	//step one meter at a time until intersection point found
 
-	const LLVector3* ext = mDrawable->getSpatialExtents();
+	//VECTORIZE THIS
+	const LLVector4a* exta = mDrawable->getSpatialExtents();
+
+	LLVector3 ext[2];
+	ext[0].set(exta[0].getF32ptr());
+	ext[1].set(exta[1].getF32ptr());
+
 	F32 rad = (delta*tdelta).magVecSquared();
 
 	F32 t = 0.f;
@@ -998,13 +1051,16 @@ BOOL LLVOSurfacePatch::lineSegmentIntersect(const LLVector3& start, const LLVect
 	return FALSE;
 }
 
-void LLVOSurfacePatch::updateSpatialExtents(LLVector3& newMin, LLVector3 &newMax)
+void LLVOSurfacePatch::updateSpatialExtents(LLVector4a& newMin, LLVector4a &newMax)
 {
 	LLVector3 posAgent = getPositionAgent();
 	LLVector3 scale = getScale();
-	newMin = posAgent-scale*0.5f; // Changing to 2.f makes the culling a -little- better, but still wrong
-	newMax = posAgent+scale*0.5f;
-	mDrawable->setPositionGroup((newMin+newMax)*0.5f);
+	newMin.load3((posAgent - scale * 0.5f).mV); // Changing to 2.f makes the culling a -little- better, but still wrong
+	newMax.load3((posAgent + scale * 0.5f).mV);
+	LLVector4a pos;
+	pos.setAdd(newMin, newMax);
+	pos.mul(0.5f);
+	mDrawable->setPositionGroup(pos);
 }
 
 U32 LLVOSurfacePatch::getPartitionType() const
@@ -1013,12 +1069,10 @@ U32 LLVOSurfacePatch::getPartitionType() const
 }
 
 LLTerrainPartition::LLTerrainPartition()
-: LLSpatialPartition(LLDrawPoolTerrain::VERTEX_DATA_MASK)
+:	LLSpatialPartition(LLDrawPoolTerrain::VERTEX_DATA_MASK, FALSE, GL_DYNAMIC_DRAW_ARB)
 {
 	mOcclusionEnabled = FALSE;
-	mRenderByGroup = FALSE;
 	mInfiniteFarClip = TRUE;
-	mBufferUsage = GL_DYNAMIC_DRAW_ARB;
 	mDrawableType = LLPipeline::RENDER_TYPE_TERRAIN;
 	mPartitionType = LLViewerRegion::PARTITION_TERRAIN;
 }
@@ -1058,7 +1112,7 @@ void LLTerrainPartition::getGeometry(LLSpatialGroup* group)
 
 		facep->setIndicesIndex(indices_index);
 		facep->setGeomIndex(index_offset);
-		facep->mVertexBuffer = buffer;
+		facep->setVertexBuffer(buffer);
 
 		LLVOSurfacePatch* patchp = (LLVOSurfacePatch*) facep->getViewerObject();
 		patchp->getGeometry(vertices, normals, colors, texcoords, texcoords2, indices);
@@ -1070,4 +1124,3 @@ void LLTerrainPartition::getGeometry(LLSpatialGroup* group)
 	buffer->setBuffer(0);
 	mFaceList.clear();
 }
-

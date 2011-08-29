@@ -77,11 +77,11 @@ void LLDrawPoolClouds::prerender()
 void LLDrawPoolClouds::render(S32 pass)
 {
 	LLFastTimer ftm(LLFastTimer::FTM_RENDER_CLOUDS);
- 	if (!(gPipeline.hasRenderType(LLPipeline::RENDER_TYPE_CLOUDS)))
+ 	if (!gPipeline.hasRenderType(LLPipeline::RENDER_TYPE_CLOUDS))
 	{
 		return;
 	}
-	
+
 	if (mDrawFace.empty())
 	{
 		return;
@@ -91,16 +91,11 @@ void LLDrawPoolClouds::render(S32 pass)
 	LLGLDepthTest gls_depth(GL_TRUE, GL_FALSE);
 	glAlphaFunc(GL_GREATER,0.01f);
 
-	gPipeline.enableLightsFullbright(LLColor4(1.f,1.f,1.f));
+	gPipeline.enableLightsFullbright(LLColor4(1.f, 1.f, 1.f));
 
 	mDrawFace[0]->bindTexture();
 
 	std::sort(mDrawFace.begin(), mDrawFace.end(), LLFace::CompareDistanceGreater());
 
 	drawLoop();
-}
-
-
-void LLDrawPoolClouds::renderForSelect()
-{
 }

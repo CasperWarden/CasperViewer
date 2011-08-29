@@ -47,41 +47,42 @@
 
 #define DEFAULT_LOD 0.0f
 
-const S32 MIN_PIXEL_AREA_3PASS_HAIR = 64*64;
+const S32 MIN_PIXEL_AREA_3PASS_HAIR = 64 * 64;
 
 //-----------------------------------------------------------------------------
 // Static Data
 //-----------------------------------------------------------------------------
-BOOL					LLViewerJoint::sDisableLOD = FALSE;
+BOOL LLViewerJoint::sDisableLOD = FALSE;
 
 //-----------------------------------------------------------------------------
 // LLViewerJoint()
 // Class Constructor
 //-----------------------------------------------------------------------------
 LLViewerJoint::LLViewerJoint()
+:	LLJoint()
 {
-	mUpdateXform = TRUE;
-	mValid = FALSE;
-	mComponents = SC_JOINT | SC_BONE | SC_AXES;
-	mMinPixelArea = DEFAULT_LOD;
-	mPickName = PN_DEFAULT;
-	mVisible = TRUE;
+	init();
 }
-
 
 //-----------------------------------------------------------------------------
 // LLViewerJoint()
 // Class Constructor
 //-----------------------------------------------------------------------------
-LLViewerJoint::LLViewerJoint(const std::string &name, LLJoint *parent) :
-	LLJoint(name, parent)
+LLViewerJoint::LLViewerJoint(const std::string &name, LLJoint *parent)
+:	LLJoint(name, parent)
+{
+	init();
+}
+
+void LLViewerJoint::init()
 {
 	mValid = FALSE;
 	mComponents = SC_JOINT | SC_BONE | SC_AXES;
 	mMinPixelArea = DEFAULT_LOD;
 	mPickName = PN_DEFAULT;
+	mVisible = TRUE;
+	mMeshID = 0;
 }
-
 
 //-----------------------------------------------------------------------------
 // ~LLViewerJoint()
@@ -91,17 +92,16 @@ LLViewerJoint::~LLViewerJoint()
 {
 }
 
-
 //--------------------------------------------------------------------
 // setValid()
 //--------------------------------------------------------------------
-void LLViewerJoint::setValid( BOOL valid, BOOL recursive )
+void LLViewerJoint::setValid(BOOL valid, BOOL recursive)
 {
 	//----------------------------------------------------------------
 	// set visibility for this joint
 	//----------------------------------------------------------------
 	mValid = valid;
-	
+
 	//----------------------------------------------------------------
 	// set visibility for children
 	//----------------------------------------------------------------
@@ -143,7 +143,7 @@ void LLViewerJoint::setValid( BOOL valid, BOOL recursive )
 // 	// rotate to our orientation
 // 	//----------------------------------------------------------------
 // 	glLoadIdentity();
-// 	glMultMatrixf( &getWorldMatrix().mMatrix[0][0] );
+// 	glMultMatrixf(&getWorldMatrix().mMatrix[0][0]);
 
 // 	//----------------------------------------------------------------
 // 	// render joint axes
@@ -151,17 +151,17 @@ void LLViewerJoint::setValid( BOOL valid, BOOL recursive )
 // 	if (mComponents & SC_AXES)
 // 	{
 // 		gGL.begin(LLRender::LINES);
-// 		gGL.color3f( 1.0f, 0.0f, 0.0f );
-// 		gGL.vertex3f( 0.0f,            0.0f, 0.0f );
-// 		gGL.vertex3f( 0.1f, 0.0f, 0.0f );
+// 		gGL.color3f(1.0f, 0.0f, 0.0f);
+// 		gGL.vertex3f(0.0f,            0.0f, 0.0f);
+// 		gGL.vertex3f(0.1f, 0.0f, 0.0f);
 
-// 		gGL.color3f( 0.0f, 1.0f, 0.0f );
-// 		gGL.vertex3f( 0.0f, 0.0f,            0.0f );
-// 		gGL.vertex3f( 0.0f, 0.1f, 0.0f );
+// 		gGL.color3f(0.0f, 1.0f, 0.0f);
+// 		gGL.vertex3f(0.0f, 0.0f,            0.0f);
+// 		gGL.vertex3f(0.0f, 0.1f, 0.0f);
 
-// 		gGL.color3f( 0.0f, 0.0f, 1.0f );
-// 		gGL.vertex3f( 0.0f, 0.0f, 0.0f );
-// 		gGL.vertex3f( 0.0f, 0.0f, 0.1f );
+// 		gGL.color3f(0.0f, 0.0f, 1.0f);
+// 		gGL.vertex3f(0.0f, 0.0f, 0.0f);
+// 		gGL.vertex3f(0.0f, 0.0f, 0.1f);
 // 		gGL.end();
 // 	}
 
@@ -170,7 +170,7 @@ void LLViewerJoint::setValid( BOOL valid, BOOL recursive )
 // 	//----------------------------------------------------------------
 // 	if (mComponents & SC_JOINT)
 // 	{
-// 		gGL.color3f( 1.0f, 1.0f, 0.0f );
+// 		gGL.color3f(1.0f, 1.0f, 0.0f);
 
 // 		gGL.begin(LLRender::TRIANGLES);
 
@@ -184,7 +184,7 @@ void LLViewerJoint::setValid( BOOL valid, BOOL recursive )
 // 		gGL.vertex3f(0.0f,             0.0f, 0.05f);
 // 		gGL.vertex3f(0.0f,       0.05f,       0.0f);
 // 		gGL.vertex3f(-0.05f,      0.0f,       0.0f);
-		
+
 // 		glNormal3f(-nc, -nc, nc);
 // 		gGL.vertex3f(0.0f,             0.0f, 0.05f);
 // 		gGL.vertex3f(-0.05f,      0.0f,      0.0f);
@@ -194,7 +194,7 @@ void LLViewerJoint::setValid( BOOL valid, BOOL recursive )
 // 		gGL.vertex3f(0.0f,              0.0f, 0.05f);
 // 		gGL.vertex3f(0.0f,       -0.05f,       0.0f);
 // 		gGL.vertex3f(0.05f,        0.0f,       0.0f);
-		
+
 // 		// joint bottom half
 // 		glNormal3f(nc, nc, -nc);
 // 		gGL.vertex3f(0.0f,             0.0f, -0.05f);
@@ -205,7 +205,7 @@ void LLViewerJoint::setValid( BOOL valid, BOOL recursive )
 // 		gGL.vertex3f(0.0f,             0.0f, -0.05f);
 // 		gGL.vertex3f(-0.05f,      0.0f,        0.0f);
 // 		gGL.vertex3f(0.0f,       0.05f,        0.0f);
-		
+
 // 		glNormal3f(-nc, -nc, -nc);
 // 		gGL.vertex3f(0.0f,              0.0f, -0.05f);
 // 		gGL.vertex3f(0.0f,       -0.05f,        0.0f);
@@ -215,7 +215,7 @@ void LLViewerJoint::setValid( BOOL valid, BOOL recursive )
 // 		gGL.vertex3f(0.0f,             0.0f,  -0.05f);
 // 		gGL.vertex3f(0.05f,       0.0f,         0.0f);
 // 		gGL.vertex3f(0.0f,      -0.05f,         0.0f);
-		
+
 // 		gGL.end();
 // 	}
 
@@ -238,11 +238,10 @@ void LLViewerJoint::setValid( BOOL valid, BOOL recursive )
 // 	glPopMatrix();
 // }
 
-
 //--------------------------------------------------------------------
 // render()
 //--------------------------------------------------------------------
-U32 LLViewerJoint::render( F32 pixelArea, BOOL first_pass, BOOL is_dummy )
+U32 LLViewerJoint::render(F32 pixelArea, BOOL first_pass, BOOL is_dummy)
 {
 	stop_glerror();
 
@@ -251,23 +250,21 @@ U32 LLViewerJoint::render( F32 pixelArea, BOOL first_pass, BOOL is_dummy )
 	//----------------------------------------------------------------
 	// ignore invisible objects
 	//----------------------------------------------------------------
-	if ( mValid )
+	if (mValid)
 	{
-
-
 		//----------------------------------------------------------------
 		// if object is transparent, defer it, otherwise
 		// give the joint subclass a chance to draw itself
 		//----------------------------------------------------------------
-		if ( gRenderForSelect || is_dummy )
+		if (is_dummy)
 		{
-			triangle_count += drawShape( pixelArea, first_pass, is_dummy );
+			triangle_count += drawShape(pixelArea, first_pass, is_dummy);
 		}
 		else if (LLPipeline::sShadowRender)
 		{
-			triangle_count += drawShape(pixelArea, first_pass, is_dummy );
+			triangle_count += drawShape(pixelArea, first_pass, is_dummy);
 		}
-		else if ( isTransparent() && !LLPipeline::sReflectionRender)
+		else if (isTransparent() && !LLPipeline::sReflectionRender)
 		{
 			// Hair and Skirt
 			if ((pixelArea > MIN_PIXEL_AREA_3PASS_HAIR))
@@ -277,18 +274,18 @@ U32 LLViewerJoint::render( F32 pixelArea, BOOL first_pass, BOOL is_dummy )
 				// first pass renders without writing to the z buffer
 				{
 					LLGLDepthTest gls_depth(GL_TRUE, GL_FALSE);
-					triangle_count += drawShape( pixelArea, first_pass, is_dummy );
+					triangle_count += drawShape(pixelArea, first_pass, is_dummy);
 				}
 				// second pass writes to z buffer only
 				gGL.setColorMask(false, false);
 				{
-					triangle_count += drawShape( pixelArea, FALSE, is_dummy  );
+					triangle_count += drawShape(pixelArea, FALSE, is_dummy);
 				}
 				// third past respects z buffer and writes color
 				gGL.setColorMask(true, false);
 				{
 					LLGLDepthTest gls_depth(GL_TRUE, GL_FALSE);
-					triangle_count += drawShape( pixelArea, FALSE, is_dummy  );
+					triangle_count += drawShape(pixelArea, FALSE, is_dummy);
 				}
 			}
 			else
@@ -297,19 +294,19 @@ U32 LLViewerJoint::render( F32 pixelArea, BOOL first_pass, BOOL is_dummy )
 				glCullFace(GL_FRONT);
 				{
 					LLGLDepthTest gls_depth(GL_TRUE, GL_FALSE);
-					triangle_count += drawShape( pixelArea, first_pass, is_dummy  );
+					triangle_count += drawShape(pixelArea, first_pass, is_dummy);
 				}
 				// Render Outside (write to the Z buffer)
 				glCullFace(GL_BACK);
 				{
-					triangle_count += drawShape( pixelArea, FALSE, is_dummy  );
+					triangle_count += drawShape(pixelArea, FALSE, is_dummy);
 				}
 			}
 		}
 		else
 		{
 			// set up render state
-			triangle_count += drawShape( pixelArea, first_pass );
+			triangle_count += drawShape(pixelArea, first_pass);
 		}
 	}
 
@@ -323,7 +320,7 @@ U32 LLViewerJoint::render( F32 pixelArea, BOOL first_pass, BOOL is_dummy )
 		F32 jointLOD = joint->getLOD();
 		if (pixelArea >= jointLOD || sDisableLOD)
 		{
-			triangle_count += joint->render( pixelArea, TRUE, is_dummy );
+			triangle_count += joint->render(pixelArea, TRUE, is_dummy);
 
 			if (jointLOD != DEFAULT_LOD)
 			{
@@ -335,14 +332,13 @@ U32 LLViewerJoint::render( F32 pixelArea, BOOL first_pass, BOOL is_dummy )
 	return triangle_count;
 }
 
-
 //--------------------------------------------------------------------
 // drawBone()
 // DEBUG (UNUSED)
 //--------------------------------------------------------------------
 // void LLViewerJoint::drawBone()
 // {
-// 	if ( mParent == NULL )
+// 	if (mParent == NULL)
 // 		return;
 
 // 	F32 boneSize = 0.02f;
@@ -354,38 +350,38 @@ U32 LLViewerJoint::render( F32 pixelArea, BOOL first_pass, BOOL is_dummy )
 // 	F32 length = boneX.normVec();
 
 // 	LLVector3 boneZ(1.0f, 0.0f, 1.0f);
-	
+
 // 	LLVector3 boneY = boneZ % boneX;
 // 	boneY.normVec();
 
 // 	boneZ = boneX % boneY;
 
 // 	LLMatrix4 rotateMat;
-// 	rotateMat.setFwdRow( boneX );
-// 	rotateMat.setLeftRow( boneY );
-// 	rotateMat.setUpRow( boneZ );
-// 	glMultMatrixf( &rotateMat.mMatrix[0][0] );
+// 	rotateMat.setFwdRow(boneX);
+// 	rotateMat.setLeftRow(boneY);
+// 	rotateMat.setUpRow(boneZ);
+// 	glMultMatrixf(&rotateMat.mMatrix[0][0]);
 
 // 	// render the bone
-// 	gGL.color3f( 0.5f, 0.5f, 0.0f );
+// 	gGL.color3f(0.5f, 0.5f, 0.0f);
 
 // 	gGL.begin(LLRender::TRIANGLES);
 
-// 	gGL.vertex3f( length,     0.0f,       0.0f);
-// 	gGL.vertex3f( 0.0f,       boneSize,  0.0f);
-// 	gGL.vertex3f( 0.0f,       0.0f,       boneSize);
+// 	gGL.vertex3f(length,     0.0f,       0.0f);
+// 	gGL.vertex3f(0.0f,       boneSize,  0.0f);
+// 	gGL.vertex3f(0.0f,       0.0f,       boneSize);
 
-// 	gGL.vertex3f( length,     0.0f,        0.0f);
-// 	gGL.vertex3f( 0.0f,       0.0f,        -boneSize);
-// 	gGL.vertex3f( 0.0f,       boneSize,   0.0f);
+// 	gGL.vertex3f(length,     0.0f,        0.0f);
+// 	gGL.vertex3f(0.0f,       0.0f,        -boneSize);
+// 	gGL.vertex3f(0.0f,       boneSize,   0.0f);
 
-// 	gGL.vertex3f( length,     0.0f,        0.0f);
-// 	gGL.vertex3f( 0.0f,       -boneSize,  0.0f);
-// 	gGL.vertex3f( 0.0f,       0.0f,        -boneSize);
+// 	gGL.vertex3f(length,     0.0f,        0.0f);
+// 	gGL.vertex3f(0.0f,       -boneSize,  0.0f);
+// 	gGL.vertex3f(0.0f,       0.0f,        -boneSize);
 
-// 	gGL.vertex3f( length,     0.0f,        0.0f);
-// 	gGL.vertex3f( 0.0f,       0.0f,        boneSize);
-// 	gGL.vertex3f( 0.0f,       -boneSize,  0.0f);
+// 	gGL.vertex3f(length,     0.0f,        0.0f);
+// 	gGL.vertex3f(0.0f,       0.0f,        boneSize);
+// 	gGL.vertex3f(0.0f,       -boneSize,  0.0f);
 
 // 	gGL.end();
 
@@ -404,7 +400,7 @@ BOOL LLViewerJoint::isTransparent()
 //--------------------------------------------------------------------
 // drawShape()
 //--------------------------------------------------------------------
-U32 LLViewerJoint::drawShape( F32 pixelArea, BOOL first_pass, BOOL is_dummy )
+U32 LLViewerJoint::drawShape(F32 pixelArea, BOOL first_pass, BOOL is_dummy)
 {
 	return 0;
 }
@@ -412,7 +408,7 @@ U32 LLViewerJoint::drawShape( F32 pixelArea, BOOL first_pass, BOOL is_dummy )
 //--------------------------------------------------------------------
 // setSkeletonComponents()
 //--------------------------------------------------------------------
-void LLViewerJoint::setSkeletonComponents( U32 comp, BOOL recursive )
+void LLViewerJoint::setSkeletonComponents(U32 comp, BOOL recursive)
 {
 	mComponents = comp;
 	if (recursive)
@@ -436,13 +432,13 @@ void LLViewerJoint::updateFaceSizes(U32 &num_vertices, U32& num_indices, F32 pix
 	}
 }
 
-void LLViewerJoint::updateFaceData(LLFace *face, F32 pixel_area, BOOL damp_wind)
+void LLViewerJoint::updateFaceData(LLFace *face, F32 pixel_area, BOOL damp_wind, bool terse_update)
 {
 	for (child_list_t::iterator iter = mChildren.begin();
 		 iter != mChildren.end(); ++iter)
 	{
 		LLViewerJoint* joint = (LLViewerJoint*)(*iter);
-		joint->updateFaceData(face, pixel_area, damp_wind);
+		joint->updateFaceData(face, pixel_area, damp_wind, terse_update);
 	}
 }
 
@@ -456,7 +452,6 @@ void LLViewerJoint::updateJointGeometry()
 	}
 }
 
-
 BOOL LLViewerJoint::updateLOD(F32 pixel_area, BOOL activate)
 {
 	BOOL lod_changed = FALSE;
@@ -467,7 +462,7 @@ BOOL LLViewerJoint::updateLOD(F32 pixel_area, BOOL activate)
 	{
 		LLViewerJoint* joint = (LLViewerJoint*)(*iter);
 		F32 jointLOD = joint->getLOD();
-		
+
 		if (found_lod || jointLOD == DEFAULT_LOD)
 		{
 			// we've already found a joint to enable, so enable the rest as alternatives
@@ -514,7 +509,6 @@ void LLViewerJoint::setVisible(BOOL visible, BOOL recursive)
 	}
 }
 
-
 void LLViewerJoint::setMeshesToChildren()
 {
 	removeAllChildren();
@@ -535,20 +529,20 @@ LLViewerJointCollisionVolume::LLViewerJointCollisionVolume()
 
 LLViewerJointCollisionVolume::LLViewerJointCollisionVolume(const std::string &name, LLJoint *parent) : LLViewerJoint(name, parent)
 {
-	
+
 }
 
 void LLViewerJointCollisionVolume::renderCollision()
 {
 	updateWorldMatrix();
-	
-	gGL.pushMatrix();
-	glMultMatrixf( &mXform.getWorldMatrix().mMatrix[0][0] );
 
-	gGL.color3f( 0.f, 0.f, 1.f );
-	
+	gGL.pushMatrix();
+	glMultMatrixf(&mXform.getWorldMatrix().mMatrix[0][0]);
+
+	gGL.color3f(0.f, 0.f, 1.f);
+
 	gGL.begin(LLRender::LINES);
-	
+
 	LLVector3 v[] = 
 	{
 		LLVector3(1,0,0),
@@ -573,7 +567,6 @@ void LLViewerJointCollisionVolume::renderCollision()
 	gGL.vertex3fv(v[1].mV); 
 	gGL.vertex3fv(v[3].mV);
 
-
 	//top
 	gGL.vertex3fv(v[0].mV); 
 	gGL.vertex3fv(v[4].mV);
@@ -586,7 +579,6 @@ void LLViewerJointCollisionVolume::renderCollision()
 
 	gGL.vertex3fv(v[3].mV); 
 	gGL.vertex3fv(v[4].mV);
-
 
 	//bottom
 	gGL.vertex3fv(v[0].mV); 
@@ -609,7 +601,7 @@ void LLViewerJointCollisionVolume::renderCollision()
 LLVector3 LLViewerJointCollisionVolume::getVolumePos(LLVector3 &offset)
 {
 	mUpdateXform = TRUE;
-	
+
 	LLVector3 result = offset;
 	result.scaleVec(getScale());
 	result.rotVec(getWorldRotation());

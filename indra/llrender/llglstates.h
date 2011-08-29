@@ -45,7 +45,9 @@ public:
 	LLGLDepthTest(GLboolean depth_enabled, GLboolean write_enabled = GL_TRUE, GLenum depth_func = GL_LEQUAL);
 	
 	~LLGLDepthTest();
-	
+
+	void checkState();
+
 	GLboolean mPrevDepthEnabled;
 	GLenum mPrevDepthFunc;
 	GLboolean mPrevWriteEnabled;

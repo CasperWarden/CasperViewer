@@ -35,7 +35,6 @@
 #include "lldrawpoolsimple.h"
 
 #include "llviewercamera.h"
-#include "llagent.h"
 #include "lldrawable.h"
 #include "llface.h"
 #include "llsky.h"
@@ -53,8 +52,12 @@ void LLDrawPoolGlow::render(S32 pass)
 	LLFastTimer t(LLFastTimer::FTM_RENDER_GLOW);
 	LLGLEnable blend(GL_BLEND);
 	LLGLDisable test(GL_ALPHA_TEST);
+	gGL.flush();
+	/// Get rid of z-fighting with non-glow pass.
+	LLGLEnable polyOffset(GL_POLYGON_OFFSET_FILL);
+	glPolygonOffset(-1.0f, -1.0f);
 	gGL.setSceneBlendType(LLRender::BT_ADD);
-	
+
 	U32 shader_level = LLViewerShaderMgr::instance()->getVertexShaderLevel(LLViewerShaderMgr::SHADER_OBJECT);
 
 	if (shader_level > 0 && fullbright_shader)
@@ -69,10 +72,10 @@ void LLDrawPoolGlow::render(S32 pass)
 	LLGLDepthTest depth(GL_TRUE, GL_FALSE);
 	gGL.setColorMask(false, true);
 	renderTexture(LLRenderPass::PASS_GLOW, getVertexDataMask());
-	
+
 	gGL.setColorMask(true, false);
 	gGL.setSceneBlendType(LLRender::BT_ALPHA);
-	
+
 	if (shader_level > 0 && fullbright_shader)
 	{
 		fullbright_shader->unbind();
@@ -119,7 +122,7 @@ void LLDrawPoolSimple::beginRenderPass(S32 pass)
 		if (gGLManager.mHasShaderObjects)
 		{
 			LLGLSLShader::bindNoShader();
-		}		
+		}
 	}
 }
 
@@ -138,7 +141,7 @@ void LLDrawPoolSimple::render(S32 pass)
 {
 	LLGLDisable blend(GL_BLEND);
 	LLGLDisable alpha_test(GL_ALPHA_TEST);
-	
+
 	{ //render simple
 		LLFastTimer t(LLFastTimer::FTM_RENDER_SIMPLE);
 		gPipeline.enableLightsDynamic();
@@ -146,6 +149,9 @@ void LLDrawPoolSimple::render(S32 pass)
 
 		if (LLPipeline::sRenderDeferred)
 		{
+			// If deferred rendering is enabled, bump faces aren't registered
+			// as simple render bump faces here as simple so bump faces will
+			// appear under water
 			renderTexture(LLRenderPass::PASS_BUMP, getVertexDataMask());
 		}
 	}
@@ -216,7 +222,7 @@ void LLDrawPoolGrass::beginRenderPass(S32 pass)
 		if (gGLManager.mHasShaderObjects)
 		{
 			LLGLSLShader::bindNoShader();
-		}		
+		}
 	}
 }
 
@@ -242,7 +248,7 @@ void LLDrawPoolGrass::render(S32 pass)
 		gGL.setSceneBlendType(LLRender::BT_ALPHA);
 		//render grass
 		LLRenderPass::renderTexture(LLRenderPass::PASS_GRASS, getVertexDataMask());
-	}			
+	}
 
 	gGL.setAlphaRejectSettings(LLRender::CF_DEFAULT);
 }
@@ -259,7 +265,7 @@ void LLDrawPoolGrass::endDeferredPass(S32 pass)
 
 void LLDrawPoolGrass::renderDeferred(S32 pass)
 {
-	gGL.setAlphaRejectSettings(LLRender::CF_GREATER, 0.5f);
+	gGL.setAlphaRejectSettings(LLRender::CF_GREATER, 0.f);
 
 	{
 		LLFastTimer t(LLFastTimer::FTM_RENDER_GRASS);
@@ -267,7 +273,7 @@ void LLDrawPoolGrass::renderDeferred(S32 pass)
 		LLGLEnable test(GL_ALPHA_TEST);
 		//render grass
 		LLRenderPass::renderTexture(LLRenderPass::PASS_GRASS, getVertexDataMask());
-	}			
+	}
 
 	gGL.setAlphaRejectSettings(LLRender::CF_DEFAULT);
 }
@@ -287,7 +293,7 @@ void LLDrawPoolFullbright::prerender()
 void LLDrawPoolFullbright::beginRenderPass(S32 pass)
 {
 	LLFastTimer t(LLFastTimer::FTM_RENDER_FULLBRIGHT);
-	
+
 	if (LLPipeline::sUnderWaterRender)
 	{
 		fullbright_shader = &gObjectFullbrightWaterProgram;
@@ -321,9 +327,9 @@ void LLDrawPoolFullbright::render(S32 pass)
 	{
 		gPipeline.enableLightsFullbright(LLColor4(1,1,1,1));
 	}
-	
+
 	//gGL.setAlphaRejectSettings(LLRender::CF_GREATER, 0.25f);
-	
+
 	//LLGLEnable test(GL_ALPHA_TEST);
 	//LLGLEnable blend(GL_BLEND);
 	gGL.setSceneBlendType(LLRender::BT_ALPHA);
@@ -337,4 +343,3 @@ S32 LLDrawPoolFullbright::getNumPasses()
 { 
 	return 1;
 }
-

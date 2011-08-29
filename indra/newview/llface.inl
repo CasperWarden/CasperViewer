@@ -102,7 +102,7 @@ inline S32	LLFace::getColors     (LLStrider<LLColor4U> &colors)
 	}
 }
 
-inline S32	LLFace::getTexCoords  (LLStrider<LLVector2> &texCoords, S32 pass )
+inline S32	LLFace::getTexCoords  (LLStrider<LLVector2> &texCoords, S32 pass)
 {
 	if (!mGeomCount)
 	{
@@ -116,13 +116,13 @@ inline S32	LLFace::getTexCoords  (LLStrider<LLVector2> &texCoords, S32 pass )
 			llerrs << "No backup memory for face" << llendl;
 		}
 		texCoords = (LLVector2*)(mBackupMem + (4 * mIndicesCount) + mDrawPoolp->mDataOffsets[LLDrawPool::DATA_TEX_COORDS0 + pass]);
-		texCoords.setStride( mDrawPoolp->getStride());
+		texCoords.setStride(mDrawPoolp->getStride());
 		return 0;
 	}
 	else
 	{
 		llassert(mGeomIndex >= 0);
-		mDrawPoolp->getTexCoordStrider(texCoords, mGeomIndex, pass );
+		mDrawPoolp->getTexCoordStrider(texCoords, mGeomIndex, pass);
 		mDrawPoolp->setDirty();
 		return mGeomIndex;
 	}
@@ -149,7 +149,6 @@ inline const U32* LLFace::getRawIndices() const
 
 	return &mDrawPoolp->mIndices[mIndicesIndex];
 }
-
 
 inline void LLFace::bindTexture(S32 stage) const
 {

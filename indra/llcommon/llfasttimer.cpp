@@ -153,10 +153,22 @@ U64 LLFastTimer::countsPerSecond() // counts per second for the *32-bit* timer
 void LLFastTimer::reset()
 {
 	countsPerSecond(); // good place to calculate clock frequency
-	
+
 	if (sCurDepth != 0)
 	{
-		llerrs << "LLFastTimer::Reset() when sCurDepth != 0" << llendl;
+		//llerrs << "LLFastTimer::Reset() when sCurDepth != 0" << llendl;
+		static bool warned = false;	// Since LL_WARNS_ONCE is broken...
+		if (warned)
+		{
+			LL_DEBUGS("FastTimer") << "LLFastTimer::Reset() when sCurDepth != 0 ("
+								   << sCurDepth << ")" << LL_ENDL;
+		}
+		else
+		{
+			LL_WARNS("FastTimer") << "LLFastTimer::Reset() when sCurDepth != 0 ("
+								  << sCurDepth << ")" << LL_ENDL;
+			warned = true;
+		}
 	}
 	if (sPauseHistory)
 	{

@@ -1,9 +1,11 @@
 /** 
  * @file avatarShadowV.glsl
  *
- * Copyright (c) 2007-$CurrentYear$, Linden Research, Inc.
- * $License$
+ * $LicenseInfo:firstyear=2007&license=viewerlgpl$
+ * $/LicenseInfo$
  */
+ 
+#version 120
 
 mat4 getSkinnedTransform();
 
@@ -28,8 +30,7 @@ void main()
 	norm = normalize(norm);
 	
 	pos = gl_ProjectionMatrix * pos;
-	//smash geometry against near clip plane
-	pos.z = max(pos.z, -1.0);
+	pos.z = max(pos.z, -pos.w+0.01);
 	gl_Position = pos;
 	
 	gl_FrontColor = gl_Color;

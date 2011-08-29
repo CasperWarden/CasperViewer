@@ -64,6 +64,7 @@ public:
 	virtual U32 getPartitionType() const;
 
 	/*virtual*/ LLDrawable* createDrawable(LLPipeline *pipeline);
+	/*virtual*/ void		updateGL();
 	/*virtual*/ BOOL        updateGeometry(LLDrawable *drawable);
 	/*virtual*/ BOOL		updateLOD();
 	/*virtual*/ void		updateFaceSize(S32 idx);
@@ -77,7 +78,7 @@ public:
 	/*virtual*/ void updateTextures();
 	/*virtual*/ void setPixelAreaAndAngle(LLAgent &agent); // generate accurate apparent angle and area
 
-	/*virtual*/ void updateSpatialExtents(LLVector3& newMin, LLVector3& newMax);
+	/*virtual*/ void updateSpatialExtents(LLVector4a& newMin, LLVector4a& newMax);
 	/*virtual*/ BOOL isActive() const; // Whether this object needs to do an idleUpdate.
 
 	void setPatch(LLSurfacePatch *patchp);

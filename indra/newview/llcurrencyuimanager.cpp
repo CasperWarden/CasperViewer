@@ -32,6 +32,8 @@
 
 #include "llviewerprecompiledheaders.h"
 
+#include "llxmlrpctransaction.h"	// Let it there to avoid conflicts with the State enum and other headers
+
 #include "lluictrlfactory.h"
 #include "lltextbox.h"
 #include "lllineeditor.h"

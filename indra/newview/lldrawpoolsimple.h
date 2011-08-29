@@ -48,7 +48,7 @@ public:
 	virtual U32 getVertexDataMask() { return VERTEX_DATA_MASK; }
 
 	LLDrawPoolSimple();
-	
+
 	/*virtual*/ S32 getNumDeferredPasses() { return 1; }
 	/*virtual*/ void beginDeferredPass(S32 pass);
 	/*virtual*/ void endDeferredPass(S32 pass);
@@ -76,7 +76,7 @@ public:
 	virtual U32 getVertexDataMask() { return VERTEX_DATA_MASK; }
 
 	LLDrawPoolGrass();
-	
+
 	/*virtual*/ S32 getNumDeferredPasses() { return 1; }
 	/*virtual*/ void beginDeferredPass(S32 pass);
 	/*virtual*/ void endDeferredPass(S32 pass);
@@ -102,7 +102,7 @@ public:
 	virtual U32 getVertexDataMask() { return VERTEX_DATA_MASK; }
 
 	LLDrawPoolFullbright();
-	
+
 	/*virtual*/ S32 getNumPostDeferredPasses() { return 1; }
 	/*virtual*/ void beginPostDeferredPass(S32 pass) { beginRenderPass(pass); }
 	/*virtual*/ void endPostDeferredPass(S32 pass) { endRenderPass(pass); }
@@ -120,7 +120,7 @@ class LLDrawPoolGlow : public LLRenderPass
 {
 public:
 	LLDrawPoolGlow(): LLRenderPass(LLDrawPool::POOL_GLOW) { }
-	
+
 	enum
 	{
 		VERTEX_DATA_MASK =	LLVertexBuffer::MAP_VERTEX |

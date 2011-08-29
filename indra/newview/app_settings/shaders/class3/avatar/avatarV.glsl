@@ -1,9 +1,11 @@
 /** 
  * @file avatarV.glsl
  *
- * Copyright (c) 2007-$CurrentYear$, Linden Research, Inc.
- * $License$
+ * $LicenseInfo:firstyear=2007&license=viewerlgpl$
+ * $/LicenseInfo$
  */
+ 
+#version 120
 
 vec4 calcLighting(vec3 pos, vec3 norm, vec4 color, vec4 baseCol);
 mat4 getSkinnedTransform();

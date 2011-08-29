@@ -68,45 +68,6 @@ void drawSolidSphere(GLdouble radius, GLint slices, GLint stacks)
 }
 
 
-// lat = 0 is Z-axis
-// lon = 0, lat = 90 at X-axis
-void lat2xyz(LLVector3 * result, F32 lat, F32 lon)
-{
-	// Convert a latitude and longitude to x,y,z on a normal sphere and return it in result
-	F32 r;
-	result->mV[VX] = (F32) (cos(lon * DEG_TO_RAD) * sin(lat * DEG_TO_RAD));
-	result->mV[VY] = (F32) (sin(lon * DEG_TO_RAD) * sin(lat * DEG_TO_RAD));
-	r = (F32) pow(result->mV[VX] * result->mV[VX] + result->mV[VY] * result->mV[VY], 0.5f);
-	if (r == 1.0f) 
-	{
-		result->mV[VZ] = 0.0f;
-	}
-	else
-	{
-		result->mV[VZ] = (F32) pow(1 - r*r, 0.5f);
-		if (lat > 90.01)
-		{
-			result->mV[VZ] *= -1.0;
-		}
-	}
-}
-
-void lat2xyz_rad(LLVector3 * result, F32 lat, F32 lon)
-{
-	// Convert a latitude and longitude to x,y,z on a normal sphere and return it in result
-	F32 r;
-	result->mV[VX] = (F32) (cos(lon) * sin(lat));
-	result->mV[VY] = (F32) (sin(lon) * sin(lat));
-	r = (F32) pow(result->mV[VX] * result->mV[VX] + result->mV[VY] * result->mV[VY], 0.5f);
-	if (r == 1.0f) 
-		result->mV[VZ] = 0.0f;
-	else
-	{
-		result->mV[VZ] = (F32) pow(1 - r*r, 0.5f);
-		if (lat > F_PI_BY_TWO) result->mV[VZ] *= -1.0;
-	}
-}
-
 // A couple thoughts on sphere drawing:
 // 1) You need more slices than stacks, but little less than 2:1
 // 2) At low LOD, setting stacks to an odd number avoids a "band" around the equator, making things look smoother

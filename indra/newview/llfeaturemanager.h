@@ -95,12 +95,16 @@ protected:
 	feature_map_t	mFeatures;
 };
 
-
 class LLFeatureManager : public LLFeatureList, public LLSingleton<LLFeatureManager>
 {
 public:
-	LLFeatureManager() :
-		LLFeatureList("default"), mInited(FALSE), mTableVersion(0), mSafe(FALSE), mGPUClass(GPU_CLASS_UNKNOWN)
+	LLFeatureManager()
+	:	LLFeatureList("default"),
+		mInited(FALSE),
+		mTableVersion(0),
+		mSafe(FALSE),
+		mGPUClass(GPU_CLASS_UNKNOWN),
+		mGPUSupported(FALSE)
 	{
 	}
 	~LLFeatureManager() {cleanupFeatureTables();}
@@ -141,7 +145,6 @@ public:
 protected:
 	void loadGPUClass();
 	void initBaseMask();
-
 
 	std::map<std::string, LLFeatureList *> mMaskList;
 	std::set<std::string> mSkippedFeatures;

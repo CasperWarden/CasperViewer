@@ -104,9 +104,12 @@ public:
 	// Extra parameter IDs
 	enum
 	{
-		PARAMS_FLEXIBLE = 0x10,
-		PARAMS_LIGHT    = 0x20,
-		PARAMS_SCULPT   = 0x30
+		PARAMS_FLEXIBLE		= 0x10,
+		PARAMS_LIGHT		= 0x20,
+		PARAMS_SCULPT		= 0x30,
+		PARAMS_LIGHT_IMAGE	= 0x40,
+		PARAMS_RESERVED		= 0x50, // Used on server-side
+		PARAMS_MESH			= 0x60,
 	};
 	
 public:
@@ -238,7 +241,7 @@ public:
 	bool operator==(const LLNetworkData& data) const;
 	void copy(const LLNetworkData& data);
 	LLSD asLLSD() const;
-	operator LLSD() const { return asLLSD(); }
+	operator LLSD() const						{ return asLLSD(); }
 	bool fromLLSD(LLSD& sd);
 };// end of attributes structure
 
@@ -257,7 +260,7 @@ public:
 	/*virtual*/ bool operator==(const LLNetworkData& data) const;
 	/*virtual*/ void copy(const LLNetworkData& data);
 	LLSD asLLSD() const;
-	operator LLSD() const { return asLLSD(); }
+	operator LLSD() const					{ return asLLSD(); }
 	bool fromLLSD(LLSD& sd);
 
 	void setSculptTexture(const LLUUID& id) { mSculptTexture = id; }
@@ -266,7 +269,29 @@ public:
 	U8 getSculptType()                      { return mSculptType; }
 };
 
+class LLLightImageParams : public LLNetworkData
+{
+protected:
+	LLUUID mLightTexture;
+	LLVector3 mParams;
 
+public:
+	LLLightImageParams();
+	/*virtual*/ BOOL pack(LLDataPacker &dp) const;
+	/*virtual*/ BOOL unpack(LLDataPacker &dp);
+	/*virtual*/ bool operator==(const LLNetworkData& data) const;
+	/*virtual*/ void copy(const LLNetworkData& data);
+	LLSD asLLSD() const;
+	operator LLSD() const					{ return asLLSD(); }
+	bool fromLLSD(LLSD& sd);
+
+	void setLightTexture(const LLUUID& id)	{ mLightTexture = id; }
+	LLUUID getLightTexture() const			{ return mLightTexture; }
+	bool isLightSpotlight() const			{ return mLightTexture.notNull(); }
+	void setParams(const LLVector3& params)	{ mParams = params; }
+	LLVector3 getParams() const				{ return mParams; }
+	
+};
 
 class LLPrimitive : public LLXform
 {
@@ -421,6 +446,7 @@ protected:
 	U8					mNumTEs;			// # of faces on the primitve	
 	U32 				mMiscFlags;			// home for misc bools
 
+public:
 	static LLVolumeMgr* sVolumeManager;
 };
 
